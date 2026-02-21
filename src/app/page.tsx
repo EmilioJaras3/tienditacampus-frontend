@@ -10,6 +10,7 @@ import {
     ShieldCheck,
     ArrowRight,
     Store,
+    Truck,
     Users,
     Zap,
     ChevronDown,
@@ -259,39 +260,68 @@ export default function Home() {
             </header>
 
             {/* ─── Features ─── */}
-            <section id="features" className="relative bg-bg py-24 px-6">
-                <div className="mx-auto max-w-7xl">
-                    <div className="mb-16 text-center">
-                        <p className="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
-                            Funciones Principales
-                        </p>
-                        <h2 className="text-3xl font-extrabold tracking-tight text-text sm:text-4xl">
-                            Todo lo que necesitas para vender mejor
+            <section id="features" className="py-20 border-y-2 border-slate-900 dark:border-white bg-white dark:bg-[#202020] px-6">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-black uppercase text-slate-900 dark:text-white mb-4">
+                            ¿Por qué{' '}
+                            <span className="bg-[#FFC72C] text-slate-900 px-2 inline-block -rotate-1 transform">
+                                Tiendita?
+                            </span>
                         </h2>
-                        <p className="mx-auto mt-4 max-w-xl text-text-secondary">
-                            Diseñado específicamente para las necesidades de vendedores dentro del campus universitario.
+                        <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-lg">
+                            La economía circular de tu universidad, digitalizada y sin rollos.
                         </p>
                     </div>
 
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <FeatureCard
-                            icon={BarChart3}
-                            title="Rentabilidad Real"
-                            description="Calcula automáticamente tus márgenes de ganancia diarios y semanales. Sabe exactamente cuánto ganas por cada producto."
-                            gradient="bg-gradient-to-br from-primary to-blue-600"
-                        />
-                        <FeatureCard
-                            icon={Package}
-                            title="Control de Inventario"
-                            description="Registra productos perecederos, controla fechas de vencimiento y minimiza las pérdidas por caducidad."
-                            gradient="bg-gradient-to-br from-secondary to-orange-600"
-                        />
-                        <FeatureCard
-                            icon={TrendingUp}
-                            title="Reportes Semanales"
-                            description="Visualiza tu progreso con reportes automatizados. Identifica tendencias y toma decisiones informadas."
-                            gradient="bg-gradient-to-br from-success to-emerald-600"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="bg-[#f8f8f8] dark:bg-[#1a1a1a] border-2 border-slate-900 dark:border-white p-8 relative shadow-[6px_6px_0px_0px_#FFC72C] hover:translate-y-1 hover:shadow-none transition-all duration-200">
+                            <div className="absolute -top-6 -right-6 w-12 h-12 bg-[#FFC72C] border-2 border-slate-900 dark:border-white flex items-center justify-center text-xl font-bold">
+                                01
+                            </div>
+                            <div className="w-16 h-16 bg-slate-900 dark:bg-white mb-6 flex items-center justify-center border-2 border-[#FFC72C]">
+                                <Store className="text-[#FFC72C] dark:text-slate-900" size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold uppercase mb-4 text-slate-900 dark:text-white">Tu Puesto Digital</h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-6">
+                                Olvídate de pegar carteles. Sube tus productos, gestiona tu stock y recibe pedidos directamente en tu celular.
+                            </p>
+                            <Link className="inline-flex items-center text-[#E31837] font-bold uppercase hover:underline decoration-2 underline-offset-4" href="/register">
+                                Empezar a vender <ArrowRight size={16} className="ml-1" />
+                            </Link>
+                        </div>
+
+                        <div className="bg-[#f8f8f8] dark:bg-[#1a1a1a] border-2 border-slate-900 dark:border-white p-8 relative shadow-[6px_6px_0px_0px_#E31837] hover:translate-y-1 hover:shadow-none transition-all duration-200">
+                            <div className="absolute -top-6 -right-6 w-12 h-12 bg-white text-slate-900 border-2 border-slate-900 flex items-center justify-center text-xl font-bold">
+                                02
+                            </div>
+                            <div className="w-16 h-16 bg-[#E31837] mb-6 flex items-center justify-center border-2 border-slate-900 dark:border-white">
+                                <Truck className="text-white" size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold uppercase mb-4 text-slate-900 dark:text-white">Delivery en Facultad</h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-6">
+                                ¿Estás en clase? Coordina la entrega en tu salón o en puntos de encuentro seguros dentro del campus.
+                            </p>
+                            <a className="inline-flex items-center text-[#E31837] font-bold uppercase hover:underline decoration-2 underline-offset-4" href="#cta">
+                                Ver mapa de entregas <ArrowRight size={16} className="ml-1" />
+                            </a>
+                        </div>
+
+                        <div className="bg-[#f8f8f8] dark:bg-[#1a1a1a] border-2 border-slate-900 dark:border-white p-8 relative shadow-[6px_6px_0px_0px_#FFC72C] hover:translate-y-1 hover:shadow-none transition-all duration-200">
+                            <div className="absolute -top-6 -right-6 w-12 h-12 bg-[#FFC72C] border-2 border-slate-900 dark:border-white flex items-center justify-center text-xl font-bold">
+                                03
+                            </div>
+                            <div className="w-16 h-16 bg-slate-900 dark:bg-white mb-6 flex items-center justify-center border-2 border-[#FFC72C]">
+                                <ShieldCheck className="text-[#FFC72C] dark:text-slate-900" size={28} />
+                            </div>
+                            <h3 className="text-2xl font-bold uppercase mb-4 text-slate-900 dark:text-white">Comunidad Segura</h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-6">
+                                Solo usuarios con correo institucional verificado. Sistema de reputación para compradores y vendedores.
+                            </p>
+                            <a className="inline-flex items-center text-[#E31837] font-bold uppercase hover:underline decoration-2 underline-offset-4" href="#cta">
+                                Conocer normas <ArrowRight size={16} className="ml-1" />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
