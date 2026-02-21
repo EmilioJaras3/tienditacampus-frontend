@@ -12,10 +12,12 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
-    const { isAuthenticated, token, user } = useAuthStore();
+    const { isAuthenticated, token, user, _hasHydrated } = useAuthStore();
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
+        if (!_hasHydrated) return; // Wait for localStorage to inject the token
+
         // Validación de autenticación y rol
         if (!token || !isAuthenticated || !user) {
             router.push('/login');
@@ -24,9 +26,9 @@ export default function DashboardLayout({
         } else {
             setIsChecking(false);
         }
-    }, [token, isAuthenticated, user, router]);
+    }, [token, isAuthenticated, user, router, _hasHydrated]);
 
-    if (isChecking) {
+    if (isChecking || !_hasHydrated) {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-background">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />

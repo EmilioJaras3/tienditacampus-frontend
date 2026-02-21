@@ -11,12 +11,14 @@ import { ordersService, Order } from '@/services/orders.service';
 
 export default function BuyerDashboardPage() {
     const router = useRouter();
-    const { user, isAuthenticated, token, logout } = useAuthStore();
+    const { user, isAuthenticated, token, logout, _hasHydrated } = useAuthStore();
     const [isChecking, setIsChecking] = useState(true);
     const [purchases, setPurchases] = useState<Order[]>([]);
     const [loadingPurchases, setLoadingPurchases] = useState(true);
 
     useEffect(() => {
+        if (!_hasHydrated) return;
+
         if (!token || !isAuthenticated || !user) {
             router.push('/login');
         } else if (user.role === 'seller') {
@@ -25,7 +27,7 @@ export default function BuyerDashboardPage() {
             setIsChecking(false);
             loadPurchases();
         }
-    }, [token, isAuthenticated, user, router]);
+    }, [token, isAuthenticated, user, router, _hasHydrated]);
 
     const loadPurchases = async () => {
         try {
@@ -47,7 +49,7 @@ export default function BuyerDashboardPage() {
         }
     };
 
-    if (isChecking || !user) {
+    if (isChecking || !user || !_hasHydrated) {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-gray-50">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -164,9 +166,9 @@ export default function BuyerDashboardPage() {
 
                                                 <div className="mt-3 flex flex-col items-end gap-2">
                                                     <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase inline-block ${order.status === 'requested' ? 'bg-blue-100 text-blue-700' :
-                                                            order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                                                                order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    'bg-red-100 text-red-700'
+                                                        order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                                            order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                                                'bg-red-100 text-red-700'
                                                         }`}>
                                                         {order.status === 'requested' ? 'Esperando Confirmación' :
                                                             order.status === 'pending' ? 'Por Entregar' :
