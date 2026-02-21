@@ -4,25 +4,39 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { Loader2, Store, ShoppingBag, Search, ExternalLink } from 'lucide-react';
+import { Loader2, Store, ShoppingBag, Search, ExternalLink, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ordersService, Order } from '@/services/orders.service';
 
 export default function BuyerDashboardPage() {
     const router = useRouter();
     const { user, isAuthenticated, token, logout } = useAuthStore();
     const [isChecking, setIsChecking] = useState(true);
+    const [purchases, setPurchases] = useState<Order[]>([]);
+    const [loadingPurchases, setLoadingPurchases] = useState(true);
 
     useEffect(() => {
-        // Verificar auth y rol
         if (!token || !isAuthenticated || !user) {
             router.push('/login');
         } else if (user.role === 'seller') {
             router.push('/dashboard');
         } else {
             setIsChecking(false);
+            loadPurchases();
         }
     }, [token, isAuthenticated, user, router]);
+
+    const loadPurchases = async () => {
+        try {
+            const data = await ordersService.getMyPurchases();
+            setPurchases(data);
+        } catch (error) {
+            console.error('Failure fetching purchases:', error);
+        } finally {
+            setLoadingPurchases(false);
+        }
+    };
 
     if (isChecking || !user) {
         return (
@@ -109,6 +123,73 @@ export default function BuyerDashboardPage() {
                             </CardContent>
                         </Card>
                     </div>
+                </div>
+
+                {/* Mis Compras */}
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Package className="text-primary" /> Mis Compras Recientes
+                    </h2>
+
+                    {loadingPurchases ? (
+                        <div className="flex justify-center py-10">
+                            <Loader2 className="animate-spin text-primary" size={32} />
+                        </div>
+                    ) : purchases.length > 0 ? (
+                        <div className="space-y-4">
+                            {purchases.map((order) => (
+                                <Card key={order.id} className="border-none shadow-sm">
+                                    <CardContent className="p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-500">
+                                                    Pedido el {new Date(order.createdAt).toLocaleDateString()} a las {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                                <p className="font-semibold text-gray-900">
+                                                    Vendedor: {order.seller?.firstName} {order.seller?.lastName}
+                                                </p>
+                                            </div>
+                                            <div className="text-left sm:text-right">
+                                                <p className="text-sm text-gray-500">Total pagado</p>
+                                                <p className="text-xl font-bold text-emerald-600">${Number(order.totalAmount).toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {order.items.map((item) => (
+                                                <div key={item.id} className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold overflow-hidden">
+                                                            {item.product?.imageUrl ? (
+                                                                <img src={item.product.imageUrl} className="w-full h-full object-cover" alt="" />
+                                                            ) : (
+                                                                item.product?.name.charAt(0)
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium text-gray-900">{item.quantity}x {item.product?.name}</p>
+                                                            <p className="text-xs text-gray-500">Unitario: ${Number(item.unitPrice).toFixed(2)}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="font-semibold text-gray-900">
+                                                        ${Number(item.subtotal).toFixed(2)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                            <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900">Aún no has hecho compras</h3>
+                            <p className="text-gray-500 mb-4">Explora el marketplace y apoya a tus compañeros.</p>
+                            <Link href="/marketplace">
+                                <Button>Ver Catálogo</Button>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>
