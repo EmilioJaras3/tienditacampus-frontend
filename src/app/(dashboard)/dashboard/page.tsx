@@ -95,88 +95,95 @@ export default function DashboardPage() {
     }));
 
     return (
-        <div className="p-8 space-y-8 animate-fade-in pb-20">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
-                <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard Financiero</h2>
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200">
+        <div className="p-8 space-y-8 animate-fade-in pb-20 bg-[#f7f7f7]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest">
+                        Dashboard
+                    </div>
+                    <h2 className="mt-3 text-3xl sm:text-4xl font-black uppercase tracking-tight text-slate-900">Dashboard financiero</h2>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2 bg-white px-3 py-2 border-2 border-slate-900 dark:border-white shadow-[4px_4px_0px_0px_#FFC72C]">
                         <input
                             type="date"
-                            className="text-sm outline-none bg-transparent"
+                            className="text-sm outline-none bg-transparent font-mono"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                         />
-                        <span className="text-gray-400">a</span>
+                        <span className="text-slate-700 font-black">a</span>
                         <input
                             type="date"
-                            className="text-sm outline-none bg-transparent"
+                            className="text-sm outline-none bg-transparent font-mono"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                         />
                     </div>
-                    <CloseDayDialog onClosed={loadDashboardData} />
+                    <div className="border-2 border-slate-900 dark:border-white shadow-[4px_4px_0px_0px_#E31837] bg-white">
+                        <CloseDayDialog onClosed={loadDashboardData} />
+                    </div>
                 </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {/* Total Revenue Card */}
-                <Card className="hover-card border-l-4 border-l-primary">
+                <Card className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#E31837]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600">
                             Ingresos Totales (Ventas)
                         </CardTitle>
-                        <DollarSign className="h-4 w-4 text-primary" />
+                        <DollarSign className="h-4 w-4 text-slate-900" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-foreground">
+                        <div className="text-2xl font-black text-slate-900">
                             ${stats?.revenue.toFixed(2) || '0.00'}
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Investment Card */}
-                <Card className="hover-card border-l-4 border-l-orange-500">
+                <Card className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#FFC72C]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600">
                             Inversión Total (Costo)
                         </CardTitle>
-                        <Package className="h-4 w-4 text-orange-500" />
+                        <Package className="h-4 w-4 text-slate-900" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-foreground">
+                        <div className="text-2xl font-black text-slate-900">
                             ${stats?.investment.toFixed(2) || '0.00'}
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Net Profit Card */}
-                <Card className="hover-card border-l-4 border-l-green-500">
+                <Card className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#1a1a1a]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600">
                             Ganancia Neta
                         </CardTitle>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <TrendingUp className="h-4 w-4 text-slate-900" />
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold ${(stats?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`text-2xl font-black ${(stats?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-[#E31837]'}`}>
                             ${stats?.netProfit.toFixed(2) || '0.00'}
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* ROI Card */}
-                <Card className="hover-card border-l-4 border-l-violet-500">
+                <Card className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#E31837]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600">
                             ROI (Rentabilidad)
                         </CardTitle>
-                        <PieChart className="h-4 w-4 text-violet-500" />
+                        <PieChart className="h-4 w-4 text-slate-900" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-foreground">
+                        <div className="text-2xl font-black text-slate-900">
                             {stats?.roi.toFixed(1) || '0.0'}%
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-slate-600 font-medium">
                             Retorno sobre la inversión
                         </p>
                     </CardContent>
