@@ -7,14 +7,16 @@ import { Search, ShoppingBag, Store, ExternalLink, Loader2 } from 'lucide-react'
 import { productsService, Product } from '@/services/products.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
 import { ProductCard } from '@/components/product-card';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function MarketplacePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch] = useDebounce(searchTerm, 500);
+
+    const { user, isAuthenticated, logout } = useAuthStore();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -34,19 +36,40 @@ export default function MarketplacePage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Navbar Simple */}
-            <nav className="bg-white border-b border-gray-200 sticky top-0 z-30">
+            {/* Navbar Context-Aware */}
+            <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="bg-primary text-white p-1.5 rounded-lg">
                             <Store size={20} />
                         </div>
-                        <span className="font-bold text-xl text-gray-900">TienditaCampus</span>
+                        <span className="font-bold text-xl text-gray-900 hidden sm:block">TienditaCampus</span>
                     </Link>
+
                     <div className="flex items-center gap-4">
-                        <Link href="/login">
-                            <Button variant="ghost">Soy Vendedor</Button>
-                        </Link>
+                        {!isAuthenticated ? (
+                            <>
+                                <Link href="/login">
+                                    <Button variant="ghost" className="hidden sm:inline-flex">Iniciar Sesión</Button>
+                                </Link>
+                                <Link href="/register">
+                                    <Button>Registrarse</Button>
+                                </Link>
+                            </>
+                        ) : user?.role === 'seller' ? (
+                            <Link href="/dashboard">
+                                <Button className="bg-blue-600 hover:bg-blue-700">Ir a mi Dashboard</Button>
+                            </Link>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <Link href="/buyer/dashboard">
+                                    <Button variant="outline" className="text-emerald-700 border-emerald-200 hover:bg-emerald-50">Mi Área</Button>
+                                </Link>
+                                <Button variant="ghost" onClick={logout} className="text-gray-500 hover:text-red-600">
+                                    <span className="hidden sm:inline">Salir</span>
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>
