@@ -33,6 +33,7 @@ export function ProductCard({ product }: { product: Product }) {
     const [quantity, setQuantity] = useState(1);
     const [deliveryMessage, setDeliveryMessage] = useState('');
     const [isPurchasing, setIsPurchasing] = useState(false);
+    const [imageFailed, setImageFailed] = useState(false);
 
     const handlePurchase = async () => {
         if (!isAuthenticated) {
@@ -77,15 +78,16 @@ export function ProductCard({ product }: { product: Product }) {
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full">
             <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                {product.imageUrl ? (
+                {product.imageUrl && !imageFailed ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={product.imageUrl}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={() => setImageFailed(true)}
                     />
                 ) : (
-                    <div className="flex items-center justify-center w-full h-full text-gray-300 text-4xl font-bold bg-gray-50">
+                    <div className="flex items-center justify-center w-full h-full text-gray-300 text-4xl font-bold bg-gray-50 uppercase">
                         {product.name.charAt(0)}
                     </div>
                 )}
