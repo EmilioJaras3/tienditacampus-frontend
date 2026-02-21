@@ -327,28 +327,40 @@ export default function Home() {
             </section>
 
             {/* ─── Stats ─── */}
-            <section id="stats" className="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-blue-600 py-20 px-6">
-                {/* Decorative circles */}
+            <section id="stats" className="relative overflow-hidden bg-[#E31837] py-20 px-6 border-y-2 border-slate-900 dark:border-white">
                 <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/5" />
-                    <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/5" />
+                    <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10" />
+                    <div className="absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-[#FFC72C]/20 blur-2xl" />
                 </div>
 
-                <div className="relative z-10 mx-auto max-w-5xl">
+                <div className="relative z-10 mx-auto max-w-6xl">
                     <div className="mb-14 text-center">
-                        <p className="mb-3 text-sm font-bold uppercase tracking-widest text-white/60">
+                        <p className="mb-3 text-sm font-black uppercase tracking-widest text-white/80">
                             Nuestro Impacto
                         </p>
-                        <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+                        <h2 className="text-4xl sm:text-5xl font-black uppercase text-white">
                             Números que hablan por sí solos
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                        <StatItem value="50+" label="Vendedores Activos" />
-                        <StatItem value="200+" label="Productos Registrados" />
-                        <StatItem value="95%" label="Satisfacción" />
-                        <StatItem value="30%" label="Menos Pérdidas" />
+                    <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+                        <div className="text-center border-2 border-slate-900 dark:border-white bg-white/10 px-4 py-6 shadow-[6px_6px_0px_0px_#FFC72C]">
+                            <div className="text-4xl md:text-5xl font-black text-white">50+</div>
+                            <div className="mt-2 text-xs font-bold uppercase tracking-widest text-white/80">Vendedores Activos</div>
+                        </div>
+                        <div className="text-center border-2 border-slate-900 dark:border-white bg-white/10 px-4 py-6 shadow-[6px_6px_0px_0px_#FFC72C]">
+                            <div className="text-4xl md:text-5xl font-black text-white">200+</div>
+                            <div className="mt-2 text-xs font-bold uppercase tracking-widest text-white/80">Productos Registrados</div>
+                        </div>
+                        <div className="text-center border-2 border-slate-900 dark:border-white bg-white/10 px-4 py-6 shadow-[6px_6px_0px_0px_#FFC72C]">
+                            <div className="text-4xl md:text-5xl font-black text-white">95%</div>
+                            <div className="mt-2 text-xs font-bold uppercase tracking-widest text-white/80">Satisfacción</div>
+                        </div>
+                        <div className="text-center border-2 border-slate-900 dark:border-white bg-white/10 px-4 py-6 shadow-[6px_6px_0px_0px_#FFC72C]">
+                            <div className="text-4xl md:text-5xl font-black text-white">30%</div>
+                            <div className="mt-2 text-xs font-bold uppercase tracking-widest text-white/80">Menos Pérdidas</div>
+                        </div>
                     </div>
                 </div>
             </section>
