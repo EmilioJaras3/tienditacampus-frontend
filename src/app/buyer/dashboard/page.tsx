@@ -44,7 +44,12 @@ export default function BuyerDashboardPage() {
                         <span className="font-bold text-xl text-gray-900 hidden sm:block">TienditaCampus</span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        <div className="text-right hidden sm:block">
+                        <div className="hidden sm:flex items-center gap-4 mr-2">
+                            <Link href="/" className="text-sm font-medium text-gray-500 hover:text-primary transition-colors">
+                                Inicio
+                            </Link>
+                        </div>
+                        <div className="text-right hidden sm:block border-l border-gray-200 pl-4">
                             <p className="text-sm font-semibold text-gray-900">{user.firstName} {user.lastName}</p>
                             <p className="text-xs text-gray-500 capitalize">{user.role}</p>
                         </div>

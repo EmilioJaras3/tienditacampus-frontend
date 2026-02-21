@@ -47,6 +47,9 @@ export default function MarketplacePage() {
                     </Link>
 
                     <div className="flex items-center gap-4">
+                        <Link href="/" className="text-sm font-medium text-gray-500 hover:text-primary transition-colors hidden sm:block mr-2">
+                            Inicio
+                        </Link>
                         {!isAuthenticated ? (
                             <>
                                 <Link href="/login">

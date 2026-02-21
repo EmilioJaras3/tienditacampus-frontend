@@ -8,7 +8,8 @@ import {
     ShoppingCart,
     BarChart3,
     Settings,
-    LogOut
+    LogOut,
+    ShoppingBag
 } from 'lucide-react';
 import { cn } from '@/lib/utils'; // Assuming utils exists, otherwise I'll need to create it or remove cn usage
 import { useAuthStore } from '../../store/auth.store';
@@ -93,7 +94,16 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            <div className="px-3 py-2">
+            <div className="px-3 py-2 border-t border-border mt-auto">
+                <Link
+                    href="/marketplace"
+                    className="text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition duration-300 text-muted-foreground mb-1"
+                >
+                    <div className="flex items-center flex-1">
+                        <ShoppingBag className="h-5 w-5 mr-3" />
+                        Ver Tienda Pública
+                    </div>
+                </Link>
                 <button
                     onClick={() => logout()}
                     className="text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-destructive hover:bg-destructive/10 rounded-lg transition duration-300 text-muted-foreground"
