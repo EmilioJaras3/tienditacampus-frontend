@@ -231,40 +231,47 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Suggestions / Predictions (HU-03) */}
-                <Card className="col-span-3 hover-card bg-gradient-to-br from-violet-50 to-white border-violet-100 flex flex-col">
+                <Card className="col-span-3 border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[8px_8px_0px_0px_#FFC72C] flex flex-col">
                     <CardHeader>
-                        <CardTitle className="text-violet-900 flex items-center gap-2">
-                            <TrendingUp size={20} />
-                            Sugerencia del Día (IA)
+                        <CardTitle className="text-slate-900 font-black uppercase tracking-tight flex items-center gap-2">
+                            <TrendingUp size={18} className="text-slate-900" />
+                            Sugerencia del dia (IA)
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="flex-grow">
                         {prediction ? (
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm border border-violet-100 h-full">
-                                    <div className="bg-violet-100 p-2 rounded-lg text-violet-600">
-                                        <Package size={24} />
+                            <div className="border-2 border-slate-900/20 bg-white p-4">
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-[#FFC72C] p-2 border-2 border-slate-900 dark:border-white text-slate-900">
+                                        <Package size={20} />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-gray-900">Prepara más {prediction.productName}</h4>
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            Basado en tus ventas históricas de los {new Date().toLocaleDateString('es-MX', { weekday: 'long' })}s,
-                                            el algoritmo sugiere preparar:
+                                        <div className="inline-flex border-2 border-slate-900 dark:border-white bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-widest">
+                                            Recomendacion
+                                        </div>
+                                        <h4 className="mt-2 font-black uppercase tracking-tight text-slate-900">
+                                            Prepara mas {prediction.productName}
+                                        </h4>
+                                        <p className="text-sm text-slate-700 font-medium mt-1">
+                                            Basado en tus ventas históricas de los {new Date().toLocaleDateString('es-MX', { weekday: 'long' })}s, el algoritmo sugiere preparar:
                                         </p>
-                                        <p className="text-2xl font-bold text-violet-600 mt-2">
+                                        <div className="mt-3 inline-flex border-2 border-slate-900 dark:border-white bg-[#E31837] px-3 py-1 font-black uppercase tracking-wide text-white">
                                             {prediction.suggested} unidades
-                                        </p>
-                                        <p className="text-xs text-gray-400 mt-1">
-                                            Confianza estadística: {(prediction.confidence * 100).toFixed(0)}%
+                                        </div>
+                                        <p className="text-xs text-slate-600 font-mono uppercase mt-2">
+                                            Confianza {(prediction.confidence * 100).toFixed(0)}%
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-center p-6 text-gray-500 bg-white/50 rounded-xl border border-dashed border-violet-200">
-                                <AlertCircle className="w-8 h-8 mb-2 text-violet-300" />
-                                <p>Aún no tenemos suficientes datos para generar predicciones.</p>
-                                <p className="text-xs mt-1">Sigue recibiendo pedidos para entrenar el modelo.</p>
+                            <div className="flex flex-col items-center justify-center h-full text-center p-6 border-2 border-slate-900/20 bg-white">
+                                <div className="mb-3 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
+                                    Sin datos
+                                </div>
+                                <AlertCircle className="w-8 h-8 mb-2 text-slate-900" />
+                                <p className="font-black uppercase tracking-tight text-slate-900">Aun no hay suficientes datos</p>
+                                <p className="text-xs mt-1 text-slate-700 font-medium">Sigue recibiendo pedidos para entrenar el modelo.</p>
                             </div>
                         )}
                     </CardContent>
