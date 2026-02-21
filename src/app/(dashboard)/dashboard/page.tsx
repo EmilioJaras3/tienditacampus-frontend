@@ -21,10 +21,14 @@ export default function DashboardPage() {
     const [prediction, setPrediction] = useState<{ productName: string; suggested: number; confidence: number } | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
+
     const loadDashboardData = async () => {
+        setLoading(true);
         try {
             const [statsData, historyData, predictionData] = await Promise.all([
-                salesService.getRoiStats(),
+                salesService.getRoiStats(startDate, endDate),
                 salesService.getHistory(),
                 salesService.getPrediction()
             ]);
@@ -40,9 +44,10 @@ export default function DashboardPage() {
 
     useEffect(() => {
         loadDashboardData();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [startDate, endDate]);
 
-    if (loading) {
+    if (loading && !stats) {
         return (
             <div className="h-full flex items-center justify-center p-8">
                 <Loader2 className="animate-spin text-primary" size={40} />
@@ -59,12 +64,24 @@ export default function DashboardPage() {
 
     return (
         <div className="p-8 space-y-8 animate-fade-in">
-            <div className="flex items-center justify-between space-y-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
                 <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard Financiero</h2>
-                <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-500 hidden sm:inline-block">
-                        {new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-gray-200">
+                        <input
+                            type="date"
+                            className="text-sm outline-none bg-transparent"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                        />
+                        <span className="text-gray-400">a</span>
+                        <input
+                            type="date"
+                            className="text-sm outline-none bg-transparent"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                        />
+                    </div>
                     <CloseDayDialog onClosed={loadDashboardData} />
                 </div>
             </div>
