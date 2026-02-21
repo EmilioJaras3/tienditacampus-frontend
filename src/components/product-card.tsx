@@ -1,4 +1,4 @@
-import { Store, ShoppingCart, Loader2 } from 'lucide-react';
+import { Store, ShoppingCart, Loader2, MapPin, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/services/products.service';
 import { ordersService } from '@/services/orders.service';
@@ -16,15 +16,22 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 export function ProductCard({ product }: { product: Product }) {
-    const sellerName = (product as any).seller?.fullName || 'Estudiante';
-    const sellerId = (product as any).seller?.id;
-    const stockAvailable = (product as any).quantity_remaining || 0;
+    const seller = (product as any).seller;
+    const sellerName = seller ? `${seller.firstName} ${seller.lastName}` : 'Estudiante';
+    const sellerId = seller?.id;
+    const sellerMajor = seller?.major;
+    const sellerCampus = seller?.campusLocation;
+
+    // Fallback to 0 if undefined, but our modified backend sends 'quantityRemaining' 
+    const stockAvailable = (product as any).quantityRemaining || 0;
 
     const { isAuthenticated, user } = useAuthStore();
     const [open, setOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [deliveryMessage, setDeliveryMessage] = useState('');
     const [isPurchasing, setIsPurchasing] = useState(false);
 
     const handlePurchase = async () => {
@@ -50,15 +57,16 @@ export function ProductCard({ product }: { product: Product }) {
                 items: [{
                     productId: product.id,
                     quantity: quantity
-                }]
+                }],
+                deliveryMessage: deliveryMessage
             });
-            toast.success('¡Compra realizada con éxito!', {
-                description: `Has comprado ${quantity}x ${product.name}`
+            toast.success('¡Solicitud enviada con éxito!', {
+                description: `Has solicitado ${quantity}x ${product.name}. Ponte de acuerdo para la entrega.`
             });
             setOpen(false);
             // Optionally reload page or update local state stock
         } catch (error: any) {
-            toast.error('Error al procesar la compra', {
+            toast.error('Error al solicitar la compra', {
                 description: error.response?.data?.message || 'Stock insuficiente o error del servidor'
             });
         } finally {
@@ -82,13 +90,17 @@ export function ProductCard({ product }: { product: Product }) {
                     </div>
                 )}
                 {product.isPerishable && (
-                    <span className="absolute top-2 right-2 bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded-full">
+                    <span className="absolute top-2 right-2 bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
                         Perecedero
                     </span>
                 )}
-                {stockAvailable > 0 && (
+                {stockAvailable > 0 ? (
                     <span className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md">
                         Stock: {stockAvailable}
+                    </span>
+                ) : (
+                    <span className="absolute bottom-2 left-2 bg-red-500/90 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md">
+                        Agotado
                     </span>
                 )}
             </div>
@@ -96,25 +108,38 @@ export function ProductCard({ product }: { product: Product }) {
             <div className="p-4 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
                     <div>
-                        <h3 className="font-semibold text-gray-900 line-clamp-1">{product.name}</h3>
-                        {sellerId && (
-                            <a href={`/seller/${sellerId}`} className="text-sm text-gray-500 flex items-center gap-1 hover:text-primary transition-colors">
-                                <Store size={14} /> {sellerName}
+                        <h3 className="font-semibold text-gray-900 line-clamp-1" title={product.name}>{product.name}</h3>
+                        {sellerId ? (
+                            <a href={`/seller/${sellerId}`} className="text-sm text-gray-700 font-medium flex items-center gap-1 hover:text-primary transition-colors mt-0.5" title="Ver perfil">
+                                <Store size={14} className="text-gray-400" /> {sellerName}
                             </a>
-                        )}
-                        {!sellerId && (
-                            <p className="text-sm text-gray-500 flex items-center gap-1">
-                                <Store size={14} /> {sellerName}
+                        ) : (
+                            <p className="text-sm text-gray-700 font-medium flex items-center gap-1 mt-0.5">
+                                <Store size={14} className="text-gray-400" /> {sellerName}
                             </p>
                         )}
+                        {(sellerMajor || sellerCampus) && (
+                            <div className="flex flex-col gap-0.5 mt-1">
+                                {sellerCampus && (
+                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                        <MapPin size={12} className="text-gray-400" /> {sellerCampus}
+                                    </p>
+                                )}
+                                {sellerMajor && (
+                                    <p className="text-xs text-gray-500 flex items-center gap-1 line-clamp-1" title={sellerMajor}>
+                                        <GraduationCap size={12} className="text-gray-400" /> {sellerMajor}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
-                    <span className="font-bold text-lg text-primary">
+                    <span className="font-bold text-lg text-primary shrink-0 ml-2">
                         ${Number(product.salePrice).toFixed(2)}
                     </span>
                 </div>
 
                 {product.description && (
-                    <p className="text-sm text-gray-600 line-clamp-2 h-10">
+                    <p className="text-sm text-gray-600 line-clamp-2 h-10 mt-1">
                         {product.description}
                     </p>
                 )}
@@ -127,20 +152,21 @@ export function ProductCard({ product }: { product: Product }) {
                                 disabled={stockAvailable < 1 || !sellerId}
                             >
                                 <ShoppingCart size={16} />
-                                {stockAvailable > 0 ? 'Comprar' : 'Agotado'}
+                                {stockAvailable > 0 ? 'Solicitar Compra' : 'Agotado'}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[400px]">
+                        <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Comprar {product.name}</DialogTitle>
+                                <DialogTitle>Solicitar Compra</DialogTitle>
                                 <DialogDescription>
-                                    Vendido por {sellerName}. Precio unitario: ${Number(product.salePrice).toFixed(2)}
+                                    Vendido por <strong>{sellerName}</strong> {sellerCampus ? `(${sellerCampus})` : ''} <br />
+                                    Precio unidad: <strong className="text-gray-900">${Number(product.salePrice).toFixed(2)}</strong>
                                 </DialogDescription>
                             </DialogHeader>
 
                             <div className="grid gap-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="quantity">¿Cuántas piezas deseas comprar?</Label>
+                                    <Label htmlFor="quantity">¿Cuántas piezas deseas apartar?</Label>
                                     <Input
                                         id="quantity"
                                         type="number"
@@ -151,6 +177,17 @@ export function ProductCard({ product }: { product: Product }) {
                                     />
                                     <p className="text-xs text-gray-500">Stock disponible: {stockAvailable}</p>
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="message">Instrucciones de entrega (Opcional)</Label>
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Ej. 'Llevo sudadera roja, estoy en la biblioteca...'"
+                                        value={deliveryMessage}
+                                        onChange={(e) => setDeliveryMessage(e.target.value)}
+                                        className="resize-none"
+                                        rows={3}
+                                    />
+                                </div>
                                 <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2">
                                     <span className="font-medium text-gray-700">Total a pagar:</span>
                                     <span className="font-bold text-xl text-primary">
@@ -159,11 +196,11 @@ export function ProductCard({ product }: { product: Product }) {
                                 </div>
                             </div>
 
-                            <DialogFooter>
+                            <DialogFooter className="sm:justify-between flex-row">
                                 <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
                                 <Button onClick={handlePurchase} disabled={isPurchasing || quantity < 1 || quantity > stockAvailable}>
                                     {isPurchasing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Confirmar Compra
+                                    Solicitar (Contraentrega)
                                 </Button>
                             </DialogFooter>
                         </DialogContent>

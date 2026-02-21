@@ -246,7 +246,8 @@ export default function DashboardPage() {
                                         <th className="px-6 py-3 font-semibold">Fecha y Hora</th>
                                         <th className="px-6 py-3 font-semibold">Comprador</th>
                                         <th className="px-6 py-3 font-semibold">Productos</th>
-                                        <th className="px-6 py-3 font-semibold text-right">Total Generado</th>
+                                        <th className="px-6 py-3 font-semibold">Estado</th>
+                                        <th className="px-6 py-3 font-semibold text-right">Potencial / Cobrado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -255,8 +256,15 @@ export default function DashboardPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-gray-600">
                                                 {new Date(sale.createdAt).toLocaleDateString()} - {new Date(sale.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-gray-900">
-                                                {sale.buyer?.firstName} {sale.buyer?.lastName}
+                                            <td className="px-6 py-4">
+                                                <p className="font-medium text-gray-900">
+                                                    {sale.buyer?.firstName} {sale.buyer?.lastName} {sale.buyer?.major ? `(${sale.buyer.major})` : ''}
+                                                </p>
+                                                {sale.deliveryMessage && (
+                                                    <p className="text-xs text-blue-600 mt-1">
+                                                        &quot;{sale.deliveryMessage}&quot;
+                                                    </p>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <ul className="list-disc list-inside text-gray-600">
@@ -265,7 +273,12 @@ export default function DashboardPage() {
                                                     ))}
                                                 </ul>
                                             </td>
-                                            <td className="px-6 py-4 text-right font-bold text-emerald-600">
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase ${sale.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                                    {sale.status === 'pending' ? 'Por Entregar' : 'Pagado'}
+                                                </span>
+                                            </td>
+                                            <td className={`px-6 py-4 text-right font-bold ${sale.status === 'pending' ? 'text-gray-400' : 'text-emerald-600'}`}>
                                                 +${Number(sale.totalAmount).toFixed(2)}
                                             </td>
                                         </tr>

@@ -17,7 +17,8 @@ export interface Order {
     buyerId: string;
     sellerId: string;
     totalAmount: number;
-    status: string;
+    status: string; // 'pending', 'completed', 'cancelled'
+    deliveryMessage: string | null;
     createdAt: string;
     updatedAt: string;
     items: OrderItem[];
@@ -31,6 +32,7 @@ export interface CreateOrderDto {
         productId: string;
         quantity: number;
     }[];
+    deliveryMessage?: string;
 }
 
 export const ordersService = {
@@ -53,5 +55,12 @@ export const ordersService = {
      */
     async getSellerSales(): Promise<Order[]> {
         return api.get<Order[]>('/orders/seller-sales');
+    },
+
+    /**
+     * Confirma la entrega y el pago contraentrega
+     */
+    async deliver(orderId: string): Promise<Order> {
+        return api.post<Order>(`/orders/${orderId}/deliver`, {});
     }
 };

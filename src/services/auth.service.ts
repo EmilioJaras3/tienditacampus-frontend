@@ -23,6 +23,8 @@ export interface User {
     firstName: string;
     lastName: string;
     role: 'admin' | 'seller' | 'buyer';
+    major?: string;
+    campusLocation?: string;
     lastLoginAt?: string;
     loginCount?: number;
 }
