@@ -22,7 +22,9 @@ const registerSchema = z
         lastName: z.string().min(1, 'Los apellidos son requeridos'),
         email: z.string().email('Email inválido'),
         phone: z.string().optional(),
-        role: z.enum(['seller', 'buyer'], { required_error: 'Selecciona tu tipo de cuenta' }),
+        role: z.enum(['seller', 'buyer'], {
+            message: 'Selecciona tu tipo de cuenta',
+        }),
         password: z
             .string()
             .min(8, 'Mínimo 8 caracteres')
