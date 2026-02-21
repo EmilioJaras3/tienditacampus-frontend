@@ -403,58 +403,107 @@ export default function Home() {
             </section>
 
             {/* ─── Final CTA ─── */}
-            <section id="cta" className="relative overflow-hidden bg-surface py-24 px-6">
-                <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
+            <section id="cta" className="relative overflow-hidden bg-[#FFC72C] py-24 px-6 border-t-2 border-slate-900 dark:border-white">
+                <div className="pointer-events-none absolute inset-0 opacity-25">
+                    <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/40 blur-3xl" />
+                    <div className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-[#E31837]/30 blur-3xl" />
                 </div>
 
-                <div className="relative z-10 mx-auto max-w-2xl text-center">
-                    <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                        <Store size={32} />
+                <div className="relative z-10 mx-auto max-w-3xl text-center">
+                    <div className="mx-auto mb-6 w-fit border-2 border-slate-900 dark:border-white bg-white px-4 py-1 text-xs font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_#E31837]">
+                        Empieza hoy
                     </div>
-                    <h2 className="text-3xl font-extrabold tracking-tight text-text sm:text-4xl">
-                        ¿Listo para vender mejor?
+
+                    <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-slate-900">
+                        ¿Listo para vender y comprar en tu campus?
                     </h2>
-                    <p className="mx-auto mt-4 max-w-md text-text-secondary">
-                        Únete a la comunidad de vendedores universitarios que ya optimizan su negocio con TienditaCampus.
+
+                    <p className="mx-auto mt-4 max-w-2xl text-slate-800 font-medium">
+                        Crea tu cuenta y entra al marketplace. Si eres vendedor, publica tu catálogo y recibe pedidos; si eres comprador, encuentra lo que se te antoje.
                     </p>
-                    <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <Link href="/register">
-                            <Button size="lg" className="group gap-2 text-base font-bold shadow-xl shadow-primary/25 px-8">
-                                Crear mi Cuenta Gratis
-                                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                            </Button>
+
+                    <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                        <Link
+                            className="group relative px-8 py-4 bg-[#E31837] text-white font-black text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#ffffff] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 text-center"
+                            href="/register"
+                        >
+                            <span className="flex items-center justify-center gap-2">
+                                Crear cuenta
+                                <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
+                            </span>
+                        </Link>
+                        <Link
+                            className="group px-8 py-4 bg-transparent text-slate-900 font-black text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white hover:bg-white hover:text-slate-900 transition-colors duration-200 text-center"
+                            href="/login"
+                        >
+                            Iniciar sesion
                         </Link>
                     </div>
                 </div>
             </section>
 
             {/* ─── Footer ─── */}
-            <footer className="border-t border-border bg-surface py-12 px-6">
-                <div className="mx-auto max-w-7xl">
-                    <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-xs shadow-sm">
-                                TC
+            <footer className="bg-[#1a1a1a] text-white pt-16 pb-8 border-t-2 border-white">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                        <div className="col-span-1 md:col-span-2">
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="w-8 h-8 bg-[#FFC72C] flex items-center justify-center border-2 border-white">
+                                    <Store size={16} className="text-slate-900" />
+                                </div>
+                                <span className="font-black text-2xl uppercase tracking-tighter">
+                                    Tiendita<span className="text-[#FFC72C]">Campus</span>
+                                </span>
                             </div>
-                            <span className="text-sm font-bold text-text">TienditaCampus</span>
+                            <p className="text-slate-400 max-w-sm mb-6">
+                                Plataforma creada por estudiantes para estudiantes. Fomentando el emprendimiento local y la economía circular en el campus.
+                            </p>
                         </div>
-                        <div className="flex items-center gap-6">
-                            <Link href="/login" className="text-sm text-text-secondary hover:text-primary transition-colors">
-                                Iniciar Sesión
-                            </Link>
-                            <Link href="/register" className="text-sm text-text-secondary hover:text-primary transition-colors">
-                                Registrarse
-                            </Link>
-                            <a href="#features" className="text-sm text-text-secondary hover:text-primary transition-colors">
-                                Funciones
-                            </a>
+
+                        <div>
+                            <h4 className="font-black uppercase text-[#FFC72C] mb-6 tracking-wider">Plataforma</h4>
+                            <ul className="space-y-3 text-slate-300">
+                                <li>
+                                    <Link className="hover:text-white hover:underline decoration-[#FFC72C] decoration-2 underline-offset-4" href="/marketplace">
+                                        Explorar
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="hover:text-white hover:underline decoration-[#FFC72C] decoration-2 underline-offset-4" href="/register">
+                                        Vender
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link className="hover:text-white hover:underline decoration-[#FFC72C] decoration-2 underline-offset-4" href="/login">
+                                        Iniciar sesion
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-black uppercase text-[#FFC72C] mb-6 tracking-wider">Ayuda</h4>
+                            <ul className="space-y-3 text-slate-300">
+                                <li>
+                                    <a className="hover:text-white hover:underline decoration-[#FFC72C] decoration-2 underline-offset-4" href="#features">
+                                        Sobre nosotros
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="hover:text-white hover:underline decoration-[#FFC72C] decoration-2 underline-offset-4" href="#cta">
+                                        Contacto
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div className="mt-8 border-t border-border pt-6 text-center">
-                        <p className="text-xs text-text-secondary/60">
-                            © 2026 TienditaCampus — Universidad Politécnica de Chiapas. Proyecto Integrador.
-                        </p>
+
+                    <div className="border-t-2 border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-slate-500 text-sm font-mono">© 2026 TienditaCampus. Universidad Politecnica de Chiapas.</p>
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 bg-green-500 rounded-full" />
+                            <span className="text-xs text-green-500 font-mono uppercase">Sistemas Operativos</span>
+                        </div>
                     </div>
                 </div>
             </footer>
