@@ -12,17 +12,19 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
-    const { isAuthenticated, token } = useAuthStore();
+    const { isAuthenticated, token, user } = useAuthStore();
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
-        // Simple client-side auth check
-        if (!token && !isAuthenticated) {
+        // Validación de autenticación y rol
+        if (!token || !isAuthenticated || !user) {
             router.push('/login');
+        } else if (user.role === 'buyer') {
+            router.push('/buyer/dashboard');
         } else {
             setIsChecking(false);
         }
-    }, [token, isAuthenticated, router]);
+    }, [token, isAuthenticated, user, router]);
 
     if (isChecking) {
         return (
