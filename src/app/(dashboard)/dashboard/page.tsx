@@ -191,13 +191,15 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
-                <Card className="col-span-4 hover-card flex flex-col">
+                <Card className="col-span-4 border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[8px_8px_0px_0px_#E31837] flex flex-col">
                     <CardHeader>
-                        <CardTitle>Historial de Rentabilidad (Ventas vs Inversión)</CardTitle>
+                        <CardTitle className="text-slate-900 font-black uppercase tracking-tight">
+                            Historial de rentabilidad
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2 flex-grow">
                         {chartData.length > 0 ? (
-                            <div className="h-[300px] w-full">
+                            <div className="h-[300px] w-full pr-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={chartData}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -205,7 +207,7 @@ export default function DashboardPage() {
                                         <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
                                         <Tooltip
                                             formatter={(value) => [`$${value}`, '']}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            contentStyle={{ borderRadius: '0px', border: '2px solid #0f172a', boxShadow: '6px 6px 0px 0px #FFC72C' }}
                                         />
                                         <Legend />
                                         <Bar dataKey="Inversión" fill="#f97316" radius={[4, 4, 0, 0]} name="Inversión" />
@@ -214,10 +216,15 @@ export default function DashboardPage() {
                                 </ResponsiveContainer>
                             </div>
                         ) : (
-                            <div className="h-[300px] flex flex-col items-center justify-center text-muted-foreground bg-gray-50 rounded-lg border border-dashed text-center p-4">
-                                <AlertCircle className="w-8 h-8 mb-2 text-gray-400" />
-                                <p>No hay datos suficientes para mostrar la gráfica.</p>
-                                <p className="text-sm">Tus ventas se graficarán aquí cuando los compradores realicen pagos o cuando registres el Cierre de Día.</p>
+                            <div className="h-[300px] flex flex-col items-center justify-center bg-white border-2 border-slate-900/20 text-center p-6 mr-4">
+                                <div className="mb-3 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
+                                    Sin datos
+                                </div>
+                                <AlertCircle className="w-8 h-8 mb-2 text-slate-900" />
+                                <p className="font-black uppercase tracking-tight text-slate-900">No hay datos para mostrar la grafica.</p>
+                                <p className="text-sm text-slate-700 font-medium mt-2 max-w-md">
+                                    Tus ventas se graficarán aquí cuando los compradores realicen pagos o cuando registres el cierre de día.
+                                </p>
                             </div>
                         )}
                     </CardContent>
