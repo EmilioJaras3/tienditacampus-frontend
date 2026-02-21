@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Store, Calendar, MapPin, Loader2, MessageCircle } from 'lucide-react';
 import { usersService, PublicUser } from '@/services/users.service';
-import { productsService, Product } from '@/services/products.service';
+import { Product } from '@/services/products.service';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,12 +19,9 @@ export default function SellerProfilePage({ params }: { params: { id: string } }
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [userData, productsData] = await Promise.all([
-                    usersService.getPublicProfile(params.id),
-                    productsService.getMarketplace('', params.id)
-                ]);
+                const userData = await usersService.getPublicProfile(params.id);
                 setSeller(userData);
-                setProducts(productsData);
+                setProducts(userData.products || []);
             } catch (err: any) {
                 console.error(err);
                 setError('No pudimos cargar la información del vendedor.');
