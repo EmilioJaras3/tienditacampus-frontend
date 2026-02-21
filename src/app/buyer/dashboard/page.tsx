@@ -158,13 +158,18 @@ export default function BuyerDashboardPage() {
 
                 {/* Mis Compras */}
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Package className="text-primary" /> Mis Compras Recientes
-                    </h2>
+                    <div className="flex items-center justify-between mb-4 gap-4">
+                        <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest">
+                            <Package size={14} className="text-slate-900" /> Mis compras recientes
+                        </div>
+                    </div>
 
                     {loadingPurchases ? (
-                        <div className="flex justify-center py-10">
-                            <Loader2 className="animate-spin text-primary" size={32} />
+                        <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#FFC72C] py-12 flex items-center justify-center">
+                            <div className="flex items-center gap-3">
+                                <Loader2 className="animate-spin text-[#E31837]" size={22} />
+                                <span className="font-black uppercase tracking-wide text-slate-900">Cargando compras...</span>
+                            </div>
                         </div>
                     ) : purchases.length > 0 ? (
                         <div className="space-y-4">
@@ -240,12 +245,18 @@ export default function BuyerDashboardPage() {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                            <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900">Aún no has hecho compras</h3>
-                            <p className="text-gray-500 mb-4">Explora el marketplace y apoya a tus compañeros.</p>
-                            <Link href="/marketplace">
-                                <Button>Ver Catálogo</Button>
+                        <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#E31837] p-10 text-center">
+                            <div className="mx-auto mb-4 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
+                                Sin compras
+                            </div>
+                            <ShoppingBag size={44} className="mx-auto text-slate-900 mb-4" />
+                            <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Aun no has hecho compras</h3>
+                            <p className="mt-2 text-slate-700 font-medium mb-6">Explora el marketplace y apoya a tus compañeros.</p>
+                            <Link
+                                href="/marketplace"
+                                className="inline-flex px-7 py-3 bg-[#E31837] text-white font-black uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#FFC72C] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200"
+                            >
+                                Ver catalogo
                             </Link>
                         </div>
                     )}
