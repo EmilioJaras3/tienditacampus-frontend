@@ -19,36 +19,47 @@ const routes = [
         icon: LayoutDashboard,
         href: '/dashboard',
         color: 'text-sky-500',
+        roles: ['seller', 'admin'],
     },
     {
         label: 'Inventario',
         icon: Package,
         href: '/products',
         color: 'text-violet-500',
+        roles: ['seller', 'admin'],
     },
     {
         label: 'Ventas',
         icon: ShoppingCart,
         href: '/sales',
         color: 'text-pink-700',
+        roles: ['seller', 'admin'],
     },
     {
         label: 'Reportes',
         icon: BarChart3,
         href: '/reports',
         color: 'text-orange-700',
+        roles: ['seller', 'admin'],
     },
     {
         label: 'Configuración',
         icon: Settings,
         href: '/settings',
         color: 'text-gray-500',
+        roles: ['seller', 'admin'],
     },
 ];
 
 export function Sidebar() {
     const pathname = usePathname();
     const logout = useAuthStore((state) => state.logout);
+    const user = useAuthStore((state) => state.user);
+
+    // Filtrar rutas según el rol del usuario (protección visual adicional)
+    const filteredRoutes = routes.filter(route =>
+        !user || route.roles.includes(user.role)
+    );
 
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-card text-card-foreground border-r border-border shadow-xl">
@@ -65,7 +76,7 @@ export function Sidebar() {
                     </h1>
                 </Link>
                 <div className="space-y-1">
-                    {routes.map((route) => (
+                    {filteredRoutes.map((route) => (
                         <Link
                             key={route.href}
                             href={route.href}
