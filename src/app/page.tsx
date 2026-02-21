@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import type { ElementType } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
     BarChart3,
@@ -17,96 +18,89 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
-/* ───────── Navbar ───────── */
-function Navbar() {
-    const [scrolled, setScrolled] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
-
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+function MarqueeBar() {
+    const items = useMemo(() => new Array<string>(8).fill('🔥 Compra Local • Vende en tu U • TienditaCampus'), []);
 
     return (
-        <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'bg-white/80 backdrop-blur-xl shadow-lg shadow-black/5 border-b border-border'
-                    : 'bg-transparent'
-                }`}
-        >
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-2.5 group">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white font-bold text-sm shadow-md shadow-primary/30 group-hover:shadow-lg group-hover:shadow-primary/40 transition-all">
-                        TC
-                    </div>
-                    <span className="text-lg font-bold text-text tracking-tight">
-                        TienditaCampus
-                    </span>
-                </Link>
+        <div className="bg-[#E31837] text-white overflow-hidden py-2 border-b-2 border-slate-900 dark:border-white z-50">
+            <div className="whitespace-nowrap flex animate-marquee font-bold text-sm tracking-widest uppercase">
+                {items.map((text: string, idx: number) => (
+                    <span key={idx} className="mx-4">{text}</span>
+                ))}
+                {items.map((text: string, idx: number) => (
+                    <span key={`dup-${idx}`} className="mx-4">{text}</span>
+                ))}
+            </div>
+        </div>
+    );
+}
 
-                {/* Desktop Links */}
-                <div className="hidden items-center gap-8 md:flex">
-                    <Link href="/marketplace" className="text-sm font-medium text-text-secondary hover:text-primary transition-colors flex items-center gap-1">
-                        <Store size={16} />
-                        Tienda
+/* ───────── Navbar ───────── */
+function Navbar() {
+    const [mobileOpen, setMobileOpen] = useState(false);
+
+    return (
+        <nav className="border-b-2 border-slate-900 dark:border-white bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur sticky top-0 z-40">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-20">
+                    <Link href="/" className="flex-shrink-0 flex items-center gap-2 group cursor-pointer">
+                        <div className="w-10 h-10 bg-[#FFC72C] border-2 border-slate-900 dark:border-white flex items-center justify-center transition-all duration-200">
+                            <Store className="text-slate-900" size={20} />
+                        </div>
+                        <span className="font-bold text-xl tracking-tighter uppercase dark:text-white">
+                            Tiendita<span className="text-[#E31837]">Campus</span>
+                        </span>
                     </Link>
-                    <a href="#features" className="text-sm font-medium text-text-secondary hover:text-primary transition-colors">
-                        Funciones
-                    </a>
-                    <a href="#stats" className="text-sm font-medium text-text-secondary hover:text-primary transition-colors">
-                        Impacto
-                    </a>
-                </div>
 
-                {/* Desktop CTAs */}
-                <div className="hidden items-center gap-3 md:flex">
-                    <Link href="/login">
-                        <Button variant="ghost" className="text-sm font-semibold">
+                    <div className="hidden md:flex items-center space-x-4">
+                        <a className="text-sm font-bold uppercase hover:text-[#E31837] transition-colors px-4 py-2" href="#features">
+                            Sobre Nosotros
+                        </a>
+                        <a className="text-sm font-bold uppercase hover:text-[#E31837] transition-colors px-4 py-2" href="#cta">
+                            Contacto
+                        </a>
+                        <div className="h-8 w-[2px] bg-slate-200 dark:bg-slate-700 mx-2" />
+                        <Link
+                            className="text-sm font-bold uppercase px-6 py-2 border-2 border-slate-900 dark:border-white hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all duration-200"
+                            href="/login"
+                        >
                             Iniciar Sesión
-                        </Button>
-                    </Link>
-                    <Link href="/register">
-                        <Button className="text-sm font-semibold shadow-md shadow-primary/25">
-                            Comenzar Gratis
-                        </Button>
-                    </Link>
-                </div>
+                        </Link>
+                        <Link
+                            className="text-sm font-bold uppercase px-6 py-2 bg-[#FFC72C] text-slate-900 border-2 border-slate-900 dark:border-white hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200"
+                            href="/register"
+                        >
+                            Crear Cuenta
+                        </Link>
+                    </div>
 
-                {/* Mobile toggle */}
-                <button
-                    className="md:hidden p-2 text-text-secondary hover:text-text transition-colors"
-                    onClick={() => setMobileOpen(!mobileOpen)}
-                >
-                    {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-                </button>
+                    <div className="md:hidden flex items-center">
+                        <button
+                            className="text-slate-900 dark:text-white hover:text-[#FFC72C] p-2"
+                            onClick={() => setMobileOpen((v: boolean) => !v)}
+                            aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+                        >
+                            {mobileOpen ? <X size={28} /> : <Menu size={28} />}
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Mobile Menu */}
             {mobileOpen && (
-                <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-border animate-slide-up">
-                    <div className="flex flex-col gap-1 px-6 py-4">
-                        <Link href="/marketplace" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium text-text-secondary hover:text-primary transition-colors flex items-center gap-2">
-                            <Store size={18} /> Tienda / Marketplace
+                <div className="md:hidden border-t-2 border-slate-900 dark:border-white bg-white dark:bg-[#1a1a1a]">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-2">
+                        <a className="block text-sm font-bold uppercase px-4 py-3 border-2 border-slate-900 dark:border-white" href="#features">
+                            Sobre Nosotros
+                        </a>
+                        <a className="block text-sm font-bold uppercase px-4 py-3 border-2 border-slate-900 dark:border-white" href="#cta">
+                            Contacto
+                        </a>
+                        <Link className="block text-sm font-bold uppercase px-4 py-3 border-2 border-slate-900 dark:border-white" href="/login">
+                            Iniciar Sesión
                         </Link>
-                        <a href="#features" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium text-text-secondary hover:text-primary transition-colors">
-                            Funciones
-                        </a>
-                        <a href="#stats" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium text-text-secondary hover:text-primary transition-colors">
-                            Impacto
-                        </a>
-                        <a href="#cta" onClick={() => setMobileOpen(false)} className="py-2.5 text-sm font-medium text-text-secondary hover:text-primary transition-colors">
-                            Únete
-                        </a>
-                        <div className="mt-3 flex flex-col gap-2">
-                            <Link href="/login">
-                                <Button variant="outline" className="w-full">Iniciar Sesión</Button>
-                            </Link>
-                            <Link href="/register">
-                                <Button className="w-full">Comenzar Gratis</Button>
-                            </Link>
-                        </div>
+                        <Link className="block text-sm font-bold uppercase px-4 py-3 bg-[#FFC72C] text-slate-900 border-2 border-slate-900 dark:border-white" href="/register">
+                            Crear Cuenta
+                        </Link>
                     </div>
                 </div>
             )}
@@ -121,7 +115,7 @@ function FeatureCard({
     description,
     gradient,
 }: {
-    icon: React.ElementType;
+    icon: ElementType;
     title: string;
     description: string;
     gradient: string;
@@ -166,6 +160,7 @@ export default function Home() {
 
     return (
         <>
+            <MarqueeBar />
             <Navbar />
 
             {/* ─── Hero ─── */}
