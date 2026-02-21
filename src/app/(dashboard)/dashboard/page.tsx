@@ -65,6 +65,15 @@ export default function DashboardPage() {
         }
     };
 
+    const handleDeliver = async (orderId: string) => {
+        try {
+            await ordersService.deliver(orderId);
+            setRecentSales(recentSales.map(s => s.id === orderId ? { ...s, status: 'completed' } : s));
+        } catch (error) {
+            console.error('Error confirming delivery:', error);
+        }
+    };
+
     useEffect(() => {
         loadDashboardData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -294,9 +303,9 @@ export default function DashboardPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col gap-2 items-start">
                                                     <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase ${sale.status === 'requested' ? 'bg-blue-100 text-blue-700' :
-                                                            sale.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                                                                sale.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    'bg-red-100 text-red-700'
+                                                        sale.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                                            sale.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                                                'bg-red-100 text-red-700'
                                                         }`}>
                                                         {sale.status === 'requested' ? 'Solicitado' :
                                                             sale.status === 'pending' ? 'Por Entregar' :
@@ -319,10 +328,20 @@ export default function DashboardPage() {
                                                             </button>
                                                         </div>
                                                     )}
+                                                    {sale.status === 'pending' && (
+                                                        <div className="flex gap-2 mt-1">
+                                                            <button
+                                                                onClick={() => handleDeliver(sale.id)}
+                                                                className="text-white bg-emerald-600 hover:bg-emerald-700 font-medium rounded-md text-xs px-2.5 py-1 shadow-sm transition-colors"
+                                                            >
+                                                                Confirmar Entrega
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className={`px-6 py-4 text-right font-bold ${sale.status === 'requested' || sale.status === 'pending' ? 'text-gray-400' :
-                                                    sale.status === 'completed' ? 'text-emerald-600' : 'text-red-300 line-through'
+                                                sale.status === 'completed' ? 'text-emerald-600' : 'text-red-300 line-through'
                                                 }`}>
                                                 +${Number(sale.totalAmount).toFixed(2)}
                                             </td>

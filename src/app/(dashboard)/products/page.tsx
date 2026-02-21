@@ -98,6 +98,7 @@ export default function ProductsPage() {
                                         <TableHead>Nombre</TableHead>
                                         <TableHead>Costo</TableHead>
                                         <TableHead>Precio Venta</TableHead>
+                                        <TableHead>Stock Actual</TableHead>
                                         <TableHead>Margen</TableHead>
                                         <TableHead className="text-right">Acciones</TableHead>
                                     </TableRow>
@@ -106,6 +107,7 @@ export default function ProductsPage() {
                                     {filteredProducts.map((product) => {
                                         const margin = product.salePrice - product.unitCost;
                                         const marginPercent = ((margin / product.salePrice) * 100).toFixed(1);
+                                        const stockQty = typeof product.stock === 'number' ? product.stock : 0;
 
                                         return (
                                             <TableRow key={product.id} className="hover:bg-muted/30 transition-colors">
@@ -119,6 +121,11 @@ export default function ProductsPage() {
                                                 </TableCell>
                                                 <TableCell>${Number(product.unitCost).toFixed(2)}</TableCell>
                                                 <TableCell className="font-bold text-primary">${Number(product.salePrice).toFixed(2)}</TableCell>
+                                                <TableCell>
+                                                    <span className={`font-semibold ${stockQty > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                        {stockQty}
+                                                    </span>
+                                                </TableCell>
                                                 <TableCell>
                                                     <span className={Number(marginPercent) > 30 ? "text-green-600" : "text-yellow-600"}>
                                                         {marginPercent}%

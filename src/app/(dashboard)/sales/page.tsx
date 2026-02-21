@@ -35,8 +35,9 @@ export default function SalesPage() {
     // State for Preparation Mode
     const [prepareItems, setPrepareItems] = useState<Record<string, number>>({});
 
-    // State for Tracking Mode
+    // State for Tracking Mode local input buffer
     const [trackingUpdates, setTrackingUpdates] = useState<Record<string, { sold: number, lost: number }>>({});
+    const [isSavingRecord, setIsSavingRecord] = useState<string | null>(null);
 
     useEffect(() => {
         loadData();
@@ -51,6 +52,16 @@ export default function SalesPage() {
             ]);
             setDailySale(saleData);
             setProducts(productsData);
+
+            // Initialize tracking buffer with DB values
+            if (saleData) {
+                const initialTracking: Record<string, { sold: number, lost: number }> = {};
+                saleData.details.forEach((d: any) => {
+                    initialTracking[d.productId] = { sold: d.quantitySold, lost: d.quantityLost };
+                });
+                setTrackingUpdates(initialTracking);
+            }
+
         } catch (error) {
             toast.error('Error al cargar datos de ventas');
         } finally {
@@ -87,31 +98,32 @@ export default function SalesPage() {
     };
 
     // --- Logic for TRACKING Mode ---
-    const handleTrackChange = async (productId: string, field: 'sold' | 'lost', val: string) => {
-        const detail = dailySale?.details.find(d => d.productId === productId);
-        if (!detail) return;
+    const handleTrackLocalChange = (productId: string, field: 'sold' | 'lost', val: string) => {
+        const numVal = parseInt(val) || 0;
+        setTrackingUpdates(prev => ({
+            ...prev,
+            [productId]: {
+                ...prev[productId],
+                [field]: numVal
+            }
+        }));
+    };
 
-        const numVal = parseInt(val);
-        if (isNaN(numVal) || numVal < 0) return;
-
-        // Optimistic UI update could be complex, let's just trigger API on blur or enter? 
-        // For better UX, let's use a local state and a "Save" button per row or global?
-        // Let's autosave on blur for "Sheet" like experience
+    const saveTrackRecord = async (productId: string) => {
+        setIsSavingRecord(productId);
 
         try {
-            const currentSold = field === 'sold' ? numVal : detail.quantitySold;
-            const currentLost = field === 'lost' ? numVal : detail.quantityLost;
+            const updates = trackingUpdates[productId] || { sold: 0, lost: 0 };
 
-            // Validate locally
-            if ((currentSold + currentLost) > detail.quantityPrepared) {
-                toast.error('No puedes vender/perder más de lo preparado');
-                return;
-            }
-
-            const updatedSale = await salesService.trackProduct(productId, currentSold, currentLost);
+            // Let Backend handle validation for now, or just send the POST to track endpoint
+            const updatedSale = await salesService.trackProduct(productId, updates.sold, updates.lost);
             setDailySale(updatedSale);
+            toast.success('Registro guardado');
         } catch (error) {
             toast.error('Error al actualizar venta');
+            // Revert on error could be implemented here
+        } finally {
+            setIsSavingRecord(null);
         }
     };
 
@@ -253,38 +265,45 @@ export default function SalesPage() {
                                     <TableHead className="text-center w-[120px]">Mermas</TableHead>
                                     <TableHead className="text-center">Restante</TableHead>
                                     <TableHead className="text-right">Subtotal Venta</TableHead>
+                                    <TableHead className="text-right w-[80px]">Acción</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {dailySale.details.map(detail => {
-                                    const remaining = detail.quantityPrepared - detail.quantitySold - detail.quantityLost;
-                                    const subtotal = detail.quantitySold * detail.unitPrice;
+                                {products.map(product => {
+                                    // Find if this product was prepared today
+                                    const detail = dailySale.details.find(d => d.productId === product.id);
+
+                                    const quantityPrepared = detail?.quantityPrepared || 0;
+                                    const currentValues = trackingUpdates[product.id] || { sold: detail?.quantitySold || 0, lost: detail?.quantityLost || 0 };
+
+                                    const remaining = quantityPrepared - currentValues.sold - currentValues.lost;
+                                    const subtotal = currentValues.sold * product.salePrice;
 
                                     return (
-                                        <TableRow key={detail.id}>
+                                        <TableRow key={product.id}>
                                             <TableCell className="font-medium">
-                                                {detail.product.name}
-                                                <div className="text-xs text-muted-foreground">${Number(detail.unitPrice).toFixed(2)} c/u</div>
+                                                {product.name}
+                                                <div className="text-xs text-muted-foreground">${Number(product.salePrice).toFixed(2)} c/u</div>
                                             </TableCell>
                                             <TableCell className="text-center font-bold text-muted-foreground">
-                                                {detail.quantityPrepared}
+                                                {quantityPrepared}
                                             </TableCell>
                                             <TableCell>
                                                 <Input
                                                     type="number"
                                                     min="0"
-                                                    value={detail.quantitySold} // Controlled by backend response for now, simpler
+                                                    value={currentValues.sold}
                                                     className="text-center bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 focus-visible:ring-green-500"
-                                                    onChange={(e) => handleTrackChange(detail.productId, 'sold', e.target.value)}
+                                                    onChange={(e) => handleTrackLocalChange(product.id, 'sold', e.target.value)}
                                                 />
                                             </TableCell>
                                             <TableCell>
                                                 <Input
                                                     type="number"
                                                     min="0"
-                                                    value={detail.quantityLost}
+                                                    value={currentValues.lost}
                                                     className="text-center bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 focus-visible:ring-red-500"
-                                                    onChange={(e) => handleTrackChange(detail.productId, 'lost', e.target.value)}
+                                                    onChange={(e) => handleTrackLocalChange(product.id, 'lost', e.target.value)}
                                                 />
                                             </TableCell>
                                             <TableCell className="text-center">
@@ -294,6 +313,17 @@ export default function SalesPage() {
                                             </TableCell>
                                             <TableCell className="text-right font-bold text-green-600">
                                                 ${subtotal.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10"
+                                                    onClick={() => saveTrackRecord(product.id)}
+                                                    disabled={isSavingRecord === product.id}
+                                                >
+                                                    {isSavingRecord === product.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Guardar'}
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     );
