@@ -48,13 +48,15 @@ export default function NewProductPage() {
     const onSubmit = async (data: ProductFormValues) => {
         setIsSubmitting(true);
         try {
-            await productsService.create({
+            const newProduct = await productsService.create({
                 ...data,
                 shelfLifeDays: data.shelfLifeDays || undefined,
                 imageUrl: data.imageUrl || undefined,
             });
-            toast.success('Producto creado exitosamente');
-            router.push('/products');
+            toast.success('Producto creado. ¡Ahora añade inventario!', {
+                description: 'Para poder venderlo, necesitas registrar la cantidad inicial.',
+            });
+            router.push(`/products/${newProduct.id}/stock`);
         } catch (error) {
             toast.error('Error al crear el producto');
             console.error(error);
