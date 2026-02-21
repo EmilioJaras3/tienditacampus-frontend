@@ -11,15 +11,9 @@ import { authService } from '../../../services/auth.service';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '../../../components/ui/card';
-import { Loader2, UserPlus } from 'lucide-react';
+import { Card } from '../../../components/ui/card';
+import { Loader2, UserPlus, Store, ShoppingBag } from 'lucide-react';
+import { cn } from '../../../lib/utils';
 
 // Esquema de validación que coincide con el backend
 const registerSchema = z
@@ -28,6 +22,7 @@ const registerSchema = z
         lastName: z.string().min(1, 'Los apellidos son requeridos'),
         email: z.string().email('Email inválido'),
         phone: z.string().optional(),
+        role: z.enum(['seller', 'buyer'], { required_error: 'Selecciona tu tipo de cuenta' }),
         password: z
             .string()
             .min(8, 'Mínimo 8 caracteres')
@@ -44,25 +39,58 @@ const registerSchema = z
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+const ROLE_OPTIONS = [
+    {
+        value: 'seller' as const,
+        label: 'Soy Vendedor',
+        description: 'Vende comida y productos en el campus',
+        icon: Store,
+        gradient: 'from-blue-500 to-indigo-600',
+        ring: 'ring-blue-500',
+        bg: 'bg-blue-50',
+    },
+    {
+        value: 'buyer' as const,
+        label: 'Soy Comprador',
+        description: 'Explora y compra lo que venden tus compañeros',
+        icon: ShoppingBag,
+        gradient: 'from-emerald-500 to-teal-600',
+        ring: 'ring-emerald-500',
+        bg: 'bg-emerald-50',
+    },
+];
+
 export default function RegisterPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedRole, setSelectedRole] = useState<'seller' | 'buyer' | null>(null);
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
     });
 
+    const handleRoleSelect = (role: 'seller' | 'buyer') => {
+        setSelectedRole(role);
+        setValue('role', role, { shouldValidate: true });
+    };
+
     const onSubmit = async (data: RegisterFormData) => {
         setIsLoading(true);
         try {
             const { confirmPassword, ...registerData } = data;
-            await authService.register(registerData);
+            const response = await authService.register(registerData);
             toast.success('¡Cuenta creada exitosamente!');
-            router.push('/dashboard');
+            // Redirigir según el rol del usuario recién creado
+            if (response.user.role === 'buyer') {
+                router.push('/buyer/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
         } catch (error: any) {
             toast.error(error.message || 'Error al registrarse');
         } finally {
@@ -80,12 +108,63 @@ export default function RegisterPage() {
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground">Crear Cuenta</h1>
                 <p className="text-sm text-muted-foreground">
-                    Únete a TienditaCampus y comienza a gestionar tus ventas universitarias.
+                    Únete a TienditaCampus — primero cuéntanos cómo usarás la plataforma.
                 </p>
             </div>
 
             <Card className="border-none shadow-none bg-transparent">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+
+                    {/* ── Selector de Rol ─────────────────────────────────── */}
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
+                            Tipo de Cuenta
+                        </Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {ROLE_OPTIONS.map((option) => {
+                                const Icon = option.icon;
+                                const isSelected = selectedRole === option.value;
+                                return (
+                                    <button
+                                        key={option.value}
+                                        type="button"
+                                        onClick={() => handleRoleSelect(option.value)}
+                                        className={cn(
+                                            'relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all duration-200 cursor-pointer',
+                                            isSelected
+                                                ? `border-transparent ring-2 ${option.ring} ${option.bg}`
+                                                : 'border-border bg-background hover:border-primary/30 hover:bg-muted/40',
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            'flex h-10 w-10 items-center justify-center rounded-full text-white shadow-md',
+                                            `bg-gradient-to-br ${option.gradient}`,
+                                        )}>
+                                            <Icon size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-foreground">{option.label}</p>
+                                            <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{option.description}</p>
+                                        </div>
+                                        {isSelected && (
+                                            <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-current">
+                                                <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 12 12" fill="currentColor">
+                                                    <path d="M10 3L5 8.5 2 5.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                                </svg>
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {/* Hidden input for z.object validation */}
+                        <input type="hidden" {...register('role')} />
+                        {errors.role && (
+                            <p className="text-xs font-medium text-destructive animate-fade-in">{errors.role.message}</p>
+                        )}
+                    </div>
+
+                    {/* ── Datos personales ────────────────────────────────── */}
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
