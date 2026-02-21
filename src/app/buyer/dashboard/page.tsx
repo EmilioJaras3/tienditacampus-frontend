@@ -119,32 +119,37 @@ export default function BuyerDashboardPage() {
 
                 {/* Accesos rápidos */}
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Accesos Rápidos</h2>
+                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest mb-4">
+                        Accesos rapidos
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Card className="hover-card border-none shadow-sm cursor-pointer group" onClick={() => router.push('/marketplace')}>
+                        <Card
+                            className="cursor-pointer group border-2 border-slate-900 dark:border-white rounded-none shadow-[6px_6px_0px_0px_#FFC72C] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                            onClick={() => router.push('/marketplace')}
+                        >
                             <CardContent className="p-6 flex items-center gap-4">
-                                <div className="bg-emerald-100 p-4 rounded-xl text-emerald-600 group-hover:scale-110 transition-transform">
-                                    <Store size={28} />
+                                <div className="bg-[#FFC72C] p-4 border-2 border-slate-900 dark:border-white text-slate-900">
+                                    <Store size={26} />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-emerald-700 transition-colors">Marketplace</h3>
-                                    <p className="text-sm text-gray-500">Ver todos los productos disponibles ahora mismo</p>
+                                    <h3 className="font-black text-lg uppercase tracking-tight text-slate-900">Marketplace</h3>
+                                    <p className="text-sm text-slate-700 font-medium">Ver productos disponibles ahora mismo</p>
                                 </div>
-                                <ExternalLink size={20} className="text-gray-300 group-hover:text-emerald-500 transition-colors" />
+                                <ExternalLink size={18} className="text-slate-900 opacity-70 group-hover:opacity-100 transition-opacity" />
                             </CardContent>
                         </Card>
 
-                        <Card className="hover-card border-none shadow-sm opacity-70 cursor-not-allowed">
+                        <Card className="opacity-70 cursor-not-allowed border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#E31837]">
                             <CardContent className="p-6 flex items-center gap-4">
-                                <div className="bg-blue-100 p-4 rounded-xl text-blue-600">
-                                    <Search size={28} />
+                                <div className="bg-white p-4 border-2 border-slate-900 dark:border-white text-slate-900">
+                                    <Search size={26} />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-bold text-lg text-gray-900">Buscar Vendedores</h3>
-                                        <span className="text-[10px] uppercase font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Próximamente</span>
+                                        <h3 className="font-black text-lg uppercase tracking-tight text-slate-900">Buscar vendedores</h3>
+                                        <span className="text-[10px] uppercase font-black bg-[#E31837] text-white px-2 py-0.5 border-2 border-slate-900 dark:border-white">Proximamente</span>
                                     </div>
-                                    <p className="text-sm text-gray-500">Encuentra a tus vendedores favoritos del campus</p>
+                                    <p className="text-sm text-slate-700 font-medium">Encuentra a tus vendedores favoritos del campus</p>
                                 </div>
                             </CardContent>
                         </Card>
