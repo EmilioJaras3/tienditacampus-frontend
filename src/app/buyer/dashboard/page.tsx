@@ -58,27 +58,34 @@ export default function BuyerDashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-[#f7f7f7] pb-20">
             {/* Header del comprador */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <header className="bg-white sticky top-0 z-30 border-b-2 border-slate-900 dark:border-white">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link href="/marketplace" className="flex items-center gap-2">
-                        <div className="bg-primary text-white p-1.5 rounded-lg">
-                            <ShoppingBag size={20} />
+                        <div className="w-9 h-9 bg-[#FFC72C] flex items-center justify-center border-2 border-slate-900 dark:border-white shadow-[3px_3px_0px_0px_#E31837]">
+                            <ShoppingBag size={16} className="text-slate-900" />
                         </div>
-                        <span className="font-bold text-xl text-gray-900 hidden sm:block">TienditaCampus</span>
+                        <span className="font-black text-lg sm:text-xl uppercase tracking-tight text-slate-900">
+                            Tiendita<span className="text-[#E31837]">Campus</span>
+                        </span>
                     </Link>
-                    <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex items-center gap-4 mr-2">
-                            <Link href="/" className="text-sm font-medium text-gray-500 hover:text-primary transition-colors">
-                                Inicio
-                            </Link>
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/"
+                            className="hidden sm:inline-flex px-3 py-1.5 text-sm font-black uppercase tracking-wide text-slate-900 border-2 border-slate-900 dark:border-white hover:bg-[#FFC72C] transition-colors"
+                        >
+                            Inicio
+                        </Link>
+                        <div className="hidden sm:block border-l-2 border-slate-900 dark:border-white pl-4 text-right">
+                            <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{user.firstName} {user.lastName}</p>
+                            <p className="text-xs text-slate-600 font-mono uppercase">{user.role}</p>
                         </div>
-                        <div className="text-right hidden sm:block border-l border-gray-200 pl-4">
-                            <p className="text-sm font-semibold text-gray-900">{user.firstName} {user.lastName}</p>
-                            <p className="text-xs text-gray-500 capitalize">{user.role}</p>
-                        </div>
-                        <Button variant="ghost" className="text-gray-500 hover:text-red-600" onClick={logout}>
+                        <Button
+                            variant="outline"
+                            className="border-2 border-slate-900 dark:border-white font-black uppercase"
+                            onClick={logout}
+                        >
                             Salir
                         </Button>
                     </div>
@@ -87,17 +94,25 @@ export default function BuyerDashboardPage() {
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
                 {/* Bienvenida */}
-                <div className="bg-gradient-to-r from-emerald-600 to-teal-500 rounded-2xl p-6 sm:p-10 text-white shadow-lg">
-                    <h1 className="text-3xl sm:text-4xl font-bold mb-2">¡Hola, {user.firstName}! 👋</h1>
-                    <p className="text-emerald-50 text-lg max-w-2xl mb-6">
+                <div className="border-2 border-slate-900 dark:border-white bg-[#FFC72C] shadow-[8px_8px_0px_0px_#E31837] p-6 sm:p-10">
+                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest">
+                        Area comprador
+                    </div>
+                    <h1 className="mt-4 text-3xl sm:text-5xl font-black uppercase tracking-tight text-slate-900">
+                        Hola, {user.firstName}
+                    </h1>
+                    <p className="mt-3 text-slate-800 font-medium text-base sm:text-lg max-w-2xl">
                         Descubre lo que tus compañeros están vendiendo hoy en el campus. Desde snacks hasta materiales.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                        <Link href="/marketplace">
-                            <Button className="bg-white text-emerald-700 hover:bg-gray-100 border-none font-bold h-12 px-6 shadow-md">
-                                <Search className="mr-2" size={20} />
-                                Explorar Tienda
-                            </Button>
+                    <div className="mt-8 flex flex-wrap gap-4">
+                        <Link
+                            href="/marketplace"
+                            className="group relative px-7 py-3.5 bg-[#E31837] text-white font-black text-base uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#ffffff] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200"
+                        >
+                            <span className="flex items-center gap-2">
+                                <Search size={18} />
+                                Explorar tienda
+                            </span>
                         </Link>
                     </div>
                 </div>
