@@ -44,9 +44,13 @@ export default function LoginPage() {
     const onSubmit = async (data: LoginFormData) => {
         setIsLoading(true);
         try {
-            await authService.login(data);
+            const response = await authService.login(data);
             toast.success('¡Bienvenido de nuevo!');
-            router.push('/dashboard');
+            if (response.user.role === 'buyer') {
+                router.push('/buyer/dashboard');
+            } else {
+                router.push('/dashboard');
+            }
         } catch (error: any) {
             toast.error(error.message || 'Error al iniciar sesión');
         } finally {

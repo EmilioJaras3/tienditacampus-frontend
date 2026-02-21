@@ -14,6 +14,7 @@ export interface RegisterDto {
     firstName: string;
     lastName: string;
     phone?: string;
+    role?: 'seller' | 'buyer';
 }
 
 export interface User {
