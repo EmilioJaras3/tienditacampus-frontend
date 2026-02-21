@@ -30,6 +30,11 @@ export function ProductCard({ product }: { product: Product }) {
                         Perecedero
                     </span>
                 )}
+                {(product as any).quantity_remaining !== undefined && (product as any).quantity_remaining > 0 && (
+                    <span className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md">
+                        Stock: {(product as any).quantity_remaining}
+                    </span>
+                )}
             </div>
             <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
