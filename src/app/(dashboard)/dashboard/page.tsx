@@ -47,6 +47,24 @@ export default function DashboardPage() {
         }
     };
 
+    const handleAccept = async (orderId: string) => {
+        try {
+            await ordersService.accept(orderId);
+            setRecentSales(recentSales.map(s => s.id === orderId ? { ...s, status: 'pending' } : s));
+        } catch (e) {
+            console.error('Error accepting:', e);
+        }
+    };
+
+    const handleReject = async (orderId: string) => {
+        try {
+            await ordersService.reject(orderId);
+            setRecentSales(recentSales.map(s => s.id === orderId ? { ...s, status: 'rejected' } : s));
+        } catch (e) {
+            console.error('Error rejecting:', e);
+        }
+    };
+
     useEffect(() => {
         loadDashboardData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,7 +264,7 @@ export default function DashboardPage() {
                                         <th className="px-6 py-3 font-semibold">Fecha y Hora</th>
                                         <th className="px-6 py-3 font-semibold">Comprador</th>
                                         <th className="px-6 py-3 font-semibold">Productos</th>
-                                        <th className="px-6 py-3 font-semibold">Estado</th>
+                                        <th className="px-6 py-3 font-semibold">Estado y Acción</th>
                                         <th className="px-6 py-3 font-semibold text-right">Potencial / Cobrado</th>
                                     </tr>
                                 </thead>
@@ -274,11 +292,38 @@ export default function DashboardPage() {
                                                 </ul>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase ${sale.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                                    {sale.status === 'pending' ? 'Por Entregar' : 'Pagado'}
-                                                </span>
+                                                <div className="flex flex-col gap-2 items-start">
+                                                    <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase ${sale.status === 'requested' ? 'bg-blue-100 text-blue-700' :
+                                                            sale.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                                                sale.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                                                    'bg-red-100 text-red-700'
+                                                        }`}>
+                                                        {sale.status === 'requested' ? 'Solicitado' :
+                                                            sale.status === 'pending' ? 'Por Entregar' :
+                                                                sale.status === 'completed' ? 'Pagado' :
+                                                                    'Rechazado'}
+                                                    </span>
+                                                    {sale.status === 'requested' && (
+                                                        <div className="flex gap-2 mt-1">
+                                                            <button
+                                                                onClick={() => handleAccept(sale.id)}
+                                                                className="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-md text-xs px-2.5 py-1 transition-colors"
+                                                            >
+                                                                Aceptar
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleReject(sale.id)}
+                                                                className="text-gray-700 bg-gray-200 hover:bg-gray-300 font-medium rounded-md text-xs px-2.5 py-1 transition-colors"
+                                                            >
+                                                                Rechazar
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
-                                            <td className={`px-6 py-4 text-right font-bold ${sale.status === 'pending' ? 'text-gray-400' : 'text-emerald-600'}`}>
+                                            <td className={`px-6 py-4 text-right font-bold ${sale.status === 'requested' || sale.status === 'pending' ? 'text-gray-400' :
+                                                    sale.status === 'completed' ? 'text-emerald-600' : 'text-red-300 line-through'
+                                                }`}>
                                                 +${Number(sale.totalAmount).toFixed(2)}
                                             </td>
                                         </tr>

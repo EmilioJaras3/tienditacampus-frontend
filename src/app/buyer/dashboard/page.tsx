@@ -38,6 +38,15 @@ export default function BuyerDashboardPage() {
         }
     };
 
+    const handleDeliver = async (orderId: string) => {
+        try {
+            await ordersService.deliver(orderId);
+            setPurchases(purchases.map(o => o.id === orderId ? { ...o, status: 'completed' } : o));
+        } catch (error) {
+            console.error('Error confirming delivery:', error);
+        }
+    };
+
     if (isChecking || !user) {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-gray-50">
@@ -149,11 +158,39 @@ export default function BuyerDashboardPage() {
                                                     Vendedor: {order.seller?.firstName} {order.seller?.lastName}
                                                 </p>
                                             </div>
-                                            <div className="text-left sm:text-right">
-                                                <p className="text-sm text-gray-500">Total pagado</p>
+                                            <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
+                                                <p className="text-sm text-gray-500 mb-1">Total {order.status === 'completed' ? 'pagado' : 'a pagar'}</p>
                                                 <p className="text-xl font-bold text-emerald-600">${Number(order.totalAmount).toFixed(2)}</p>
+
+                                                <div className="mt-3 flex flex-col items-end gap-2">
+                                                    <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase inline-block ${order.status === 'requested' ? 'bg-blue-100 text-blue-700' :
+                                                            order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                                                                order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                                                    'bg-red-100 text-red-700'
+                                                        }`}>
+                                                        {order.status === 'requested' ? 'Esperando Confirmación' :
+                                                            order.status === 'pending' ? 'Por Entregar' :
+                                                                order.status === 'completed' ? 'Completado' :
+                                                                    'Rechazado/Cancelado'}
+                                                    </span>
+
+                                                    {order.status === 'pending' && (
+                                                        <Button onClick={() => handleDeliver(order.id)} className="bg-emerald-600 hover:bg-emerald-700 shadow-md h-8 text-xs">
+                                                            Confirmar Recepción
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {order.deliveryMessage && (
+                                            <div className="mb-4 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                                                <p className="text-xs font-semibold text-blue-800 mb-1">Tus instrucciones de entrega:</p>
+                                                <p className="text-sm text-blue-600">
+                                                    &quot;{order.deliveryMessage}&quot;
+                                                </p>
+                                            </div>
+                                        )}
                                         <div className="space-y-3">
                                             {order.items.map((item) => (
                                                 <div key={item.id} className="flex items-center justify-between">

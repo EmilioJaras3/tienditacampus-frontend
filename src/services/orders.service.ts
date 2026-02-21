@@ -62,5 +62,19 @@ export const ordersService = {
      */
     async deliver(orderId: string): Promise<Order> {
         return api.post<Order>(`/orders/${orderId}/deliver`, {});
+    },
+
+    /**
+     * Seller: Aceptar una solicitud de orden
+     */
+    async accept(orderId: string): Promise<Order> {
+        return api.post<Order>(`/orders/${orderId}/accept`, {});
+    },
+
+    /**
+     * Seller: Rechazar una solicitud de orden
+     */
+    async reject(orderId: string): Promise<Order> {
+        return api.post<Order>(`/orders/${orderId}/reject`, {});
     }
 };

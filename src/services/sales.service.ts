@@ -87,7 +87,7 @@ export const salesService = {
      * Registrar venta/merma individual (tracking)
      */
     async trackProduct(productId: string, sold: number, lost: number): Promise<DailySale> {
-        return api.patch<DailySale>(`/sales/track/${productId}`, { quantitySold: sold, quantityLost: lost });
+        return api.post<DailySale>('/sales/track', { productId, quantitySold: sold, quantityLost: lost });
     },
 
     /**
