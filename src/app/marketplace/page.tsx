@@ -128,8 +128,11 @@ export default function MarketplacePage() {
 
                 {/* Grid de Productos */}
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <Loader2 className="animate-spin text-primary" size={40} />
+                    <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#FFC72C] py-16 flex items-center justify-center">
+                        <div className="flex items-center gap-3">
+                            <Loader2 className="animate-spin text-[#E31837]" size={24} />
+                            <span className="font-black uppercase tracking-wide text-slate-900">Cargando productos...</span>
+                        </div>
                     </div>
                 ) : products.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -138,10 +141,13 @@ export default function MarketplacePage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
-                        <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900">No encontramos productos</h3>
-                        <p className="text-gray-500">Intenta buscar con otro término.</p>
+                    <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#E31837] p-10 text-center">
+                        <div className="mx-auto mb-4 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
+                            Sin resultados
+                        </div>
+                        <ShoppingBag size={44} className="mx-auto text-slate-900 mb-4" />
+                        <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">No encontramos productos</h3>
+                        <p className="mt-2 text-slate-700 font-medium">Intenta buscar con otro termino.</p>
                     </div>
                 )}
             </main>
