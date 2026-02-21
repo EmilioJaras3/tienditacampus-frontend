@@ -164,59 +164,99 @@ export default function Home() {
             <Navbar />
 
             {/* ─── Hero ─── */}
-            <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-16">
-                {/* Background decorations */}
-                <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                    <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />
-                    <div className="absolute -bottom-20 -right-40 h-[400px] w-[400px] rounded-full bg-secondary/10 blur-3xl" />
-                    <div className="absolute left-1/2 top-1/4 h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-success/5 blur-3xl" />
+            <header className="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32 bg-[#f8f8f8] dark:bg-[#1a1a1a]">
+                <div
+                    className="absolute inset-0 z-0 opacity-10"
+                    style={{
+                        backgroundImage: 'radial-gradient(#FFC72C 1px, transparent 1px)',
+                        backgroundSize: '20px 20px',
+                    }}
+                />
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div className="lg:col-span-7 flex flex-col items-start text-left animate-fade-in">
+                            <div className="inline-block px-4 py-1 mb-6 border-2 border-[#E31837] text-[#E31837] font-bold text-xs uppercase tracking-widest bg-[#E31837]/10 rounded-full">
+                                La red #1 de emprendedores universitarios
+                            </div>
+
+                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] mb-8 uppercase text-slate-900 dark:text-white">
+                                Emprende <br />
+                                <span className="text-[#FFC72C]">en tu</span> <br />
+                                <span className="relative inline-block">
+                                    Campus
+                                    <svg
+                                        className="absolute -bottom-2 left-0 w-full h-3 text-[#E31837]"
+                                        preserveAspectRatio="none"
+                                        viewBox="0 0 100 10"
+                                    >
+                                        <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" strokeWidth="8" />
+                                    </svg>
+                                </span>
+                            </h1>
+
+                            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-lg mb-10 font-medium leading-relaxed border-l-4 border-[#FFC72C] pl-6">
+                                Conecta con tu comunidad universitaria. Compra snacks, apuntes y merch, o vende tus productos sin intermediarios.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                <Link
+                                    className="group relative px-8 py-4 bg-[#E31837] text-white font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 text-center"
+                                    href="/marketplace"
+                                >
+                                    <span className="flex items-center justify-center gap-2">
+                                        Explorar Tienda
+                                        <ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
+                                    </span>
+                                </Link>
+
+                                <Link
+                                    className="group px-8 py-4 bg-transparent text-slate-900 dark:text-white font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white hover:bg-white hover:text-slate-900 transition-colors duration-200 text-center"
+                                    href="/register"
+                                >
+                                    Crear Cuenta
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="lg:col-span-5 relative">
+                            <div className="relative z-10 border-2 border-slate-900 dark:border-white bg-slate-800 p-2 shadow-[8px_8px_0px_0px_#E31837] rotate-2 hover:rotate-0 transition-transform duration-300">
+                                <div className="relative bg-slate-900 aspect-[4/5] overflow-hidden group">
+                                    <div className="absolute inset-0 bg-[#FFC72C]/20 mix-blend-multiply pointer-events-none" />
+                                    <div className="absolute bottom-6 left-6 right-6 bg-[#1a1a1a] border-2 border-[#FFC72C] p-4">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[#FFC72C] text-xs font-bold uppercase">Trending Ahora</span>
+                                            <Zap size={16} className="text-[#FFC72C]" />
+                                        </div>
+                                        <div className="text-white font-bold text-lg">Brownies Mágicos (Facultad de Artes)</div>
+                                        <div className="flex justify-between items-end mt-2">
+                                            <span className="text-2xl font-black text-[#FFC72C]">$2.50</span>
+                                            <Link
+                                                className="bg-[#FFC72C] text-slate-900 p-2 border-2 border-slate-900 hover:bg-[#E31837] hover:text-white transition-colors"
+                                                href="/marketplace"
+                                                aria-label="Explorar productos"
+                                            >
+                                                <ArrowRight size={16} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="absolute -top-12 -right-8 w-24 h-24 bg-[#FFC72C] rounded-full blur-2xl opacity-20 z-0" />
+                            <div className="absolute -bottom-8 -left-8 w-32 h-32 border-2 border-dashed border-[#E31837] z-0 rounded-full" />
+                        </div>
+                    </div>
                 </div>
 
-                <div className="relative z-10 mx-auto max-w-4xl text-center animate-fade-in">
-                    {/* Badge */}
-                    <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary">
-                        <Zap size={14} />
-                        Plataforma para vendedores universitarios
-                    </div>
-
-                    <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-text sm:text-5xl md:text-6xl lg:text-7xl">
-                        Gestiona tu negocio{' '}
-                        <span className="bg-gradient-to-r from-primary via-blue-500 to-primary bg-clip-text text-transparent">
-                            dentro del campus
-                        </span>
-                    </h1>
-
-                    <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-secondary md:text-xl">
-                        Herramientas digitales que te ayudan a entender tu rentabilidad real,
-                        reducir pérdidas y tomar mejores decisiones de inventario.
-                    </p>
-
-                    {/* CTAs */}
-                    <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <Link href="/marketplace">
-                            <Button size="lg" className="group gap-2 text-base font-bold shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all px-8 bg-blue-600 hover:bg-blue-700">
-                                <Store size={18} />
-                                Explorar Tienda
-                            </Button>
-                        </Link>
-                        <Link href="/register">
-                            <Button variant="outline" size="lg" className="group gap-2 text-base font-bold px-8">
-                                Comenzar Gratis
-                                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Scroll indicator */}
                 <a
                     href="#features"
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-text-secondary/50 hover:text-primary transition-colors animate-bounce"
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-500 dark:text-slate-300 hover:text-[#E31837] transition-colors animate-bounce"
                 >
-                    <span className="text-[10px] font-medium uppercase tracking-widest">Descubre más</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Descubre más</span>
                     <ChevronDown size={18} />
                 </a>
-            </section>
+            </header>
 
             {/* ─── Features ─── */}
             <section id="features" className="relative bg-bg py-24 px-6">
