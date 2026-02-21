@@ -174,27 +174,34 @@ export default function BuyerDashboardPage() {
                     ) : purchases.length > 0 ? (
                         <div className="space-y-4">
                             {purchases.map((order) => (
-                                <Card key={order.id} className="border-none shadow-sm">
+                                <Card
+                                    key={order.id}
+                                    className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#FFC72C]"
+                                >
                                     <CardContent className="p-6">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b-2 border-slate-900/20 pb-4">
                                             <div>
-                                                <p className="text-sm font-medium text-gray-500">
+                                                <p className="text-xs font-mono uppercase text-slate-600">
                                                     Pedido el {new Date(order.createdAt).toLocaleDateString()} a las {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </p>
-                                                <p className="font-semibold text-gray-900">
+                                                <p className="font-black text-slate-900 uppercase tracking-tight">
                                                     Vendedor: {order.seller?.firstName} {order.seller?.lastName}
                                                 </p>
                                             </div>
                                             <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
-                                                <p className="text-sm text-gray-500 mb-1">Total {order.status === 'completed' ? 'pagado' : 'a pagar'}</p>
-                                                <p className="text-xl font-bold text-emerald-600">${Number(order.totalAmount).toFixed(2)}</p>
+                                                <p className="text-xs font-mono uppercase text-slate-600 mb-1">Total {order.status === 'completed' ? 'pagado' : 'a pagar'}</p>
+                                                <div className="inline-flex border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-2 py-1 font-black text-slate-900">
+                                                    ${Number(order.totalAmount).toFixed(2)}
+                                                </div>
 
                                                 <div className="mt-3 flex flex-col items-end gap-2">
-                                                    <span className={`px-2 py-1 text-xs font-bold rounded-lg uppercase inline-block ${order.status === 'requested' ? 'bg-blue-100 text-blue-700' :
-                                                        order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                                                            order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                                                'bg-red-100 text-red-700'
-                                                        }`}>
+                                                    <span
+                                                        className={`px-2 py-1 text-xs font-black uppercase tracking-wider border-2 border-slate-900 dark:border-white inline-block ${order.status === 'requested' ? 'bg-white text-slate-900' :
+                                                            order.status === 'pending' ? 'bg-[#FFC72C] text-slate-900' :
+                                                                order.status === 'completed' ? 'bg-green-500 text-slate-900' :
+                                                                    'bg-[#E31837] text-white'
+                                                            }`}
+                                                    >
                                                         {order.status === 'requested' ? 'Esperando Confirmación' :
                                                             order.status === 'pending' ? 'Por Entregar' :
                                                                 order.status === 'completed' ? 'Completado' :
@@ -202,7 +209,10 @@ export default function BuyerDashboardPage() {
                                                     </span>
 
                                                     {order.status === 'pending' && (
-                                                        <Button onClick={() => handleDeliver(order.id)} className="bg-emerald-600 hover:bg-emerald-700 shadow-md h-8 text-xs">
+                                                        <Button
+                                                            onClick={() => handleDeliver(order.id)}
+                                                            className="bg-[#E31837] hover:bg-[#c9122e] border-2 border-slate-900 dark:border-white font-black uppercase shadow-[4px_4px_0px_0px_#ffffff] h-9 text-xs"
+                                                        >
                                                             Confirmar Recepción
                                                         </Button>
                                                     )}
@@ -211,9 +221,9 @@ export default function BuyerDashboardPage() {
                                         </div>
 
                                         {order.deliveryMessage && (
-                                            <div className="mb-4 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
-                                                <p className="text-xs font-semibold text-blue-800 mb-1">Tus instrucciones de entrega:</p>
-                                                <p className="text-sm text-blue-600">
+                                            <div className="mb-4 border-2 border-slate-900/20 bg-white p-3">
+                                                <p className="text-xs font-black uppercase tracking-wider text-slate-900 mb-1">Tus instrucciones de entrega</p>
+                                                <p className="text-sm text-slate-700 font-medium">
                                                     &quot;{order.deliveryMessage}&quot;
                                                 </p>
                                             </div>
@@ -222,7 +232,7 @@ export default function BuyerDashboardPage() {
                                             {order.items.map((item) => (
                                                 <div key={item.id} className="flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold overflow-hidden">
+                                                        <div className="w-10 h-10 bg-[#f1f1f1] border-2 border-slate-900/20 flex items-center justify-center text-slate-900 font-black overflow-hidden">
                                                             {item.product?.imageUrl ? (
                                                                 <img src={item.product.imageUrl} className="w-full h-full object-cover" alt="" />
                                                             ) : (
@@ -230,13 +240,11 @@ export default function BuyerDashboardPage() {
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="font-medium text-gray-900">{item.quantity}x {item.product?.name}</p>
-                                                            <p className="text-xs text-gray-500">Unitario: ${Number(item.unitPrice).toFixed(2)}</p>
+                                                            <p className="font-black text-slate-900 uppercase tracking-tight">{item.quantity}x {item.product?.name}</p>
+                                                            <p className="text-xs text-slate-600 font-mono uppercase">Unitario ${Number(item.unitPrice).toFixed(2)}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="font-semibold text-gray-900">
-                                                        ${Number(item.subtotal).toFixed(2)}
-                                                    </div>
+                                                    <div className="font-black text-slate-900">${Number(item.subtotal).toFixed(2)}</div>
                                                 </div>
                                             ))}
                                         </div>
