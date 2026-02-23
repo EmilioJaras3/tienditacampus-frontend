@@ -18,7 +18,7 @@ export default function MarketplacePage() {
     const loadProducts = async (q?: string) => {
         try {
             setLoading(true);
-            const data = await productsService.findMarketplace(q);
+            const data = await productsService.getMarketplace(q);
             setProducts(data);
         } catch (error) {
             console.error("Error loading products", error);
