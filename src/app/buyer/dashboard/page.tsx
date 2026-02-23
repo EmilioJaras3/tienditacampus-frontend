@@ -1,272 +1,155 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/auth.store';
-import { Loader2, Store, ShoppingBag, Search, ExternalLink, Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 import { ordersService, Order } from '@/services/orders.service';
+import { Package, Clock, CheckCircle, XCircle, ChevronRight, Store } from 'lucide-react';
+import Link from 'next/link';
 
 export default function BuyerDashboardPage() {
-    const router = useRouter();
-    const { user, isAuthenticated, token, logout, _hasHydrated } = useAuthStore();
-    const [isChecking, setIsChecking] = useState(true);
-    const [purchases, setPurchases] = useState<Order[]>([]);
-    const [loadingPurchases, setLoadingPurchases] = useState(true);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<'activos' | 'completados' | 'cancelados'>('activos');
 
     useEffect(() => {
-        if (!_hasHydrated) return;
+        loadOrders();
+    }, []);
 
-        if (!token || !isAuthenticated || !user) {
-            router.push('/login');
-        } else if (user.role === 'seller') {
-            router.push('/dashboard');
-        } else {
-            setIsChecking(false);
-            loadPurchases();
-        }
-    }, [token, isAuthenticated, user, router, _hasHydrated]);
-
-    const loadPurchases = async () => {
+    const loadOrders = async () => {
         try {
+            setLoading(true);
             const data = await ordersService.getMyPurchases();
-            setPurchases(data);
+            setOrders(data);
         } catch (error) {
-            console.error('Failure fetching purchases:', error);
+            console.error("Error loading orders", error);
         } finally {
-            setLoadingPurchases(false);
+            setLoading(false);
         }
     };
 
-    const handleDeliver = async (orderId: string) => {
-        try {
-            await ordersService.deliver(orderId);
-            setPurchases(purchases.map(o => o.id === orderId ? { ...o, status: 'completed' } : o));
-        } catch (error) {
-            console.error('Error confirming delivery:', error);
+    const getStatusStyle = (status: string) => {
+        switch (status) {
+            case 'requested':
+            case 'pending':
+                return {
+                    bg: 'bg-neo-yellow',
+                    text: 'text-black',
+                    icon: <Clock className="w-5 h-5" />,
+                    label: status === 'requested' ? 'SOLICITADO' : 'EN PREPARACIÓN'
+                };
+            case 'delivered':
+            case 'completed':
+                return {
+                    bg: 'bg-neo-green',
+                    text: 'text-black',
+                    icon: <CheckCircle className="w-5 h-5" />,
+                    label: 'ENTREGADO'
+                };
+            case 'rejected':
+                return {
+                    bg: 'bg-neo-red',
+                    text: 'text-white',
+                    icon: <XCircle className="w-5 h-5" />,
+                    label: 'CANCELADO'
+                };
+            default:
+                return {
+                    bg: 'bg-gray-200',
+                    text: 'text-black',
+                    icon: <Package className="w-5 h-5" />,
+                    label: status
+                };
         }
     };
 
-    if (isChecking || !user || !_hasHydrated) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
-    }
+    const filteredOrders = orders.filter(o => {
+        if (filter === 'activos') return ['requested', 'pending'].includes(o.status);
+        if (filter === 'completados') return ['delivered', 'completed'].includes(o.status);
+        if (filter === 'cancelados') return o.status === 'rejected';
+        return true;
+    });
 
     return (
-        <div className="min-h-screen bg-[#f7f7f7] pb-20">
-            {/* Header del comprador */}
-            <header className="bg-white sticky top-0 z-30 border-b-2 border-slate-900 dark:border-white">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link href="/marketplace" className="flex items-center gap-2">
-                        <div className="w-9 h-9 bg-[#FFC72C] flex items-center justify-center border-2 border-slate-900 dark:border-white shadow-[3px_3px_0px_0px_#E31837]">
-                            <ShoppingBag size={16} className="text-slate-900" />
-                        </div>
-                        <span className="font-black text-lg sm:text-xl uppercase tracking-tight text-slate-900">
-                            Tiendita<span className="text-[#E31837]">Campus</span>
+        <div className="bg-neo-white font-display text-black min-h-screen selection:bg-neo-yellow selection:text-black">
+            <header className="border-b-4 border-black bg-white sticky top-[64px] z-40">
+                <div className="max-w-4xl mx-auto px-4 py-6 md:px-8">
+                    <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter flex flex-col md:flex-row md:items-center gap-2">
+                        <span>Mis</span>
+                        <span className="bg-neo-red text-white px-4 py-1 border-2 border-black inline-block -rotate-2 transform">
+                            Compras
                         </span>
-                    </Link>
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href="/"
-                            className="hidden sm:inline-flex px-3 py-1.5 text-sm font-black uppercase tracking-wide text-slate-900 border-2 border-slate-900 dark:border-white hover:bg-[#FFC72C] transition-colors"
-                        >
-                            Inicio
-                        </Link>
-                        <div className="hidden sm:block border-l-2 border-slate-900 dark:border-white pl-4 text-right">
-                            <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{user.firstName} {user.lastName}</p>
-                            <p className="text-xs text-slate-600 font-mono uppercase">{user.role}</p>
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="border-2 border-slate-900 dark:border-white font-black uppercase"
-                            onClick={logout}
-                        >
-                            Salir
-                        </Button>
-                    </div>
+                    </h1>
                 </div>
             </header>
 
-            <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
-                {/* Bienvenida */}
-                <div className="border-2 border-slate-900 dark:border-white bg-[#FFC72C] shadow-[8px_8px_0px_0px_#E31837] p-6 sm:p-10">
-                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest">
-                        Area comprador
-                    </div>
-                    <h1 className="mt-4 text-3xl sm:text-5xl font-black uppercase tracking-tight text-slate-900">
-                        Hola, {user.firstName}
-                    </h1>
-                    <p className="mt-3 text-slate-800 font-medium text-base sm:text-lg max-w-2xl">
-                        Descubre lo que tus compañeros están vendiendo hoy en el campus. Desde snacks hasta materiales.
-                    </p>
-                    <div className="mt-8 flex flex-wrap gap-4">
-                        <Link
-                            href="/marketplace"
-                            className="group relative px-7 py-3.5 bg-[#E31837] text-white font-black text-base uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#ffffff] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200"
+            <main className="max-w-4xl mx-auto px-4 py-8 md:px-8">
+                {/* Tabs */}
+                <div className="flex overflow-x-auto gap-4 pb-4 mb-6 border-b-4 border-black hide-scrollbar">
+                    {['activos', 'completados', 'cancelados'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setFilter(tab as any)}
+                            className={`px-6 py-3 font-black text-sm uppercase tracking-widest border-2 border-black whitespace-nowrap transition-transform hover:-translate-y-1 ${filter === tab
+                                    ? 'bg-black text-white shadow-none translate-y-0'
+                                    : 'bg-white text-black shadow-neo-sm hover:shadow-neo'
+                                }`}
                         >
-                            <span className="flex items-center gap-2">
-                                <Search size={18} />
-                                Explorar tienda
-                            </span>
-                        </Link>
-                    </div>
+                            {tab}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Accesos rápidos */}
-                <div>
-                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest mb-4">
-                        Accesos rapidos
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Card
-                            className="cursor-pointer group border-2 border-slate-900 dark:border-white rounded-none shadow-[6px_6px_0px_0px_#FFC72C] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                            onClick={() => router.push('/marketplace')}
-                        >
-                            <CardContent className="p-6 flex items-center gap-4">
-                                <div className="bg-[#FFC72C] p-4 border-2 border-slate-900 dark:border-white text-slate-900">
-                                    <Store size={26} />
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="font-black text-lg uppercase tracking-tight text-slate-900">Marketplace</h3>
-                                    <p className="text-sm text-slate-700 font-medium">Ver productos disponibles ahora mismo</p>
-                                </div>
-                                <ExternalLink size={18} className="text-slate-900 opacity-70 group-hover:opacity-100 transition-opacity" />
-                            </CardContent>
-                        </Card>
-
-                        <Card className="opacity-70 cursor-not-allowed border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#E31837]">
-                            <CardContent className="p-6 flex items-center gap-4">
-                                <div className="bg-white p-4 border-2 border-slate-900 dark:border-white text-slate-900">
-                                    <Search size={26} />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-black text-lg uppercase tracking-tight text-slate-900">Buscar vendedores</h3>
-                                        <span className="text-[10px] uppercase font-black bg-[#E31837] text-white px-2 py-0.5 border-2 border-slate-900 dark:border-white">Proximamente</span>
-                                    </div>
-                                    <p className="text-sm text-slate-700 font-medium">Encuentra a tus vendedores favoritos del campus</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* Mis Compras */}
-                <div>
-                    <div className="flex items-center justify-between mb-4 gap-4">
-                        <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-white px-3 py-1 text-xs font-black uppercase tracking-widest">
-                            <Package size={14} className="text-slate-900" /> Mis compras recientes
-                        </div>
-                    </div>
-
-                    {loadingPurchases ? (
-                        <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#FFC72C] py-12 flex items-center justify-center">
-                            <div className="flex items-center gap-3">
-                                <Loader2 className="animate-spin text-[#E31837]" size={22} />
-                                <span className="font-black uppercase tracking-wide text-slate-900">Cargando compras...</span>
-                            </div>
-                        </div>
-                    ) : purchases.length > 0 ? (
-                        <div className="space-y-4">
-                            {purchases.map((order) => (
-                                <Card
-                                    key={order.id}
-                                    className="border-2 border-slate-900 dark:border-white rounded-none bg-white shadow-[6px_6px_0px_0px_#FFC72C]"
-                                >
-                                    <CardContent className="p-6">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b-2 border-slate-900/20 pb-4">
-                                            <div>
-                                                <p className="text-xs font-mono uppercase text-slate-600">
-                                                    Pedido el {new Date(order.createdAt).toLocaleDateString()} a las {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </p>
-                                                <p className="font-black text-slate-900 uppercase tracking-tight">
-                                                    Vendedor: {order.seller?.firstName} {order.seller?.lastName}
-                                                </p>
-                                            </div>
-                                            <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
-                                                <p className="text-xs font-mono uppercase text-slate-600 mb-1">Total {order.status === 'completed' ? 'pagado' : 'a pagar'}</p>
-                                                <div className="inline-flex border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-2 py-1 font-black text-slate-900">
-                                                    ${Number(order.totalAmount).toFixed(2)}
-                                                </div>
-
-                                                <div className="mt-3 flex flex-col items-end gap-2">
-                                                    <span
-                                                        className={`px-2 py-1 text-xs font-black uppercase tracking-wider border-2 border-slate-900 dark:border-white inline-block ${order.status === 'requested' ? 'bg-white text-slate-900' :
-                                                            order.status === 'pending' ? 'bg-[#FFC72C] text-slate-900' :
-                                                                order.status === 'completed' ? 'bg-green-500 text-slate-900' :
-                                                                    'bg-[#E31837] text-white'
-                                                            }`}
-                                                    >
-                                                        {order.status === 'requested' ? 'Esperando Confirmación' :
-                                                            order.status === 'pending' ? 'Por Entregar' :
-                                                                order.status === 'completed' ? 'Completado' :
-                                                                    'Rechazado/Cancelado'}
-                                                    </span>
-
-                                                    {order.status === 'pending' && (
-                                                        <Button
-                                                            onClick={() => handleDeliver(order.id)}
-                                                            className="bg-[#E31837] hover:bg-[#c9122e] border-2 border-slate-900 dark:border-white font-black uppercase shadow-[4px_4px_0px_0px_#ffffff] h-9 text-xs"
-                                                        >
-                                                            Confirmar Recepción
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {order.deliveryMessage && (
-                                            <div className="mb-4 border-2 border-slate-900/20 bg-white p-3">
-                                                <p className="text-xs font-black uppercase tracking-wider text-slate-900 mb-1">Tus instrucciones de entrega</p>
-                                                <p className="text-sm text-slate-700 font-medium">
-                                                    &quot;{order.deliveryMessage}&quot;
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div className="space-y-3">
-                                            {order.items.map((item) => (
-                                                <div key={item.id} className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-[#f1f1f1] border-2 border-slate-900/20 flex items-center justify-center text-slate-900 font-black overflow-hidden">
-                                                            {item.product?.imageUrl ? (
-                                                                <img src={item.product.imageUrl} className="w-full h-full object-cover" alt="" />
-                                                            ) : (
-                                                                item.product?.name.charAt(0)
-                                                            )}
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-black text-slate-900 uppercase tracking-tight">{item.quantity}x {item.product?.name}</p>
-                                                            <p className="text-xs text-slate-600 font-mono uppercase">Unitario ${Number(item.unitPrice).toFixed(2)}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-black text-slate-900">${Number(item.subtotal).toFixed(2)}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#E31837] p-10 text-center">
-                            <div className="mx-auto mb-4 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
-                                Sin compras
-                            </div>
-                            <ShoppingBag size={44} className="mx-auto text-slate-900 mb-4" />
-                            <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">Aun no has hecho compras</h3>
-                            <p className="mt-2 text-slate-700 font-medium mb-6">Explora el marketplace y apoya a tus compañeros.</p>
-                            <Link
-                                href="/marketplace"
-                                className="inline-flex px-7 py-3 bg-[#E31837] text-white font-black uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#FFC72C] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200"
-                            >
-                                Ver catalogo
+                {/* Lista de Pedidos */}
+                <div className="flex flex-col gap-6">
+                    {loading ? (
+                        [1, 2, 3].map(i => <div key={i} className="h-48 bg-gray-200 border-4 border-black animate-pulse" />)
+                    ) : filteredOrders.length === 0 ? (
+                        <div className="bg-white border-4 border-black p-12 text-center shadow-neo-lg transform rotate-1">
+                            <Store className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                            <h3 className="text-2xl font-black uppercase text-gray-500 mb-6">No hay pedidos aquí.</h3>
+                            <Link href="/marketplace" className="inline-block bg-neo-yellow text-black font-black uppercase tracking-wider px-8 py-4 border-4 border-black shadow-neo hover:-translate-y-1 transition-transform">
+                                Explorar Campus
                             </Link>
                         </div>
+                    ) : (
+                        filteredOrders.map(order => {
+                            const style = getStatusStyle(order.status);
+                            const productCount = order.items?.reduce((acc, i) => acc + i.quantity, 0) || 0;
+                            const mainProduct = order.items?.[0]?.product?.name || `Producto #${order.items?.[0]?.productId.substring(0, 4)}`;
+
+                            return (
+                                <article key={order.id} className="bg-white border-4 border-black p-6 shadow-neo-lg flex flex-col md:flex-row gap-6 hover:-translate-y-1 transition-transform group">
+                                    <div className={`w-16 h-16 md:w-24 md:w-24 border-4 border-black flex items-center justify-center shrink-0 -rotate-3 group-hover:rotate-0 transition-transform ${style.bg} ${style.text}`}>
+                                        <Package className="w-8 h-8 md:w-12 md:h-12" />
+                                    </div>
+
+                                    <div className="flex-grow flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black uppercase border-2 border-black shadow-neo-sm ${style.bg} ${style.text}`}>
+                                                    {style.icon} {style.label}
+                                                </span>
+                                                <span className="text-xl font-black">${Number(order.totalAmount).toFixed(2)}</span>
+                                            </div>
+                                            <h3 className="text-xl md:text-2xl font-black uppercase leading-tight mb-1">
+                                                {mainProduct}
+                                                {productCount > 1 && <span className="text-gray-500 ml-2">+{productCount - 1} más</span>}
+                                            </h3>
+                                            <p className="font-bold text-sm text-gray-600">
+                                                Vendido por: <span className="text-black uppercase underline decoration-2 underline-offset-4 decoration-neo-red">{order.seller?.fullName || 'Vendedor Oculto'}</span>
+                                            </p>
+                                        </div>
+                                        <div className="mt-4 flex items-center justify-between pt-4 border-t-4 border-dashed border-gray-200">
+                                            <div className="text-xs font-bold font-mono text-gray-500">
+                                                {new Date(order.createdAt).toLocaleString()}
+                                            </div>
+                                            <button className="flex items-center gap-2 font-black uppercase text-sm tracking-widest text-neo-red hover:text-black transition-colors group">
+                                                Ver Recibo <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform border-2 border-current rounded-full p-0.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })
                     )}
                 </div>
             </main>
