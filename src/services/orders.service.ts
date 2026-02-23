@@ -1,10 +1,24 @@
 import { api } from './api';
 import { Product } from './products.service';
-import { User } from './auth.service';
+
+export interface Order {
+    id: string;
+    buyerId: string;
+    sellerId: string;
+    status: 'requested' | 'accepted' | 'rejected' | 'delivered';
+    totalAmount: number;
+    deliveryMessage?: string;
+    deliveryLocation?: string;
+    createdAt: string;
+    updatedAt: string;
+    items: OrderItem[];
+    // Expand based on backend entity relations
+    buyer?: { fullName: string; email: string };
+    seller?: { fullName: string; email: string };
+}
 
 export interface OrderItem {
     id: string;
-    orderId: string;
     productId: string;
     quantity: number;
     unitPrice: number;
@@ -12,69 +26,57 @@ export interface OrderItem {
     product?: Product;
 }
 
-export interface Order {
-    id: string;
-    buyerId: string;
-    sellerId: string;
-    totalAmount: number;
-    status: string; // 'pending', 'completed', 'cancelled'
-    deliveryMessage: string | null;
-    createdAt: string;
-    updatedAt: string;
-    items: OrderItem[];
-    buyer?: User;
-    seller?: User;
+export interface OrderItemDto {
+    productId: string;
+    quantity: number;
 }
 
 export interface CreateOrderDto {
     sellerId: string;
-    items: {
-        productId: string;
-        quantity: number;
-    }[];
+    items: OrderItemDto[];
     deliveryMessage?: string;
 }
 
 export const ordersService = {
     /**
-     * Comprar productos de un vendedor
+     * Crear una nueva orden (Buyer)
      */
-    async purchase(data: CreateOrderDto): Promise<Order> {
+    async createOrder(data: CreateOrderDto): Promise<Order> {
         return api.post<Order>('/orders/purchase', data);
     },
 
     /**
-     * Obtener el historial de compras del usuario logueado
+     * Obtener compras del usuario (Buyer)
      */
     async getMyPurchases(): Promise<Order[]> {
         return api.get<Order[]>('/orders/my-purchases');
     },
 
     /**
-     * Obtener el historial de ventas (pedidos recibidos) del vendedor logueado
+     * Obtener ventas para gestionar (Seller)
      */
-    async getSellerSales(): Promise<Order[]> {
+    async getIncomingOrders(): Promise<Order[]> {
         return api.get<Order[]>('/orders/seller-sales');
     },
 
     /**
-     * Confirma la entrega y el pago contraentrega
+     * Aceptar una orden (Seller)
      */
-    async deliver(orderId: string): Promise<Order> {
-        return api.post<Order>(`/orders/${orderId}/deliver`, {});
+    async acceptOrder(id: string): Promise<Order> {
+        return api.post<Order>(`/orders/${id}/accept`);
     },
 
     /**
-     * Seller: Aceptar una solicitud de orden
+     * Rechazar una orden (Seller)
      */
-    async accept(orderId: string): Promise<Order> {
-        return api.post<Order>(`/orders/${orderId}/accept`, {});
+    async rejectOrder(id: string): Promise<Order> {
+        return api.post<Order>(`/orders/${id}/reject`);
     },
 
     /**
-     * Seller: Rechazar una solicitud de orden
+     * Marcar como entregada (Seller o Buyer)
      */
-    async reject(orderId: string): Promise<Order> {
-        return api.post<Order>(`/orders/${orderId}/reject`, {});
+    async markAsDelivered(id: string): Promise<Order> {
+        return api.post<Order>(`/orders/${id}/deliver`);
     }
 };
