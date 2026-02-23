@@ -54,7 +54,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         setIsPurchasing(true);
         try {
-            await ordersService.purchase({
+            await ordersService.createOrder({
                 sellerId: sellerId,
                 items: [{
                     productId: product.id,
