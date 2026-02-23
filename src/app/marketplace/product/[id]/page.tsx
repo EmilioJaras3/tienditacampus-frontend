@@ -16,7 +16,7 @@ export default function ProductDetailPage() {
         const loadProduct = async () => {
             try {
                 setLoading(true);
-                const data = await productsService.getById(id as string, false);
+                const data = await productsService.getById(id as string);
                 setProduct(data);
             } catch (error) {
                 console.error("Error loading product", error);
@@ -28,17 +28,7 @@ export default function ProductDetailPage() {
         if (id) loadProduct();
     }, [id]);
 
-    const loadProduct = async () => {
-        try {
-            setLoading(true);
-            const data = await productsService.getById(id as string, false);
-            setProduct(data);
-        } catch (error) {
-            console.error("Error loading product", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     if (loading) return (
         <div className="max-w-7xl mx-auto px-4 py-12 animate-pulse bg-background-dark min-h-screen">

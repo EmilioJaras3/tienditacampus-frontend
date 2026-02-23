@@ -58,6 +58,7 @@ export default function Home() {
                         <div className="lg:col-span-5 relative">
                             <div className="relative z-10 border-2 border-slate-900 dark:border-white bg-slate-800 p-2 shadow-neo-red rotate-2 hover:rotate-0 transition-transform duration-300">
                                 <div className="relative bg-slate-900 aspect-[4/5] overflow-hidden group">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         alt="Estudiantes en el campus"
                                         className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 mix-blend-overlay opacity-80"

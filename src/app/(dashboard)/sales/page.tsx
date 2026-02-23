@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 export default function ManageOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'all' | 'requested' | 'pending' | 'completed'>('all');
+    const [activeTab, setActiveTab] = useState<'all' | 'requested' | 'accepted' | 'completed'>('all');
 
     useEffect(() => {
         loadOrders();
@@ -65,7 +65,7 @@ export default function ManageOrdersPage() {
     const getStatusStyle = (status: string) => {
         switch (status) {
             case 'requested': return { bg: 'bg-neo-yellow', text: 'text-black', label: 'Nuevo' };
-            case 'pending': return { bg: 'bg-neo-red', text: 'text-white', label: 'En Cocina' };
+            case 'accepted': return { bg: 'bg-neo-red', text: 'text-white', label: 'En Cocina' };
             case 'completed':
             case 'delivered': return { bg: 'bg-neo-green', text: 'text-black', label: 'Completado' };
             case 'rejected': return { bg: 'bg-black', text: 'text-white', label: 'Cancelado' };
@@ -109,10 +109,10 @@ export default function ManageOrdersPage() {
                         <span className="font-bold uppercase tracking-widest text-xs">Pendientes</span>
                     </button>
                     <button
-                        onClick={() => setActiveTab('pending')}
-                        className={`p-4 border-4 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-1 ${activeTab === 'pending' ? 'bg-neo-red text-white border-neo-red shadow-[4px_4px_0px_0px_#ffffff]' : 'border-neo-red text-neo-red'}`}
+                        onClick={() => setActiveTab('accepted')}
+                        className={`p-4 border-4 flex flex-col items-center justify-center text-center transition-transform hover:-translate-y-1 ${activeTab === 'accepted' ? 'bg-neo-red text-white border-neo-red shadow-[4px_4px_0px_0px_#ffffff]' : 'border-neo-red text-neo-red'}`}
                     >
-                        <span className="font-black text-3xl mb-1">{orders.filter(o => o.status === 'pending').length}</span>
+                        <span className="font-black text-3xl mb-1">{orders.filter(o => o.status === 'accepted').length}</span>
                         <span className="font-bold uppercase tracking-widest text-xs">En Cocina</span>
                     </button>
                     <button
@@ -183,7 +183,7 @@ export default function ManageOrdersPage() {
                                                     </button>
                                                 </>
                                             )}
-                                            {order.status === 'pending' && (
+                                            {order.status === 'accepted' && (
                                                 <button onClick={() => handleDeliver(order.id)} className="bg-neo-green text-black border-2 border-neo-green font-black uppercase px-6 py-2 shadow-[2px_2px_0_0_#ffffff] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center gap-2">
                                                     <CheckCircle2 className="w-5 h-5" /> Marcar Entregado
                                                 </button>
