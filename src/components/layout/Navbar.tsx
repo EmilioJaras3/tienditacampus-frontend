@@ -3,103 +3,161 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
-import { Button } from '@/components/ui/button';
 import {
     LayoutDashboard,
     ShoppingBag,
     Package,
     LogOut,
     User,
-    ShoppingBasket
+    ShoppingBasket,
+    Menu,
+    X
 } from 'lucide-react';
+import { useState } from 'react';
 
 export function Navbar() {
     const pathname = usePathname();
-    const { user, logout, isAuthenticated } = useAuthStore();
+    const { user, logout, isAuthenticated, _hasHydrated } = useAuthStore();
+    const [mobileOpen, setMobileOpen] = useState(false);
 
-    // No mostrar la Navbar estándar en el Dashboard de Seller (usa Sidebar propia)
-    if (pathname.startsWith('/dashboard')) return null;
+    // No mostrar la Navbar en el Dashboard de Seller (usa Sidebar propia)
+    if (pathname.startsWith('/dashboard') || pathname.startsWith('/products') || pathname.startsWith('/sales') || pathname.startsWith('/reports') || pathname.startsWith('/settings')) return null;
 
     const isBuyer = user?.role === 'buyer';
-    const isSeller = user?.role === 'seller';
+    const isSeller = user?.role === 'seller' || user?.role === 'admin';
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b-4 border-black font-display">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2">
-                        <div className="bg-indigo-600 p-1.5 rounded-lg">
-                            <ShoppingBasket className="h-6 w-6 text-white" />
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <div className="bg-neo-red p-1.5 border-2 border-black shadow-[2px_2px_0_0_#000] group-hover:shadow-none group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all">
+                            <ShoppingBasket className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+                        <span className="text-lg font-black uppercase tracking-tight text-black">
                             TienditaCampus
                         </span>
                     </Link>
 
-                    {/* Links Izquierda / Centro */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    {/* Links Centro - Desktop */}
+                    <div className="hidden md:flex items-center gap-1">
                         <Link
                             href="/marketplace"
-                            className={`text-sm font-medium transition-colors hover:text-indigo-600 ${pathname === '/marketplace' ? 'text-indigo-600' : 'text-slate-600'
+                            className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all border-2 ${pathname === '/marketplace'
+                                    ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
+                                    : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
                                 }`}
                         >
-                            Marketplace
+                            <span className="flex items-center gap-1.5">
+                                <ShoppingBag className="w-4 h-4" /> Tienda
+                            </span>
                         </Link>
                         {isAuthenticated && isBuyer && (
                             <Link
-                                href="/buyer/orders"
-                                className={`text-sm font-medium transition-colors hover:text-indigo-600 ${pathname.startsWith('/buyer/orders') ? 'text-indigo-600' : 'text-slate-600'
+                                href="/buyer/dashboard"
+                                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all border-2 ${pathname.startsWith('/buyer')
+                                        ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
+                                        : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
                                     }`}
                             >
-                                Mis Pedidos
+                                <span className="flex items-center gap-1.5">
+                                    <Package className="w-4 h-4" /> Mis Pedidos
+                                </span>
                             </Link>
                         )}
                         {isAuthenticated && isSeller && (
                             <Link
                                 href="/dashboard"
-                                className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all border-2 bg-transparent text-black border-transparent hover:border-black hover:bg-neo-red/10`}
                             >
-                                Ir a Panel Vendedor
+                                <span className="flex items-center gap-1.5">
+                                    <LayoutDashboard className="w-4 h-4" /> Panel Vendedor
+                                </span>
                             </Link>
                         )}
                     </div>
 
-                    {/* Botones Derecha */}
-                    <div className="flex items-center space-x-4">
+                    {/* Botones Derecha - Desktop */}
+                    <div className="hidden md:flex items-center gap-3">
                         {!isAuthenticated ? (
                             <>
-                                <Link href="/login">
-                                    <Button variant="ghost" size="sm">Iniciar Sesión</Button>
+                                <Link
+                                    href="/auth/login"
+                                    className="px-5 py-2 text-sm font-bold uppercase tracking-wider text-black border-2 border-black hover:bg-black hover:text-white transition-all"
+                                >
+                                    Entrar
                                 </Link>
-                                <Link href="/register">
-                                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">Crear Cuenta</Button>
+                                <Link
+                                    href="/auth/register"
+                                    className="px-5 py-2 text-sm font-bold uppercase tracking-wider text-white bg-neo-red border-2 border-black shadow-[3px_3px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+                                >
+                                    Crear Cuenta
                                 </Link>
                             </>
                         ) : (
-                            <div className="flex items-center space-x-4">
-                                <Link href={isBuyer ? "/buyer/settings" : "/dashboard/settings"}>
-                                    <div className="flex items-center space-x-2 text-sm text-slate-700 hover:text-indigo-600 transition-colors cursor-pointer">
-                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-                                            <User className="h-4 w-4" />
-                                        </div>
-                                        <span className="hidden sm:inline font-medium">{user?.firstName}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-neo-yellow/20">
+                                    <div className="w-7 h-7 bg-neo-red border-2 border-black flex items-center justify-center text-white font-black text-xs">
+                                        {user?.firstName?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
-                                </Link>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
+                                    <span className="text-sm font-bold text-black hidden sm:inline">{user?.firstName}</span>
+                                </div>
+                                <button
                                     onClick={logout}
-                                    className="text-slate-500 hover:text-red-600"
+                                    className="px-3 py-2 text-sm font-bold uppercase text-black border-2 border-black hover:bg-neo-red hover:text-white transition-all"
                                 >
-                                    <LogOut className="h-4 w-4 sm:mr-2" />
-                                    <span className="hidden sm:inline">Salir</span>
-                                </Button>
+                                    <LogOut className="h-4 w-4" />
+                                </button>
                             </div>
                         )}
                     </div>
+
+                    {/* Mobile hamburger */}
+                    <button
+                        className="md:hidden p-2 border-2 border-black"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                    >
+                        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            {mobileOpen && (
+                <div className="md:hidden border-t-4 border-black bg-white">
+                    <div className="flex flex-col p-4 gap-2">
+                        <Link href="/marketplace" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm border-2 border-black bg-neo-yellow/20 hover:bg-neo-yellow transition-colors">
+                            <span className="flex items-center gap-2"><ShoppingBag className="w-4 h-4" /> Tienda</span>
+                        </Link>
+                        {isAuthenticated && isBuyer && (
+                            <Link href="/buyer/dashboard" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm border-2 border-black hover:bg-neo-yellow/20 transition-colors">
+                                <span className="flex items-center gap-2"><Package className="w-4 h-4" /> Mis Pedidos</span>
+                            </Link>
+                        )}
+                        {isAuthenticated && isSeller && (
+                            <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm border-2 border-black hover:bg-neo-red/10 transition-colors">
+                                <span className="flex items-center gap-2"><LayoutDashboard className="w-4 h-4" /> Panel Vendedor</span>
+                            </Link>
+                        )}
+                        <hr className="border-2 border-black my-2" />
+                        {!isAuthenticated ? (
+                            <>
+                                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black hover:bg-black hover:text-white transition-colors">
+                                    Entrar
+                                </Link>
+                                <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black bg-neo-red text-white hover:bg-red-700 transition-colors">
+                                    Crear Cuenta
+                                </Link>
+                            </>
+                        ) : (
+                            <button onClick={() => { logout(); setMobileOpen(false); }} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black text-neo-red hover:bg-neo-red hover:text-white transition-colors">
+                                <span className="flex items-center justify-center gap-2"><LogOut className="w-4 h-4" /> Cerrar Sesión</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
         </nav>
     );
 }
