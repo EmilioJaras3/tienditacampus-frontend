@@ -20,6 +20,13 @@ import { useState } from 'react';
 
 const routes = [
     {
+        label: 'Ver Tienda',
+        icon: ShoppingBag,
+        href: '/marketplace',
+        color: 'bg-neo-yellow',
+        roles: ['seller', 'admin', 'buyer'],
+    },
+    {
         label: 'Resumen',
         icon: LayoutDashboard,
         href: '/dashboard',

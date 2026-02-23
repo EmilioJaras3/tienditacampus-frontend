@@ -80,7 +80,7 @@ export default function ReportsPage() {
                     </div>
                     <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Ingresos Totales</p>
                     <h3 className="text-4xl font-black tracking-tighter text-black">
-                        ${stats?.revenue.toFixed(2) || '0.00'}
+                        ${stats?.revenue?.toFixed(2) || '0.00'}
                     </h3>
                 </div>
 
@@ -97,7 +97,7 @@ export default function ReportsPage() {
                     </div>
                     <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1 relative z-10">Ganancia Neta (ROI)</p>
                     <h3 className="text-4xl font-black tracking-tighter text-white relative z-10">
-                        ${stats?.netProfit.toFixed(2) || '0.00'}
+                        ${stats?.netProfit?.toFixed(2) || '0.00'}
                     </h3>
                 </div>
 
@@ -110,7 +110,7 @@ export default function ReportsPage() {
                     </div>
                     <p className="text-xs font-black uppercase text-black/40 tracking-widest mb-1">Margen Objetivo</p>
                     <h3 className="text-4xl font-black tracking-tighter text-black">
-                        {stats?.roi.toFixed(1) || '0.0'}%
+                        {stats?.roi?.toFixed(1) || '0.0'}%
                     </h3>
                 </div>
 

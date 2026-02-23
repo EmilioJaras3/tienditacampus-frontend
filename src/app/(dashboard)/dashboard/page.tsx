@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Package, TrendingUp, CheckCircle2, ChevronRight, AlertCircle, Loader2, DollarSign, Users, ShoppingBasket, Rocket } from "lucide-react";
+import { Package, TrendingUp, CheckCircle2, ChevronRight, AlertCircle, Loader2, DollarSign, Users, ShoppingBasket, Rocket, Plus } from "lucide-react";
 import { salesService, RoiStats } from '@/services/sales.service';
 import { ordersService, Order } from '@/services/orders.service';
 import { useAuthStore } from '@/store/auth.store';
@@ -118,7 +118,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                         <div className="text-7xl font-black tracking-tighter leading-none mb-2">
-                            ${stats?.revenue.toFixed(0) || '0'}
+                            ${stats?.revenue?.toFixed(0) || '0'}
                         </div>
                         <p className="font-extrabold uppercase text-[10px] text-slate-400">Sincronizado hace 1 min</p>
                     </div>
@@ -133,7 +133,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="relative z-10">
                         <div className={`text-7xl font-black tracking-tighter leading-none mb-2 ${(stats?.netProfit || 0) < 0 ? 'text-neo-red' : 'text-white'}`}>
-                            ${stats?.netProfit.toFixed(0) || '0'}
+                            ${stats?.netProfit?.toFixed(0) || '0'}
                         </div>
                         <p className="font-extrabold uppercase text-[10px] text-neo-green tracking-widest flex items-center gap-1">
                             <Rocket size={12} /> ROI OBJETIVO ALCANZADO
