@@ -13,6 +13,18 @@ export default function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
+        const loadProduct = async () => {
+            try {
+                setLoading(true);
+                const data = await productsService.getById(id as string, false);
+                setProduct(data);
+            } catch (error) {
+                console.error("Error loading product", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         if (id) loadProduct();
     }, [id]);
 

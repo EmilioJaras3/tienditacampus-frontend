@@ -22,21 +22,21 @@ function CheckoutContent() {
     const [deliveryMessage, setDeliveryMessage] = useState('');
 
     useEffect(() => {
+        const loadProduct = async () => {
+            try {
+                setLoading(true);
+                const data = await productsService.getById(productId as string);
+                setProduct(data);
+            } catch (error) {
+                console.error("Error loading product", error);
+                toast.error('Producto no encontrado');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         if (productId) loadProduct();
     }, [productId]);
-
-    const loadProduct = async () => {
-        try {
-            setLoading(true);
-            const data = await productsService.getById(productId as string);
-            setProduct(data);
-        } catch (error) {
-            console.error("Error loading product", error);
-            toast.error('Producto no encontrado');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleCheckout = async (e: React.FormEvent) => {
         e.preventDefault();

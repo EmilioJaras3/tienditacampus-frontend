@@ -167,7 +167,7 @@ export default function ManageOrdersPage() {
                                         {order.deliveryMessage && (
                                             <div className="bg-white/5 border-l-4 border-neo-yellow p-3 mb-6">
                                                 <p className="text-sm font-medium italic text-gray-300">
-                                                    "{order.deliveryMessage}"
+                                                    &quot;{order.deliveryMessage}&quot;
                                                 </p>
                                             </div>
                                         )}
