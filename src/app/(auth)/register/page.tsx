@@ -8,64 +8,35 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { authService } from '../../../services/auth.service';
-import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import { Card } from '../../../components/ui/card';
-import { Loader2, UserPlus, Store, ShoppingBag } from 'lucide-react';
-import { cn } from '../../../lib/utils';
+import {
+    Loader2,
+    UserPlus,
+    AtSign,
+    Lock,
+    User,
+    GraduationCap,
+    MapPin,
+    CheckCircle2
+} from 'lucide-react';
 
-// Esquema de validación que coincide con el backend
-const registerSchema = z
-    .object({
-        firstName: z.string().min(1, 'El nombre es requerido'),
-        lastName: z.string().min(1, 'Los apellidos son requeridos'),
-        email: z.string().email('Email inválido'),
-        phone: z.string().optional(),
-        role: z.enum(['seller', 'buyer'], {
-            message: 'Selecciona tu tipo de cuenta',
-        }),
-        password: z
-            .string()
-            .min(8, 'Mínimo 8 caracteres')
-            .max(72, 'Máximo 72 caracteres')
-            .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-            .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-            .regex(/[0-9]/, 'Debe contener al menos un número'),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: 'Las contraseñas no coinciden',
-        path: ['confirmPassword'],
-    });
+const registerSchema = z.object({
+    firstName: z.string().min(2, { message: 'Nombre muy corto' }),
+    lastName: z.string().min(2, { message: 'Apellido muy corto' }),
+    email: z.string().email({ message: 'Email inválido' }),
+    password: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
+    campusLocation: z.string().min(3, { message: 'Requerido' }),
+    major: z.string().min(3, { message: 'Requerido' }),
+    role: z.enum(['buyer', 'seller']),
+});
 
 type RegisterFormData = z.infer<typeof registerSchema>;
-
-const ROLE_OPTIONS = [
-    {
-        value: 'seller' as const,
-        label: 'Soy Vendedor',
-        description: 'Vende comida y productos en el campus',
-        icon: Store,
-        gradient: 'from-blue-500 to-indigo-600',
-        ring: 'ring-blue-500',
-        bg: 'bg-blue-50',
-    },
-    {
-        value: 'buyer' as const,
-        label: 'Soy Comprador',
-        description: 'Explora y compra lo que venden tus compañeros',
-        icon: ShoppingBag,
-        gradient: 'from-emerald-500 to-teal-600',
-        ring: 'ring-emerald-500',
-        bg: 'bg-emerald-50',
-    },
-];
 
 export default function RegisterPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedRole, setSelectedRole] = useState<'seller' | 'buyer' | null>(null);
+    const [selectedRole, setSelectedRole] = useState<'buyer' | 'seller'>('buyer');
 
     const {
         register,
@@ -74,25 +45,17 @@ export default function RegisterPage() {
         formState: { errors },
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
+        defaultValues: {
+            role: 'buyer'
+        }
     });
-
-    const handleRoleSelect = (role: 'seller' | 'buyer') => {
-        setSelectedRole(role);
-        setValue('role', role, { shouldValidate: true });
-    };
 
     const onSubmit = async (data: RegisterFormData) => {
         setIsLoading(true);
         try {
-            const { confirmPassword, ...registerData } = data;
-            const response = await authService.register(registerData);
-            toast.success('¡Cuenta creada exitosamente!');
-            // Redirigir según el rol del usuario recién creado
-            if (response.user.role === 'buyer') {
-                router.push('/buyer/dashboard');
-            } else {
-                router.push('/dashboard');
-            }
+            await authService.register(data);
+            toast.success('¡Registro exitoso! Ahora inicia sesión.');
+            router.push('/login');
         } catch (error: any) {
             toast.error(error.message || 'Error al registrarse');
         } finally {
@@ -101,185 +64,143 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col space-y-2 text-center lg:text-left">
-                <div className="mb-2 flex justify-center lg:justify-start">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-600 text-white shadow-lg shadow-primary/30">
-                        <UserPlus size={28} />
-                    </div>
+        <div className="w-full max-w-2xl mx-auto py-10">
+            {/* Header */}
+            <div className="mb-10 text-center lg:text-left">
+                <div className="inline-flex h-16 w-16 items-center justify-center border-4 border-black bg-neo-red shadow-[4px_4px_0_0_#000] mb-6 rotate-3">
+                    <UserPlus size={32} className="text-white" />
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Crear Cuenta</h1>
-                <p className="text-sm text-muted-foreground">
-                    Únete a TienditaCampus — primero cuéntanos cómo usarás la plataforma.
+                <h1 className="text-5xl font-black uppercase tracking-tighter text-black leading-none mb-3">
+                    ÚNETE A LA <br /> <span className="text-neo-yellow bg-black px-2">TRIBU</span>
+                </h1>
+                <p className="text-lg font-bold text-slate-600 border-l-4 border-black pl-4 mt-4 uppercase">
+                    Crea tu cuenta y empieza a mover el campus.
                 </p>
             </div>
 
-            <Card className="border-none shadow-none bg-transparent">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Form Container */}
+            <div className="border-4 border-black bg-white p-8 md:p-12 shadow-[12px_12px_0_0_#E31837] relative">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
-                    {/* ── Selector de Rol ─────────────────────────────────── */}
-                    <div className="space-y-2">
-                        <Label className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                            Tipo de Cuenta
-                        </Label>
-                        <div className="grid grid-cols-2 gap-3">
-                            {ROLE_OPTIONS.map((option) => {
-                                const Icon = option.icon;
-                                const isSelected = selectedRole === option.value;
-                                return (
-                                    <button
-                                        key={option.value}
-                                        type="button"
-                                        onClick={() => handleRoleSelect(option.value)}
-                                        className={cn(
-                                            'relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-center transition-all duration-200 cursor-pointer',
-                                            isSelected
-                                                ? `border-transparent ring-2 ${option.ring} ${option.bg}`
-                                                : 'border-border bg-background hover:border-primary/30 hover:bg-muted/40',
-                                        )}
-                                    >
-                                        <div className={cn(
-                                            'flex h-10 w-10 items-center justify-center rounded-full text-white shadow-md',
-                                            `bg-gradient-to-br ${option.gradient}`,
-                                        )}>
-                                            <Icon size={20} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-foreground">{option.label}</p>
-                                            <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{option.description}</p>
-                                        </div>
-                                        {isSelected && (
-                                            <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-current">
-                                                <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 12 12" fill="currentColor">
-                                                    <path d="M10 3L5 8.5 2 5.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                                                </svg>
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                    {/* Role Selector */}
+                    <div className="space-y-3">
+                        <Label className="text-sm font-black uppercase tracking-widest text-black">¿Cuál es tu misión?</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => { setSelectedRole('buyer'); setValue('role', 'buyer'); }}
+                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'buyer'
+                                        ? 'bg-neo-yellow shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
+                                        : 'bg-white hover:bg-slate-50 opacity-60'
+                                    }`}
+                            >
+                                <CheckCircle2 className={`w-6 h-6 ${selectedRole === 'buyer' ? 'text-black' : 'text-slate-300'}`} />
+                                <span className="font-black uppercase text-xs">Comprar</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setSelectedRole('seller'); setValue('role', 'seller'); }}
+                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'seller'
+                                        ? 'bg-neo-red text-white shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
+                                        : 'bg-white hover:bg-slate-50 opacity-60 text-black'
+                                    }`}
+                            >
+                                <CheckCircle2 className={`w-6 h-6 ${selectedRole === 'seller' ? 'text-white' : 'text-slate-300'}`} />
+                                <span className="font-black uppercase text-xs">Vender</span>
+                            </button>
                         </div>
-                        {/* Hidden input for z.object validation */}
-                        <input type="hidden" {...register('role')} />
-                        {errors.role && (
-                            <p className="text-xs font-medium text-destructive animate-fade-in">{errors.role.message}</p>
-                        )}
                     </div>
 
-                    {/* ── Datos personales ────────────────────────────────── */}
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="firstName" className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                                    Nombre
-                                </Label>
-                                <Input
-                                    id="firstName"
-                                    className="h-11 border-input bg-background focus:ring-primary/20 transition-all"
-                                    {...register('firstName')}
-                                    disabled={isLoading}
-                                />
-                                {errors.firstName && (
-                                    <p className="text-xs font-medium text-destructive animate-fade-in">
-                                        {errors.firstName.message}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="lastName" className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                                    Apellidos
-                                </Label>
-                                <Input
-                                    id="lastName"
-                                    className="h-11 border-input bg-background focus:ring-primary/20 transition-all"
-                                    {...register('lastName')}
-                                    disabled={isLoading}
-                                />
-                                {errors.lastName && (
-                                    <p className="text-xs font-medium text-destructive animate-fade-in">
-                                        {errors.lastName.message}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Nombres */}
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                                Email Institucional
-                            </Label>
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><User size={14} /> Nombre</Label>
                             <Input
-                                id="email"
-                                type="email"
-                                placeholder="usuario@universidad.edu"
-                                className="h-11 border-input bg-background focus:ring-primary/20 transition-all"
-                                {...register('email')}
-                                disabled={isLoading}
+                                {...register('firstName')}
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="Ej. Juan"
                             />
-                            {errors.email && (
-                                <p className="text-xs font-medium text-destructive animate-fade-in">{errors.email.message}</p>
-                            )}
+                            {errors.firstName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.firstName.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><User size={14} /> Apellido</Label>
+                            <Input
+                                {...register('lastName')}
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="Ej. Pérez"
+                            />
+                            {errors.lastName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.lastName.message}</p>}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="password" className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                                    Contraseña
-                                </Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    className="h-11 border-input bg-background focus:ring-primary/20 transition-all"
-                                    {...register('password')}
-                                    disabled={isLoading}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-xs uppercase tracking-widest text-muted-foreground/70 font-semibold">
-                                    Confirmar
-                                </Label>
-                                <Input
-                                    id="confirmPassword"
-                                    type="password"
-                                    className="h-11 border-input bg-background focus:ring-primary/20 transition-all"
-                                    {...register('confirmPassword')}
-                                    disabled={isLoading}
-                                />
-                            </div>
+                        {/* Académico */}
+                        <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><MapPin size={14} /> Campus / Sede</Label>
+                            <Input
+                                {...register('campusLocation')}
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="Ej. Campus Norte"
+                            />
+                            {errors.campusLocation && <p className="text-xs font-black text-neo-red italic uppercase">{errors.campusLocation.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><GraduationCap size={14} /> Carrera</Label>
+                            <Input
+                                {...register('major')}
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="Ej. Ingeniería"
+                            />
+                            {errors.major && <p className="text-xs font-black text-neo-red italic uppercase">{errors.major.message}</p>}
                         </div>
 
-                        {(errors.password || errors.confirmPassword) && (
-                            <div className="space-y-1">
-                                {errors.password && <p className="text-xs font-medium text-destructive animate-fade-in">{errors.password.message}</p>}
-                                {errors.confirmPassword && <p className="text-xs font-medium text-destructive animate-fade-in">{errors.confirmPassword.message}</p>}
-                            </div>
-                        )}
-
-                        <div className="rounded-lg bg-muted p-3 text-[10px] text-muted-foreground flex items-start space-x-2">
-                            <div className="mt-0.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                            <p>Mínimo 8 caracteres, incluye una mayúscula, una minúscula y un número para mayor seguridad.</p>
+                        {/* Credenciales */}
+                        <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><AtSign size={14} /> Email</Label>
+                            <Input
+                                {...register('email')}
+                                type="email"
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="correo@ejemplo.edu"
+                            />
+                            {errors.email && <p className="text-xs font-black text-neo-red italic uppercase">{errors.email.message}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><Lock size={14} /> Contraseña</Label>
+                            <Input
+                                {...register('password')}
+                                type="password"
+                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                placeholder="••••••••"
+                            />
+                            {errors.password && <p className="text-xs font-black text-neo-red italic uppercase">{errors.password.message}</p>}
                         </div>
                     </div>
 
-                    <Button
+                    <button
                         type="submit"
-                        className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary-dark transition-all duration-300 shadow-md shadow-primary/20"
+                        className="group w-full h-20 bg-black text-white text-xl font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex items-center justify-center gap-4 disabled:opacity-70"
                         disabled={isLoading}
                     >
                         {isLoading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2 className="h-8 w-8 animate-spin" />
                         ) : (
-                            'Crear mi Cuenta'
+                            <>
+                                CREAR MI CUENTA
+                                <CheckCircle2 className="group-hover:scale-125 transition-transform text-neo-yellow" />
+                            </>
                         )}
-                    </Button>
+                    </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-muted-foreground">
-                    ¿Ya eres parte de TienditaCampus?{' '}
-                    <Link href="/login" className="font-bold text-primary hover:text-primary-dark transition-colors">
-                        Inicia Sesión
+                <div className="mt-12 text-center border-t-4 border-black pt-8">
+                    <p className="font-bold text-slate-500 uppercase text-sm mb-4">¿Ya eres parte de la red?</p>
+                    <Link
+                        href="/login"
+                        className="inline-block px-10 py-3 bg-white border-4 border-black text-black font-black uppercase text-sm hover:bg-black hover:text-white transition-all shadow-[5px_5px_0_0_#000] hover:shadow-none"
+                    >
+                        INICIAR SESIÓN
                     </Link>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 }
