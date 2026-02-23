@@ -131,7 +131,7 @@ export default function LoginPage() {
 
                 <div className="mt-8 text-center text-sm text-muted-foreground">
                     ¿Nuevo en la plataforma?{' '}
-                    <Link href="/auth/register" className="font-bold text-primary hover:text-primary-dark transition-colors">
+                    <Link href="/register" className="font-bold text-primary hover:text-primary-dark transition-colors">
                         Crea una cuenta ahora
                     </Link>
                 </div>

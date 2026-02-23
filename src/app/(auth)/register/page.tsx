@@ -275,7 +275,7 @@ export default function RegisterPage() {
 
                 <div className="mt-6 text-center text-sm text-muted-foreground">
                     ¿Ya eres parte de TienditaCampus?{' '}
-                    <Link href="/auth/login" className="font-bold text-primary hover:text-primary-dark transition-colors">
+                    <Link href="/login" className="font-bold text-primary hover:text-primary-dark transition-colors">
                         Inicia Sesión
                     </Link>
                 </div>

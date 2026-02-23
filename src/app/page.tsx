@@ -45,7 +45,7 @@ export default function Home() {
                                     </span>
                                 </Link>
                                 <Link
-                                    href="/auth/register"
+                                    href="/register"
                                     className="group px-8 py-4 bg-neo-yellow text-slate-900 font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[3px_3px_0_0_#E31837] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 text-center"
                                 >
                                     <span className="flex items-center justify-center gap-2">
@@ -56,7 +56,7 @@ export default function Home() {
                             </div>
                             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
                                 ¿Ya tienes cuenta?{' '}
-                                <Link href="/auth/login" className="font-bold text-neo-red underline decoration-2 underline-offset-4 hover:text-neo-yellow transition-colors">
+                                <Link href="/login" className="font-bold text-neo-red underline decoration-2 underline-offset-4 hover:text-neo-yellow transition-colors">
                                     Inicia sesión aquí
                                 </Link>
                             </p>
@@ -149,13 +149,13 @@ export default function Home() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
-                            href="/auth/register"
+                            href="/register"
                             className="px-10 py-5 bg-neo-yellow text-black font-black text-xl uppercase border-4 border-white shadow-[6px_6px_0_0_#E31837] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all"
                         >
                             Empezar Gratis
                         </Link>
                         <Link
-                            href="/auth/login"
+                            href="/login"
                             className="px-10 py-5 bg-transparent text-white font-black text-xl uppercase border-4 border-white hover:bg-white hover:text-black transition-all"
                         >
                             Ya tengo cuenta
@@ -175,8 +175,8 @@ export default function Home() {
                     </div>
                     <div className="flex gap-6 text-sm font-bold uppercase tracking-wider text-gray-400">
                         <Link href="/marketplace" className="hover:text-neo-yellow transition-colors">Tienda</Link>
-                        <Link href="/auth/login" className="hover:text-neo-yellow transition-colors">Entrar</Link>
-                        <Link href="/auth/register" className="hover:text-neo-yellow transition-colors">Registrarse</Link>
+                        <Link href="/login" className="hover:text-neo-yellow transition-colors">Entrar</Link>
+                        <Link href="/register" className="hover:text-neo-yellow transition-colors">Registrarse</Link>
                     </div>
                 </div>
             </footer>

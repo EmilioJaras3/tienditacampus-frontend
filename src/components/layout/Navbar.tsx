@@ -45,8 +45,8 @@ export function Navbar() {
                         <Link
                             href="/marketplace"
                             className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all border-2 ${pathname === '/marketplace'
-                                    ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
-                                    : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
+                                ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
+                                : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
                                 }`}
                         >
                             <span className="flex items-center gap-1.5">
@@ -57,8 +57,8 @@ export function Navbar() {
                             <Link
                                 href="/buyer/dashboard"
                                 className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all border-2 ${pathname.startsWith('/buyer')
-                                        ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
-                                        : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
+                                    ? 'bg-neo-yellow text-black border-black shadow-[2px_2px_0_0_#000]'
+                                    : 'bg-transparent text-black border-transparent hover:border-black hover:bg-neo-yellow/30'
                                     }`}
                             >
                                 <span className="flex items-center gap-1.5">
@@ -83,13 +83,13 @@ export function Navbar() {
                         {!isAuthenticated ? (
                             <>
                                 <Link
-                                    href="/auth/login"
+                                    href="/login"
                                     className="px-5 py-2 text-sm font-bold uppercase tracking-wider text-black border-2 border-black hover:bg-black hover:text-white transition-all"
                                 >
                                     Entrar
                                 </Link>
                                 <Link
-                                    href="/auth/register"
+                                    href="/register"
                                     className="px-5 py-2 text-sm font-bold uppercase tracking-wider text-white bg-neo-red border-2 border-black shadow-[3px_3px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
                                 >
                                     Crear Cuenta
@@ -143,10 +143,10 @@ export function Navbar() {
                         <hr className="border-2 border-black my-2" />
                         {!isAuthenticated ? (
                             <>
-                                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black hover:bg-black hover:text-white transition-colors">
+                                <Link href="/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black hover:bg-black hover:text-white transition-colors">
                                     Entrar
                                 </Link>
-                                <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black bg-neo-red text-white hover:bg-red-700 transition-colors">
+                                <Link href="/register" onClick={() => setMobileOpen(false)} className="px-4 py-3 font-bold uppercase text-sm text-center border-2 border-black bg-neo-red text-white hover:bg-red-700 transition-colors">
                                     Crear Cuenta
                                 </Link>
                             </>
