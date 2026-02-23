@@ -12,7 +12,8 @@ import {
     ShoppingBag,
     ShoppingBasket,
     Menu,
-    X
+    X,
+    ShieldCheck
 } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { useState } from 'react';
@@ -52,6 +53,13 @@ const routes = [
         href: '/settings',
         color: 'bg-slate-300',
         roles: ['seller', 'admin'],
+    },
+    {
+        label: 'Auditoría',
+        icon: ShieldCheck,
+        href: '/audit',
+        color: 'bg-neo-red',
+        roles: ['admin', 'seller'],
     },
 ];
 
@@ -104,8 +112,8 @@ export function Sidebar() {
                         key={route.href}
                         href={route.href}
                         className={`group flex items-center p-3 w-full font-black uppercase text-xs tracking-widest border-2 transition-all ${pathname === route.href
-                                ? 'bg-black text-white border-black shadow-[4px_4px_0_0_#FFC72C] translate-x-[-2px] translate-y-[-2px]'
-                                : 'bg-white text-black border-transparent hover:border-black hover:bg-slate-50'
+                            ? 'bg-black text-white border-black shadow-[4px_4px_0_0_#FFC72C] translate-x-[-2px] translate-y-[-2px]'
+                            : 'bg-white text-black border-transparent hover:border-black hover:bg-slate-50'
                             }`}
                         onClick={() => setOpen(false)}
                     >
@@ -151,25 +159,23 @@ export function Sidebar() {
                     <div className="bg-neo-red p-1 border-2 border-black">
                         <ShoppingBasket className="h-5 w-5 text-white" />
                     </div>
+                </Link>
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="p-2 border-2 border-black bg-neo-yellow shadow-[2px_2px_0_0_#000]"
+                >
+                    {open ? <X /> : <Menu />}
+                </button>
             </div>
-            <button
-                onClick={() => setOpen(!open)}
-                className="p-2 border-2 border-black bg-neo-yellow shadow-[2px_2px_0_0_#000]"
-            >
-                {open ? <X /> : <Menu />}
-            </button>
-        </div >
 
-            {/* Mobile Sidebar Overlay */ }
-    {
-        open && (
-            <div className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)}>
-                <div className="w-72 h-full" onClick={e => e.stopPropagation()}>
-                    <SidebarContent />
+            {/* Mobile Sidebar Overlay */}
+            {open && (
+                <div className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)}>
+                    <div className="w-72 h-full" onClick={e => e.stopPropagation()}>
+                        <SidebarContent />
+                    </div>
                 </div>
-            </div>
-        )
-    }
+            )}
         </>
     );
 }

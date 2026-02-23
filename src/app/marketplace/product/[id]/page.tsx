@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { productsService, Product } from '@/services/products.service';
-import { ArrowLeft, ShoppingCart, CheckCircle, MapPin } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, CheckCircle, MapPin, Package, Star, MessageSquare, ShieldCheck, Clock, Loader2, Minus, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -28,122 +29,166 @@ export default function ProductDetailPage() {
         if (id) loadProduct();
     }, [id]);
 
-
-
     if (loading) return (
-        <div className="max-w-7xl mx-auto px-4 py-12 animate-pulse bg-background-dark min-h-screen">
-            <div className="h-96 bg-gray-800 rounded-xl border-2 border-white mb-8" />
+        <div className="h-screen flex items-center justify-center bg-neo-white">
+            <Loader2 className="animate-spin text-black" size={64} />
         </div>
     );
 
     if (!product) return (
-        <div className="max-w-7xl mx-auto px-4 py-12 text-center bg-background-dark min-h-screen text-white">
-            <h2 className="text-2xl font-bold font-mono">Producto no encontrado</h2>
+        <div className="h-screen flex flex-col items-center justify-center bg-neo-white gap-6">
+            <h2 className="text-4xl font-black uppercase tracking-tighter">Producto No Encontrado</h2>
+            <Link href="/marketplace">
+                <button className="px-8 py-4 bg-black text-white font-black uppercase border-4 border-black shadow-neo-yellow hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all">
+                    Regresar al Marketplace
+                </button>
+            </Link>
         </div>
     );
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
-            <main className="flex-grow container mx-auto px-4 py-8 max-w-7xl">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="bg-neo-white font-display text-black min-h-screen selection:bg-neo-red selection:text-white pb-32 mt-16">
+            <main className="max-w-7xl mx-auto px-4 py-10 md:px-8">
+                {/* Back Button & Breadcrumbs */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                     <button
                         onClick={() => router.back()}
-                        className="group inline-flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-sm hover:text-white transition-colors"
+                        className="group flex items-center gap-3 h-14 px-6 bg-white border-4 border-black font-black uppercase text-xs tracking-widest shadow-neo-sm hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all active:scale-95"
                     >
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Volver al Tianguis
+                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                        VOLVER ATRÁS
                     </button>
-                    <div className="flex gap-2 text-xs font-mono text-gray-400">
-                        <span>INICIO</span> / <span>PRODUCTO</span> / <span className="text-white uppercase line-clamp-1">{product.name}</span>
+                    <div className="bg-black text-white px-4 py-2 border-2 border-black font-black uppercase text-[10px] tracking-[0.2em] -rotate-1">
+                        TIENDACAMPUS / PRODUCTO / {product.name.toUpperCase()}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                    <div className="lg:col-span-7 flex flex-col gap-4">
-                        <div className="relative w-full aspect-square md:aspect-[4/3] rounded-xl overflow-hidden border-2 border-neo-white shadow-neo-white bg-black group">
-                            <div className="absolute inset-0 bg-neo-yellow mix-blend-multiply opacity-50 z-10 pointer-events-none"></div>
-                            {/* Placeholder de imagen de producto en grises según tu diseño */}
-                            <div className="w-full h-full flex flex-col items-center justify-center filter grayscale contrast-125">
-                                <span className="material-symbols-outlined text-[120px] text-white">lunch_dining</span>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+                    {/* Visual Section */}
+                    <div className="lg:col-span-6 space-y-8">
+                        <div className="relative aspect-square border-4 border-black bg-slate-50 shadow-neo-lg overflow-hidden group">
+                            {product.imageUrl ? (
+                                <img
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-slate-100 italic font-black text-9xl text-slate-200 uppercase select-none">
+                                    {product.name.charAt(0)}
+                                </div>
+                            )}
+                            <div className="absolute top-6 left-6 z-20 bg-neo-yellow border-4 border-black px-6 py-2 font-black text-2xl tracking-tighter shadow-neo transform -rotate-3">
+                                {product.isPerishable ? 'FRESCO' : 'STOCK'}
                             </div>
+                        </div>
 
-                            <div className="absolute top-4 left-4 bg-black border border-neo-yellow px-3 py-1 z-20">
-                                <span className="text-neo-yellow font-bold text-xs uppercase tracking-widest">
-                                    {product.isPerishable ? 'Fresco' : 'Envasado'}
-                                </span>
-                            </div>
+                        {/* Social Proof Sim (Deco) */}
+                        <div className="grid grid-cols-3 gap-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="aspect-square border-4 border-black bg-white flex items-center justify-center grayscale opacity-30 hover:opacity-100 hover:grayscale-0 transition-all cursor-crosshair">
+                                    <Package size={40} />
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="lg:col-span-5 flex flex-col gap-6">
-                        <div className="bg-surface-dark p-6 rounded-xl border-2 border-white/10 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-neo-primary blur-[60px] opacity-20 pointer-events-none"></div>
-                            <h1 className="text-4xl md:text-5xl font-black text-white leading-[0.95] tracking-tight mb-4 uppercase">
+                    {/* Info Section */}
+                    <div className="lg:col-span-6 flex flex-col pt-4">
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-neo-red text-white py-1 px-3 border-2 border-black font-black uppercase text-[10px] tracking-widest">
+                                    LO MÁS VENDIDO
+                                </div>
+                                <div className="flex items-center gap-1 text-neo-yellow">
+                                    <Star fill="currentColor" size={16} /><Star fill="currentColor" size={16} /><Star fill="currentColor" size={16} /><Star fill="currentColor" size={16} /><Star fill="currentColor" size={16} />
+                                </div>
+                            </div>
+
+                            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
                                 {product.name}
                             </h1>
-                            <div className="flex items-end gap-3 mb-6">
-                                <div className="bg-white text-black text-3xl font-black px-4 py-1 -skew-x-6 border-2 border-neo-primary shadow-neo-sm inline-block">
-                                    ${product.salePrice}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-3 border-2 border-dashed border-white/30 rounded-lg hover:bg-white/5 hover:border-neo-primary transition-all group">
-                                <div className="w-10 h-10 rounded bg-neo-primary flex items-center justify-center border border-white text-black font-bold text-lg">
-                                    {product.seller?.fullName?.substring(0, 2).toUpperCase() || 'VD'}
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-xs text-neo-primary uppercase font-bold tracking-wider">Vendedor</p>
-                                    <p className="text-white font-bold text-sm group-hover:underline">@{product.seller?.fullName?.replace(' ', '') || 'CampusStore'}</p>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-white uppercase border-l-4 border-neo-primary pl-3">Descripción</h3>
-                            <div className="text-gray-300 font-normal leading-relaxed text-sm md:text-base border-2 border-white/10 p-4 rounded-lg bg-[#1a1515]">
-                                <p className="mb-4">{product.description || 'Este producto es de alta calidad y está disponible hoy mismo en el campus.'}</p>
-                                <ul className="space-y-2 font-mono text-xs text-neo-primary/80">
-                                    <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-4 h-4" /> LISTO PARA ENTREGAR
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <MapPin className="w-4 h-4" /> ENTREGA EN CAMPUS
-                                    </li>
-                                </ul>
+                            <div className="flex items-end gap-6 py-4">
+                                <span className="text-7xl font-black tracking-tighter text-neo-red border-b-8 border-black">${Number(product.salePrice).toFixed(2)}</span>
+                                <span className="text-xs font-black uppercase text-slate-400 mb-4 tracking-widest italic">PAGO CONTRA ENTREGA</span>
                             </div>
-                        </div>
 
-                        <div className="mt-auto pt-6 border-t-2 border-white/10">
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-white font-bold uppercase text-sm">Cantidad</label>
-                                    <div className="flex items-center border-2 border-white rounded bg-black">
-                                        <button
-                                            className="w-10 h-10 flex items-center justify-center text-white hover:bg-white/20 transition-colors border-r border-white/20 font-bold"
-                                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        >-</button>
-                                        <input
-                                            className="w-12 h-10 bg-transparent text-center text-white font-bold focus:outline-none border-none appearance-none"
-                                            readOnly
-                                            type="number"
-                                            value={quantity}
-                                        />
-                                        <button
-                                            className="w-10 h-10 flex items-center justify-center text-neo-primary hover:bg-neo-primary/20 transition-colors border-l border-white/20 font-bold"
-                                            onClick={() => setQuantity(quantity + 1)}
-                                        >+</button>
+                            {/* Seller Card Redesign */}
+                            <div className="p-6 border-4 border-black bg-slate-50 flex items-center justify-between group hover:bg-neo-yellow/10 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 border-4 border-black bg-black text-white flex items-center justify-center font-black text-2xl group-hover:rotate-6 transition-transform">
+                                        {product.seller?.fullName?.charAt(0).toUpperCase() || 'V'}
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vendedor Verificado</p>
+                                        <p className="font-black text-xl uppercase tracking-tighter">@{product.seller?.fullName?.replace(/\s/g, '').toLowerCase() || 'vendedor'}</p>
                                     </div>
                                 </div>
-                                <button
-                                    className="w-full bg-neo-red text-white font-black text-xl uppercase py-4 px-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_#ffffff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 group"
-                                    onClick={() => router.push(`/checkout?productId=${product.id}&qty=${quantity}`)}
-                                >
-                                    <span>Pedir Ahora</span>
-                                    <ShoppingCart className="w-5 h-5 group-hover:animate-bounce" />
+                                <button className="h-12 w-12 border-2 border-slate-300 hover:border-black flex items-center justify-center transition-colors">
+                                    <MessageSquare size={20} />
                                 </button>
-                                <p className="text-center text-xs text-gray-500 mt-2">
-                                    Pago seguro o en efectivo contra entrega.
+                            </div>
+
+                            <div className="space-y-4 pt-6">
+                                <h3 className="text-xl font-black uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <div className="w-3 h-3 bg-neo-red"></div> SOBRE PRODUCTO
+                                </h3>
+                                <p className="text-lg font-bold text-slate-500 leading-relaxed border-l-4 border-black pl-6">
+                                    {product.description || 'Este producto es de alta calidad y está disponible hoy mismo para entrega inmediata en cualquier punto estratégico del campus universitario.'}
                                 </p>
                             </div>
+
+                            {/* Trust Badges */}
+                            <div className="grid grid-cols-2 gap-4 py-8 border-y-4 border-black border-dashed">
+                                <div className="flex items-center gap-3">
+                                    <ShieldCheck className="text-neo-green" size={24} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Seguridad Campus</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Clock className="text-neo-red" size={24} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Entrega Flash</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Section */}
+                        <div className="mt-12 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div className="text-xs font-black uppercase text-black tracking-widest">Seleccionar Cantidad</div>
+                                <div className="flex items-center border-4 border-black bg-white h-14 shadow-neo-sm overflow-hidden">
+                                    <button
+                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        className="w-14 h-full flex items-center justify-center hover:bg-black hover:text-white transition-all border-r-4 border-black active:scale-90"
+                                    >
+                                        <Minus size={20} />
+                                    </button>
+                                    <input
+                                        type="number"
+                                        value={quantity}
+                                        readOnly
+                                        className="w-16 h-full text-center font-black text-xl focus:outline-none"
+                                    />
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="w-14 h-full flex items-center justify-center hover:bg-black hover:text-white transition-all border-l-4 border-black active:scale-90"
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => router.push(`/checkout?productId=${product.id}&qty=${quantity}`)}
+                                className="w-full h-20 bg-black text-white text-3xl font-black uppercase tracking-[0.1em] border-4 border-black shadow-[10px_10px_0_0_#E31837] hover:shadow-none hover:translate-x-[10px] hover:translate-y-[10px] transition-all flex items-center justify-center gap-6 active:scale-95"
+                            >
+                                <ShoppingCart size={32} />
+                                PEDIR AHORA
+                            </button>
+
+                            <p className="text-[10px] font-black uppercase text-slate-400 text-center tracking-widest italic pt-2">
+                                Garantía Tiendita: Pago contra entrega en zonas seguras
+                            </p>
                         </div>
                     </div>
                 </div>

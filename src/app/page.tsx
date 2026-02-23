@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Home() {
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col selection:bg-neo-yellow selection:text-slate-900">
+        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col selection:bg-neo-yellow selection:text-slate-900 pt-16">
             {/* Banner superior animado */}
             <div className="bg-neo-red text-white overflow-hidden py-2 border-b-2 border-slate-900 dark:border-white z-40">
                 <div className="whitespace-nowrap flex animate-marquee font-bold text-sm tracking-widest uppercase">
