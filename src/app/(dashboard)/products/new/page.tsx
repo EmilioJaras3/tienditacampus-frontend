@@ -10,13 +10,14 @@ import Link from 'next/link';
 import { productsService } from '@/services/products.service';
 import { toast } from 'sonner';
 
+// Definimos el esquema con tipos más explícitos para el resolver
 const productSchema = z.object({
     name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-    description: z.string().optional(),
-    unitCost: z.coerce.number().min(0, 'El costo no puede ser negativo'),
-    salePrice: z.coerce.number().min(0, 'El precio no puede ser negativo'),
+    description: z.string().optional().or(z.literal('')),
+    unitCost: z.preprocess((val) => Number(val), z.number().min(0, 'El costo no puede ser negativo')),
+    salePrice: z.preprocess((val) => Number(val), z.number().min(0, 'El precio no puede ser negativo')),
     isPerishable: z.boolean().default(false),
-    shelfLifeDays: z.coerce.number().optional(),
+    shelfLifeDays: z.preprocess((val) => (val === '' || val === null || val === undefined) ? undefined : Number(val), z.number().min(0).optional()),
     imageUrl: z.string().optional().or(z.literal('')),
 });
 
@@ -39,11 +40,17 @@ export default function NewProductPage() {
         },
     });
 
+    const isPerishable = form.watch('isPerishable');
+
     const onSubmit = async (data: ProductFormValues) => {
         setIsSubmitting(true);
         try {
             const newProduct = await productsService.create({
-                ...data,
+                name: data.name,
+                description: data.description || undefined,
+                unitCost: Number(data.unitCost),
+                salePrice: Number(data.salePrice),
+                isPerishable: data.isPerishable,
                 shelfLifeDays: data.shelfLifeDays || undefined,
                 imageUrl: data.imageUrl || undefined,
             });
@@ -60,21 +67,19 @@ export default function NewProductPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 md:p-10 space-y-10 font-display min-h-screen bg-neo-white selection:bg-neo-yellow selection:text-black pb-24">
+        <div className="p-4 md:p-10 max-w-5xl space-y-12 font-display bg-neo-white min-h-screen selection:bg-neo-red selection:text-white pb-32">
             {/* Header */}
-            <div className="flex items-center gap-6 border-b-4 border-black pb-8">
-                <Link href="/products">
-                    <button className="h-14 w-14 border-4 border-black bg-white flex items-center justify-center shadow-[4px_4px_0_0_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all active:scale-95">
-                        <ArrowLeft className="h-6 w-6" />
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b-4 border-black pb-8">
+                <div className="space-y-4">
+                    <button onClick={() => router.back()} className="group flex items-center gap-2 font-black uppercase text-xs tracking-widest hover:text-neo-red transition-colors">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> ATRÁS
                     </button>
-                </Link>
-                <div>
-                    <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black leading-none">
-                        NUEVO <span className="text-neo-red">LANZAMIENTO</span>
+                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
+                        NUEVO <span className="text-neo-red">PRODUCTO</span>
                     </h1>
-                    <p className="text-sm font-bold text-slate-500 uppercase flex items-center gap-2 mt-1">
-                        <Info size={14} /> Completa los datos para publicar
-                    </p>
+                </div>
+                <div className="bg-neo-yellow border-4 border-black p-4 rotate-3 hidden lg:block">
+                    <p className="font-black uppercase text-xs">Modo Creación</p>
                 </div>
             </div>
 
@@ -198,44 +203,44 @@ export default function NewProductPage() {
                             <div className="flex items-center gap-4 p-3 border-2 border-black bg-slate-50">
                                 <input
                                     type="checkbox"
-                                    id="isPerishable"
+                                    id="is-perishable"
                                     {...form.register('isPerishable')}
-                                    className="w-6 h-6 border-2 border-black accent-black"
+                                    className="w-6 h-6 accent-neo-red border-2 border-black"
                                 />
-                                <label htmlFor="isPerishable" className="text-xs font-black uppercase text-black cursor-pointer">Es Perecedero</label>
+                                <label htmlFor="is-perishable" className="text-xs font-black uppercase tracking-widest cursor-pointer">Es un producto perecedero</label>
                             </div>
 
-                            {form.watch('isPerishable') && (
-                                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                                    <label className="text-xs font-black uppercase text-black pl-1">Días de Vida Útil</label>
-                                    <input
-                                        type="number"
-                                        {...form.register('shelfLifeDays')}
-                                        className="w-full h-12 px-4 border-4 border-black font-black outline-none focus:bg-neo-red/5"
-                                        placeholder="EJ. 5 DÍAS"
-                                    />
+                            {isPerishable && (
+                                <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                                    <label className="text-xs font-black uppercase text-black pl-1">Días de Vida Útil (TENTATIVO)</label>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="number"
+                                            {...form.register('shelfLifeDays')}
+                                            className="w-24 h-12 px-4 border-4 border-black font-black outline-none focus:bg-neo-red/5"
+                                        />
+                                        <span className="font-bold uppercase text-[10px] text-slate-400">días desde producción</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="pt-10 flex flex-col md:flex-row gap-6">
+                    {/* Botón Guardar */}
+                    <div className="flex justify-end pt-10">
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-grow group h-20 bg-black text-white text-2xl font-black uppercase tracking-[0.2em] border-4 border-black shadow-[10px_10px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[10px] hover:translate-y-[10px] transition-all flex items-center justify-center gap-4 active:scale-95 disabled:opacity-70"
+                            className="bg-black text-white px-12 py-5 border-2 border-black font-black uppercase text-xl shadow-[8px_8px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex items-center gap-4 disabled:opacity-50 active:scale-95"
                         >
                             {isSubmitting ? (
-                                <Loader2 className="h-8 w-8 animate-spin" />
+                                <Loader2 className="animate-spin" />
                             ) : (
-                                <>
-                                    PUBLICAR AHORA
-                                    <Save className="group-hover:scale-125 transition-transform text-neo-yellow" />
-                                </>
+                                <Save size={24} className="text-neo-yellow" />
                             )}
+                            LANZAR PRODUCTO
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
