@@ -199,24 +199,7 @@ export default function ReportsPage() {
                 </div>
             </div>
 
-            {/* CTA Final */}
-            <div className="bg-black text-white border-4 border-black p-10 shadow-neo flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-2 bg-neo-yellow"></div>
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-16 h-16 border-4 border-white bg-neo-red flex items-center justify-center rotate-12">
-                        <Calendar size={32} className="text-white" />
-                    </div>
-                    <div className="text-center md:text-left">
-                        <h3 className="text-2xl font-black uppercase tracking-widest text-neo-yellow">Predicción IA</h3>
-                        <p className="text-sm font-bold text-slate-400 uppercase max-w-sm">
-                            Mañana se espera un aumento de demanda del <span className="text-white">20%</span> por el evento en la explanada.
-                        </p>
-                    </div>
-                </div>
-                <button className="relative z-10 px-8 py-4 bg-neo-yellow text-black font-black uppercase text-sm border-2 border-black shadow-[4px_4px_0_0_#FFF] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all">
-                    Generar Reporte PDF
-                </button>
-            </div>
+
         </div>
     );
 }

@@ -69,12 +69,7 @@ export const salesService = {
         return api.get<any>('/sales/today');
     },
 
-    /**
-     * Obtener sugerencia de preparación (IA - IQR)
-     */
-    async getPrediction(): Promise<{ productName: string; suggested: number; confidence: number } | null> {
-        return api.get<{ productName: string; suggested: number; confidence: number } | null>('/sales/prediction');
-    },
+
 
     /**
      * Iniciar el día (preparación)
