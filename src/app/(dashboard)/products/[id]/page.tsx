@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Upload, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema) as any,
@@ -55,8 +56,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 salePrice: Number(product.salePrice),
                 isPerishable: product.isPerishable,
                 shelfLifeDays: product.shelfLifeDays ? Number(product.shelfLifeDays) : undefined,
-                imageUrl: product.imageUrl || undefined, // Use undefined directly
+                imageUrl: product.imageUrl || undefined,
             });
+            if (product.imageUrl) {
+                setImagePreview(product.imageUrl);
+            }
         } catch (error) {
             toast.error('Error al cargar el producto');
             router.push('/products');
@@ -68,6 +72,31 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     useEffect(() => {
         loadProduct();
     }, [loadProduct]);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error('Imagen demasiado grande', {
+                    description: 'El tamaño máximo es de 2MB'
+                });
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setImagePreview(base64String);
+                form.setValue('imageUrl', base64String);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setImagePreview(null);
+        form.setValue('imageUrl', '');
+    };
 
     const onSubmit = async (data: ProductFormValues) => {
         setIsSubmitting(true);
@@ -117,7 +146,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             <label className="text-sm font-medium leading-none">Nombre del Producto</label>
                             <Input
                                 {...form.register('name')}
-                                className={form.formState.errors.name ? "border-destructive" : ""}
+                                className={`neo-input ${form.formState.errors.name ? "border-destructive" : ""}`}
                             />
                             {form.formState.errors.name && (
                                 <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
@@ -127,20 +156,20 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none">Costo Unitario ($)</label>
-                                <Input type="number" step="0.01" {...form.register('unitCost')} />
+                                <Input type="number" step="0.01" {...form.register('unitCost')} className="neo-input text-black" />
                             </div>
 
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none">Precio de Venta ($)</label>
-                                <Input type="number" step="0.01" {...form.register('salePrice')} />
+                                <Input type="number" step="0.01" {...form.register('salePrice')} className="neo-input text-black" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium leading-none">Descripción</label>
-                            <div className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <div className="min-h-[120px] w-full">
                                 <textarea
-                                    className="w-full h-full bg-transparent outline-none resize-none"
+                                    className="neo-input h-full py-4 resize-none"
                                     {...form.register('description')}
                                 />
                             </div>
@@ -164,20 +193,56 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                         {form.watch('isPerishable') && (
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none">Días de vida útil</label>
-                                <Input type="number" {...form.register('shelfLifeDays')} />
+                                <Input type="number" {...form.register('shelfLifeDays')} className="neo-input w-32" />
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium leading-none">URL de la Imagen (Opcional)</label>
-                            <Input
-                                placeholder="https://ejemplo.com/mi-producto.jpg"
-                                {...form.register('imageUrl')}
-                                className={form.formState.errors.imageUrl ? "border-destructive" : ""}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                Pega aquí el enlace directo a la imagen de tu producto.
-                            </p>
+                        <div className="space-y-4">
+                            <label className="text-sm font-medium leading-none">Foto del Producto</label>
+
+                            <div className="relative group/upload">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                    id="edit-product-image-upload"
+                                />
+
+                                {!imagePreview ? (
+                                    <label
+                                        htmlFor="edit-product-image-upload"
+                                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer"
+                                    >
+                                        <Upload className="w-10 h-10 text-muted-foreground mb-2" />
+                                        <span className="text-sm text-muted-foreground">Click para subir foto</span>
+                                    </label>
+                                ) : (
+                                    <div className="relative w-full h-48 border rounded-lg overflow-hidden group">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                                            <label
+                                                htmlFor="edit-product-image-upload"
+                                                className="p-2 bg-white rounded-full cursor-pointer hover:bg-gray-100 transition-colors text-black"
+                                            >
+                                                <Upload size={20} />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={removeImage}
+                                                className="p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors"
+                                            >
+                                                <X size={20} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             {form.formState.errors.imageUrl && (
                                 <p className="text-sm text-destructive">{form.formState.errors.imageUrl.message}</p>
                             )}

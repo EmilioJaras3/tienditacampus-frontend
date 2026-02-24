@@ -21,8 +21,6 @@ export default function DashboardLayout({
         // Validación de autenticación y rol
         if (!token || !isAuthenticated || !user) {
             router.push('/login');
-        } else if (user.role === 'buyer') {
-            router.push('/buyer/dashboard');
         } else {
             setIsChecking(false);
         }

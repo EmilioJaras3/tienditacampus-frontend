@@ -90,8 +90,8 @@ export default function RegisterPage() {
                                 type="button"
                                 onClick={() => { setSelectedRole('buyer'); setValue('role', 'buyer'); }}
                                 className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'buyer'
-                                        ? 'bg-neo-yellow shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-                                        : 'bg-white hover:bg-slate-50 opacity-60'
+                                    ? 'bg-neo-yellow shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
+                                    : 'bg-white hover:bg-slate-50 opacity-60'
                                     }`}
                             >
                                 <CheckCircle2 className={`w-6 h-6 ${selectedRole === 'buyer' ? 'text-black' : 'text-slate-300'}`} />
@@ -101,8 +101,8 @@ export default function RegisterPage() {
                                 type="button"
                                 onClick={() => { setSelectedRole('seller'); setValue('role', 'seller'); }}
                                 className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'seller'
-                                        ? 'bg-neo-red text-white shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
-                                        : 'bg-white hover:bg-slate-50 opacity-60 text-black'
+                                    ? 'bg-neo-red text-white shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
+                                    : 'bg-white hover:bg-slate-50 opacity-60 text-black'
                                     }`}
                             >
                                 <CheckCircle2 className={`w-6 h-6 ${selectedRole === 'seller' ? 'text-white' : 'text-slate-300'}`} />
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                             <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><User size={14} /> Nombre</Label>
                             <Input
                                 {...register('firstName')}
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="Ej. Juan"
                             />
                             {errors.firstName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.firstName.message}</p>}
@@ -126,7 +126,7 @@ export default function RegisterPage() {
                             <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><User size={14} /> Apellido</Label>
                             <Input
                                 {...register('lastName')}
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="Ej. Pérez"
                             />
                             {errors.lastName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.lastName.message}</p>}
@@ -137,7 +137,7 @@ export default function RegisterPage() {
                             <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><MapPin size={14} /> Campus / Sede</Label>
                             <Input
                                 {...register('campusLocation')}
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="Ej. Campus Norte"
                             />
                             {errors.campusLocation && <p className="text-xs font-black text-neo-red italic uppercase">{errors.campusLocation.message}</p>}
@@ -146,7 +146,7 @@ export default function RegisterPage() {
                             <Label className="text-xs font-black uppercase text-black flex items-center gap-2"><GraduationCap size={14} /> Carrera</Label>
                             <Input
                                 {...register('major')}
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="Ej. Ingeniería"
                             />
                             {errors.major && <p className="text-xs font-black text-neo-red italic uppercase">{errors.major.message}</p>}
@@ -158,7 +158,7 @@ export default function RegisterPage() {
                             <Input
                                 {...register('email')}
                                 type="email"
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="correo@ejemplo.edu"
                             />
                             {errors.email && <p className="text-xs font-black text-neo-red italic uppercase">{errors.email.message}</p>}
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                             <Input
                                 {...register('password')}
                                 type="password"
-                                className="h-12 border-4 border-black rounded-none font-bold focus:bg-neo-yellow/5"
+                                className="neo-input"
                                 placeholder="••••••••"
                             />
                             {errors.password && <p className="text-xs font-black text-neo-red italic uppercase">{errors.password.message}</p>}

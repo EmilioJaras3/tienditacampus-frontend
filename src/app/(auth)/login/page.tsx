@@ -81,7 +81,7 @@ export default function LoginPage() {
                                     id="email"
                                     type="email"
                                     placeholder="tu@correo.edu"
-                                    className="h-14 border-4 border-black bg-white rounded-none text-black font-bold focus:ring-0 focus:bg-neo-yellow/5 transition-all outline-none"
+                                    className="neo-input"
                                     {...register('email')}
                                     disabled={isLoading}
                                 />
@@ -109,7 +109,7 @@ export default function LoginPage() {
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
-                                    className="h-14 border-4 border-black bg-white rounded-none text-black font-bold focus:ring-0 focus:bg-neo-yellow/5 transition-all outline-none"
+                                    className="neo-input"
                                     {...register('password')}
                                     disabled={isLoading}
                                 />

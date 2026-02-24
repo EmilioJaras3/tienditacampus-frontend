@@ -110,6 +110,10 @@
   @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-[var(--primary)]/50;
 }
 
+@utility neo-input {
+  @apply w-full h-14 px-4 border-4 border-black font-black uppercase outline-none bg-white text-black placeholder:text-black/50 focus:bg-neo-yellow/5 focus:shadow-neo-sm transition-all;
+}
+
 @utility animate-marquee {
   animation: marquee 20s linear infinite;
 }
