@@ -1,11 +1,8 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import { PwaRegister } from '@/components/pwa-register';
 import { GoogleProvider } from '@/components/providers/google-provider';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
     title: 'TienditaCampus',
@@ -20,7 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="es">
-            <body className={`${inter.variable} antialiased`}>
+            <body className="antialiased">
                 <GoogleProvider>
                     {children}
                 </GoogleProvider>

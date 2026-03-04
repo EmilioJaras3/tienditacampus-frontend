@@ -119,7 +119,7 @@ export function CloseDayDialog({ onClosed }: { onClosed?: () => void }) {
 
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Cierre de Caja Rápido ⚡</DialogTitle>
+                    <DialogTitle>Cierre de Caja Rapido</DialogTitle>
                     <DialogDescription>
                         Registra la merma (lo que no se vendió) para cerrar el día.
                     </DialogDescription>

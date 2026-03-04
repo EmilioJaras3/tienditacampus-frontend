@@ -54,7 +54,7 @@ export default function ProductsPage() {
                     <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none text-black">
                         MI <span className="text-neo-red">STOCK</span>
                     </h1>
-                    <p className="text-lg font-bold text-slate-500 uppercase tracking-tight max-w-md border-l-4 border-neo-yellow pl-4">
+                    <p className="text-lg font-bold text-black uppercase tracking-tight max-w-md border-l-4 border-neo-yellow pl-4">
                         Gestiona tus productos, precios y controla tus existencias.
                     </p>
                 </div>

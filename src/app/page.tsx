@@ -8,7 +8,7 @@ export default function Home() {
             <div className="bg-neo-red text-white overflow-hidden py-2 border-b-2 border-slate-900 dark:border-white z-40">
                 <div className="whitespace-nowrap flex animate-marquee font-bold text-sm tracking-widest uppercase">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                        <span key={i} className="mx-4">🔥 Compra Local • Vende en tu U • TienditaCampus</span>
+                        <span key={i} className="mx-4">Compra Local • Vende en tu U • TienditaCampus</span>
                     ))}
                 </div>
             </div>
@@ -19,7 +19,7 @@ export default function Home() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                         <div className="lg:col-span-7 flex flex-col items-start text-left">
                             <div className="inline-block px-4 py-1 mb-6 border-2 border-neo-red text-neo-red font-bold text-xs uppercase tracking-widest bg-neo-red/10 rounded-full">
-                                🚀 La red #1 de emprendedores universitarios
+                                La red #1 de emprendedores universitarios
                             </div>
                             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 uppercase text-slate-900 dark:text-white">
                                 Emprende <br />

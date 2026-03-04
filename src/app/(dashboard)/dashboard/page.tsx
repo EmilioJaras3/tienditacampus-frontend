@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Package, TrendingUp, CheckCircle2, ChevronRight, AlertCircle, Loader2, DollarSign, Users, ShoppingBasket, Rocket, Plus } from "lucide-react";
 import { salesService, RoiStats } from '@/services/sales.service';
 import { ordersService, Order } from '@/services/orders.service';
+import { financeService, DashboardComparisonResponse } from '@/services/finance.service';
 import { useAuthStore } from '@/store/auth.store';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -12,6 +13,7 @@ export default function DashboardPage() {
     const { user } = useAuthStore();
     const [stats, setStats] = useState<RoiStats | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
+    const [comparison, setComparison] = useState<DashboardComparisonResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,10 +25,13 @@ export default function DashboardPage() {
         try {
             const [statsData, ordersData] = await Promise.all([
                 salesService.getRoiStats('', ''),
-                ordersService.getIncomingOrders()
+                ordersService.getIncomingOrders(),
             ]);
+
+            const comparisonData = await financeService.getDashboardComparison();
             setStats(statsData);
             setOrders(ordersData);
+            setComparison(comparisonData);
         } catch (error) {
             console.error("Error loading dashboard:", error);
         } finally {
@@ -55,6 +60,8 @@ export default function DashboardPage() {
     };
 
     const pendingOrders = orders.filter(o => o.status === 'requested');
+
+    const toMoney = (value?: string) => Number(value || 0).toFixed(2);
 
     if (loading && !stats) {
         return (
@@ -245,6 +252,60 @@ export default function DashboardPage() {
                     </div>
                 </section>
             </div>
+
+            {/* Comparative Snapshot */}
+            <section className="space-y-6">
+                <div className="flex items-center justify-between border-b-4 border-black pb-4">
+                    <h2 className="text-3xl font-black uppercase tracking-tighter">Comparativo Operativo</h2>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Semana y Mes</span>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <article className="bg-white border-4 border-black p-6 shadow-neo-lg">
+                        <h3 className="font-black uppercase text-sm tracking-widest mb-4">Semana Actual vs Anterior</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm font-bold">
+                            <div className="border-2 border-black p-3">
+                                <p className="uppercase text-[10px] text-slate-400">Actual (Utilidad)</p>
+                                <p>${toMoney(comparison?.weekComparison?.current_profit)}</p>
+                            </div>
+                            <div className="border-2 border-black p-3">
+                                <p className="uppercase text-[10px] text-slate-400">Anterior (Utilidad)</p>
+                                <p>${toMoney(comparison?.weekComparison?.previous_profit)}</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article className="bg-white border-4 border-black p-6 shadow-neo-lg">
+                        <h3 className="font-black uppercase text-sm tracking-widest mb-4">Mes Actual vs Anterior</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm font-bold">
+                            <div className="border-2 border-black p-3">
+                                <p className="uppercase text-[10px] text-slate-400">Actual (Utilidad)</p>
+                                <p>${toMoney(comparison?.monthComparison?.current_profit)}</p>
+                            </div>
+                            <div className="border-2 border-black p-3">
+                                <p className="uppercase text-[10px] text-slate-400">Anterior (Utilidad)</p>
+                                <p>${toMoney(comparison?.monthComparison?.previous_profit)}</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <article className="bg-white border-4 border-black p-6 shadow-neo-lg">
+                    <h3 className="font-black uppercase text-sm tracking-widest mb-4">Rentabilidad por Producto</h3>
+                    <div className="space-y-2">
+                        {(comparison?.profitabilityByProduct || []).slice(0, 5).map((item) => (
+                            <div key={item.product_id} className="grid grid-cols-[1fr_auto_auto] gap-3 border-2 border-black p-2 text-sm">
+                                <span className="font-black uppercase truncate">{item.product_name}</span>
+                                <span className="font-bold">${toMoney(item.profit)}</span>
+                                <span className="font-bold text-neo-red">{Number(item.margin_pct || 0).toFixed(2)}%</span>
+                            </div>
+                        ))}
+                        {(!comparison?.profitabilityByProduct || comparison.profitabilityByProduct.length === 0) && (
+                            <p className="text-xs font-black uppercase text-slate-400">Sin datos de rentabilidad en el periodo.</p>
+                        )}
+                    </div>
+                </article>
+            </section>
         </div>
     );
 }

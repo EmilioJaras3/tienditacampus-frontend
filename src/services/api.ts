@@ -12,7 +12,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!API_BASE_URL) {
     console.warn(
-        '⚠️ ATENCIÓN: La variable NEXT_PUBLIC_API_URL no está definida. Se usará http://localhost:3001/api como fallback. Asegúrate de configurar tu archivo .env.local',
+        'ATENCION: La variable NEXT_PUBLIC_API_URL no esta definida. Se usara http://localhost:3001/api como fallback. Asegurate de configurar tu archivo .env.local',
     );
 }
 
@@ -61,8 +61,9 @@ class ApiClient {
             ...(fetchOptions.headers as Record<string, string>),
         };
 
-        // Inyectar token si existe y se requiere
-        if (requiresAuth) {
+        // Inyectar token JWT solo si no viene ya un Authorization header explícito
+        // (ej: el benchmarking envía el Google OAuth token directamente)
+        if (requiresAuth && !headers['Authorization']) {
             const token = useAuthStore.getState().token;
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;

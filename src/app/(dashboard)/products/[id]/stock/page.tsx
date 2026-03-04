@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/table';
 import { productsService, Product } from '@/services/products.service';
 import { inventoryService, InventoryRecord } from '@/services/inventory.service';
+import { financeService, BreakEvenResult } from '@/services/finance.service';
+import { ApiError } from '@/services/api';
 import { toast } from 'sonner';
 
 const stockSchema = z.object({
@@ -34,8 +36,11 @@ export default function StockManagementPage({ params }: { params: { id: string }
     const router = useRouter();
     const [product, setProduct] = useState<Product | null>(null);
     const [history, setHistory] = useState<InventoryRecord[]>([]);
+    const [breakEvenResult, setBreakEvenResult] = useState<BreakEvenResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCalculatingBreakEven, setIsCalculatingBreakEven] = useState(false);
+    const [fixedCosts, setFixedCosts] = useState<number>(0);
 
     const form = useForm<StockFormValues>({
         resolver: zodResolver(stockSchema) as any,
@@ -89,6 +94,29 @@ export default function StockManagementPage({ params }: { params: { id: string }
             toast.error('Error al agregar stock');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleCalculateBreakEven = async () => {
+        if (!product) return;
+
+        try {
+            setIsCalculatingBreakEven(true);
+            const result = await financeService.calculateBreakEven({
+                productId: product.id,
+                fixedCosts,
+                unitCost: Number(product.unitCost),
+                unitPrice: Number(product.salePrice),
+            });
+            setBreakEvenResult(result);
+        } catch (error) {
+            if (error instanceof ApiError) {
+                toast.error(error.message);
+            } else {
+                toast.error('No se pudo calcular el punto de equilibrio');
+            }
+        } finally {
+            setIsCalculatingBreakEven(false);
         }
     };
 
@@ -197,6 +225,42 @@ export default function StockManagementPage({ params }: { params: { id: string }
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Punto de Equilibrio</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-sm font-medium leading-none">Costos Fijos ($)</label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={fixedCosts}
+                                onChange={(event) => setFixedCosts(Number(event.target.value))}
+                            />
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                            <p>Costo unitario: ${Number(product.unitCost).toFixed(2)}</p>
+                            <p>Precio venta: ${Number(product.salePrice).toFixed(2)}</p>
+                        </div>
+                        <Button onClick={handleCalculateBreakEven} disabled={isCalculatingBreakEven}>
+                            {isCalculatingBreakEven ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Calcular
+                        </Button>
+                    </div>
+
+                    {breakEvenResult && (
+                        <div className="border rounded-md p-4 bg-muted/20 text-sm space-y-1">
+                            <p><strong>Producto:</strong> {breakEvenResult.productName}</p>
+                            <p><strong>Margen unitario:</strong> ${breakEvenResult.unitMargin}</p>
+                            <p><strong>Unidades para equilibrio:</strong> {breakEvenResult.breakEvenUnits}</p>
+                            <p className="text-muted-foreground">{breakEvenResult.formula}</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }

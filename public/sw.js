@@ -8,8 +8,8 @@ const CACHE_NAME = 'tienditacampus-v1';
 const STATIC_ASSETS = [
     '/',
     '/manifest.json',
-    '/icons/icon-192x192.png',
-    '/icons/icon-512x512.png',
+    '/icons/icon-192x192.svg',
+    '/icons/icon-512x512.svg',
 ];
 
 // Instalación: cachear assets estáticos
@@ -43,6 +43,11 @@ self.addEventListener('fetch', (event) => {
 
     // API calls: Network First
     if (url.pathname.startsWith('/api/')) {
+        if (request.method !== 'GET') {
+            event.respondWith(fetch(request));
+            return;
+        }
+
         event.respondWith(
             fetch(request)
                 .then((response) => {

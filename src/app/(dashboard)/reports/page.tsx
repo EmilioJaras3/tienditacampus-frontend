@@ -4,27 +4,44 @@ import { useState, useEffect } from 'react';
 import {
     BarChart3,
     TrendingUp,
-    PieChart,
-    Calendar,
     ArrowUpRight,
-    ArrowDownRight,
     DollarSign,
     Target,
     Package,
     Loader2,
-    CalendarDays
+    CalendarDays,
+    RefreshCw,
 } from 'lucide-react';
 import { salesService, RoiStats } from '@/services/sales.service';
+import { ordersService, Order } from '@/services/orders.service';
+import { financeService, WeeklyReport, DashboardComparisonResponse } from '@/services/finance.service';
 
 export default function ReportsPage() {
     const [stats, setStats] = useState<RoiStats | null>(null);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [comparison, setComparison] = useState<DashboardComparisonResponse | null>(null);
+    const [weeklyReports, setWeeklyReports] = useState<WeeklyReport[]>([]);
+    const [weekdayAnalytics, setWeekdayAnalytics] = useState<Awaited<ReturnType<typeof salesService.getWeekdayAnalytics>>>([]);
+    const [isGeneratingWeek, setIsGeneratingWeek] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadStats = async () => {
             try {
-                const data = await salesService.getRoiStats('', '');
+                const [data, ordersData] = await Promise.all([
+                    salesService.getRoiStats('', ''),
+                    ordersService.getIncomingOrders(),
+                ]);
+                const [comparisonData, reportsData, weekdayData] = await Promise.all([
+                    financeService.getDashboardComparison(),
+                    financeService.getWeeklyReports(),
+                    salesService.getWeekdayAnalytics(),
+                ]);
                 setStats(data);
+                setOrders(ordersData);
+                setComparison(comparisonData);
+                setWeeklyReports(reportsData);
+                setWeekdayAnalytics(weekdayData);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -33,6 +50,20 @@ export default function ReportsPage() {
         };
         loadStats();
     }, []);
+
+    const toMoney = (value?: string | number) => Number(value || 0).toFixed(2);
+
+    const handleGenerateWeekly = async () => {
+        try {
+            setIsGeneratingWeek(true);
+            const generated = await financeService.generateWeeklyReport();
+            setWeeklyReports(generated);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsGeneratingWeek(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -123,7 +154,7 @@ export default function ReportsPage() {
                     </div>
                     <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Ventas Exitosas</p>
                     <h3 className="text-4xl font-black tracking-tighter text-black">
-                        {Math.floor((stats?.revenue || 0) / 50) + 5}
+                        {orders.filter(o => ['completed', 'delivered'].includes(o.status)).length}
                     </h3>
                 </div>
             </div>
@@ -133,69 +164,107 @@ export default function ReportsPage() {
                 {/* Ventas Semanales */}
                 <div className="lg:col-span-2 bg-white border-4 border-black p-8 shadow-neo relative">
                     <div className="flex items-center justify-between mb-10">
-                        <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
+                        <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3 text-black">
                             <BarChart3 className="text-neo-red" /> Rendimiento Semanal
                         </h3>
-                        <div className="flex gap-2">
-                            <div className="w-3 h-3 bg-black"></div>
-                            <div className="w-3 h-3 bg-neo-red"></div>
-                            <div className="w-3 h-3 bg-neo-yellow"></div>
-                        </div>
+                        <button
+                            onClick={handleGenerateWeekly}
+                            disabled={isGeneratingWeek}
+                            className="flex items-center gap-2 border-2 border-black px-3 py-2 font-black uppercase text-[10px] text-black hover:bg-neo-yellow"
+                        >
+                            <RefreshCw size={14} className={isGeneratingWeek ? 'animate-spin' : ''} />
+                            {isGeneratingWeek ? 'Generando...' : 'Regenerar semana'}
+                        </button>
                     </div>
 
-                    {/* Fake Chart bars */}
-                    <div className="h-64 flex items-end justify-between gap-4 px-4 border-b-4 border-black">
-                        {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-                            <div key={i} className="flex-1 group relative">
-                                <div
-                                    style={{ height: `${h}%` }}
-                                    className={`w-full border-x-2 border-t-2 border-black transition-all ${h > 75 ? 'bg-neo-red' : h > 50 ? 'bg-neo-yellow' : 'bg-black'
-                                        } group-hover:brightness-110 shadow-[4px_0_0_0_#000]`}
-                                ></div>
-                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black text-white px-2 py-1 text-[10px] font-black z-10">
-                                    ${h * 15}
+                    <div className="space-y-3">
+                        {weeklyReports.slice(0, 4).map((report) => (
+                            <div key={report.id} className="grid grid-cols-2 md:grid-cols-4 gap-3 border-2 border-black p-3 text-xs font-black uppercase text-black">
+                                <div>
+                                    <p className="text-black">Semana</p>
+                                    <p>{report.weekStart} a {report.weekEnd}</p>
                                 </div>
-                                <p className="text-center mt-4 text-[10px] font-black uppercase text-slate-400">
-                                    {['L', 'M', 'M', 'J', 'V', 'S', 'D'][i]}
-                                </p>
+                                <div>
+                                    <p className="text-black">Utilidad Neta</p>
+                                    <p>${toMoney(report.totalProfit)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-black">Pérdida</p>
+                                    <p>{toMoney(report.lossPercentage)}%</p>
+                                </div>
+                                <div>
+                                    <p className="text-black">Inv vs Ingreso</p>
+                                    <p>${toMoney(report.totalInvestment)} / ${toMoney(report.totalRevenue)}</p>
+                                </div>
                             </div>
                         ))}
+                        {weeklyReports.length === 0 && (
+                            <p className="text-xs font-black uppercase text-black">No hay reportes semanales generados.</p>
+                        )}
                     </div>
                 </div>
 
-                {/* Categorías más vendidas */}
-                <div className="bg-white border-4 border-black p-8 shadow-neo">
+                {/* Comparativo */}
+                <div className="bg-white border-4 border-black p-8 shadow-neo text-black">
                     <h3 className="text-2xl font-black uppercase tracking-tighter mb-10 flex items-center gap-3">
-                        <PieChart className="text-neo-red" /> Los Favoritos
+                        <TrendingUp className="text-neo-red" /> Comparativo
                     </h3>
                     <div className="space-y-6">
-                        {[
-                            { label: 'Snacks', val: 45, color: 'bg-neo-red' },
-                            { label: 'Bebidas', val: 30, color: 'bg-neo-yellow' },
-                            { label: 'Papelería', val: 15, color: 'bg-neo-green' },
-                            { label: 'Postres', val: 10, color: 'bg-blue-400' }
-                        ].map((cat, i) => (
-                            <div key={i} className="space-y-2">
-                                <div className="flex justify-between items-end">
-                                    <span className="text-xs font-black uppercase text-black">{cat.label}</span>
-                                    <span className="text-xs font-black text-slate-400">{cat.val}%</span>
-                                </div>
-                                <div className="h-4 border-2 border-black bg-slate-50 overflow-hidden">
-                                    <div
-                                        style={{ width: `${cat.val}%` }}
-                                        className={`h-full border-r-2 border-black ${cat.color} transition-all duration-1000`}
-                                    ></div>
-                                </div>
+                        <div className="space-y-2">
+                            <p className="text-xs font-black uppercase text-black">Semana (utilidad)</p>
+                            <div className="flex justify-between text-sm font-black uppercase">
+                                <span>Actual</span>
+                                <span>${toMoney(comparison?.weekComparison?.current_profit)}</span>
                             </div>
-                        ))}
+                            <div className="flex justify-between text-sm font-black uppercase">
+                                <span>Anterior</span>
+                                <span>${toMoney(comparison?.weekComparison?.previous_profit)}</span>
+                            </div>
+                        </div>
+                        <div className="space-y-2 border-t-2 border-dashed border-black pt-4">
+                            <p className="text-xs font-black uppercase text-black">Mes (utilidad)</p>
+                            <div className="flex justify-between text-sm font-black uppercase">
+                                <span>Actual</span>
+                                <span>${toMoney(comparison?.monthComparison?.current_profit)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm font-black uppercase">
+                                <span>Anterior</span>
+                                <span>${toMoney(comparison?.monthComparison?.previous_profit)}</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mt-12 p-4 border-4 border-black border-dashed bg-slate-50">
-                        <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Insight del día</p>
-                        <p className="text-xs font-bold italic leading-relaxed">
-                            &quot;Las ventas de <span className="text-neo-red font-black">Snacks</span> han subido un 15% los días Jueves. Considera aumentar el stock antes del mediodía.&quot;
-                        </p>
+                        <p className="text-[10px] font-black uppercase text-black mb-2">Top rentabilidad</p>
+                        {comparison?.profitabilityByProduct?.slice(0, 3).map((item) => (
+                            <div key={item.product_id} className="flex justify-between text-xs font-black uppercase py-1 text-black">
+                                <span className="truncate mr-2">{item.product_name}</span>
+                                <span className="text-neo-red">{Number(item.margin_pct || 0).toFixed(2)}%</span>
+                            </div>
+                        ))}
+                        {(!comparison?.profitabilityByProduct || comparison.profitabilityByProduct.length === 0) && (
+                            <p className="text-xs font-bold italic leading-relaxed text-black">Sin productos con rentabilidad registrada.</p>
+                        )}
                     </div>
+                </div>
+            </div>
+
+            <div className="bg-white border-4 border-black p-8 shadow-neo text-black">
+                <h3 className="text-2xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
+                    <BarChart3 className="text-neo-red" /> Ventas por Día de Semana
+                </h3>
+                <div className="space-y-3">
+                    {weekdayAnalytics.map((item) => (
+                        <div key={item.weekday} className="grid grid-cols-2 md:grid-cols-4 gap-3 border-2 border-black p-3 text-xs font-black uppercase text-black">
+                            <span>{item.weekdayName}</span>
+                            <span>Días: {item.daysCount}</span>
+                            <span>Ingresos: ${toMoney(item.revenueSum)}</span>
+                            <span>Unidades: {item.unitsSoldSum}</span>
+                        </div>
+                    ))}
+                    {weekdayAnalytics.length === 0 && (
+                        <p className="text-xs font-black uppercase text-black">Sin datos de ventas por día de semana.</p>
+                    )}
                 </div>
             </div>
 
