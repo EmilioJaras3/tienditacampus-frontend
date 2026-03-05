@@ -1,17 +1,17 @@
-// Cliente HTTP centralizado para el backend
+// Cliente HTTP centralizado.
 
 import { useAuthStore } from '../store/auth.store';
 
-// Validación de URL base
+// 1. Validar URL base.
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-if (!API_BASE_URL && process.env.NODE_ENV === 'production') {
-    throw new Error('CRITICAL: NEXT_PUBLIC_API_URL is not defined in production environment.');
+if (!API_BASE_URL) {
+    throw new Error('Falta NEXT_PUBLIC_API_URL');
 }
 
-const BASE_URL = API_BASE_URL || 'http://localhost:3001/api';
+const BASE_URL = API_BASE_URL;
 
-// Error personalizado de API
+// Error API personalizado.
 export class ApiError extends Error {
     public status: number;
     public data: any;

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Store, Calendar, MapPin, Loader2, MessageCircle } from 'lucide-react';
 import { usersService, PublicUser } from '@/services/users.service';
 import { Product } from '@/services/products.service';
-import { ProductCard } from '@/components/product-card';
+import { ProductCard } from '@/features/products/product-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
