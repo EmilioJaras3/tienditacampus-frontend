@@ -1,24 +1,17 @@
-/**
- * TienditaCampus - Cliente HTTP Base
- * 
- * Configuración centralizada para todas las llamadas al backend.
- * Asegura que las variables de entorno estén presentes y normaliza las respuestas/errores.
- */
+// Cliente HTTP centralizado para el backend
 
 import { useAuthStore } from '../store/auth.store';
 
-// 1. Validación de Entorno
+// Validación de URL base
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-if (!API_BASE_URL) {
-    console.warn(
-        'ATENCION: La variable NEXT_PUBLIC_API_URL no esta definida. Se usara http://localhost:3001/api como fallback. Asegurate de configurar tu archivo .env.local',
-    );
+if (!API_BASE_URL && process.env.NODE_ENV === 'production') {
+    throw new Error('CRITICAL: NEXT_PUBLIC_API_URL is not defined in production environment.');
 }
 
 const BASE_URL = API_BASE_URL || 'http://localhost:3001/api';
 
-// 2. Clase de Error Normalizada
+// Error personalizado de API
 export class ApiError extends Error {
     public status: number;
     public data: any;
@@ -55,14 +48,13 @@ class ApiClient {
             url += `?${searchParams.toString()}`;
         }
 
-        // Configuración de Headers segura
+        // Headers con JSON por defecto
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             ...(fetchOptions.headers as Record<string, string>),
         };
 
-        // Inyectar token JWT solo si no viene ya un Authorization header explícito
-        // (ej: el benchmarking envía el Google OAuth token directamente)
+        // Inyectar token JWT si no hay uno explícito
         if (requiresAuth && !headers['Authorization']) {
             const token = useAuthStore.getState().token;
             if (token) {
@@ -76,13 +68,13 @@ class ApiClient {
                 headers,
             });
 
-            // Manejo de 401: Sesión expirada
+            // Si la sesión expiró (401)
             if (response.status === 401) {
                 useAuthStore.getState().logout();
                 throw new ApiError(401, 'Sesión expirada. Por favor, inicia sesión nuevamente.');
             }
 
-            // Normalización de Errores (4xx, 5xx)
+            // Manejo de errores 4xx/5xx
             if (!response.ok) {
                 let errorMessage = `API Error: ${response.status} ${response.statusText}`;
                 let errorData = null;
@@ -101,7 +93,7 @@ class ApiClient {
                 throw new ApiError(response.status, errorMessage, errorData);
             }
 
-            // Respuesta exitosa (siempre intenta parsear JSON, o retorna null si está vacío)
+            // Procesar respuesta exitosa
             if (response.status === 204) {
                 return {} as T;
             }

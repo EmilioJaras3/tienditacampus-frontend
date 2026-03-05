@@ -115,7 +115,7 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={() => { setSelectedRole('buyer'); setValue('role', 'buyer'); }}
-                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'buyer'
+                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-[background-color,transform,shadow] ${selectedRole === 'buyer'
                                     ? 'bg-neo-yellow shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
                                     : 'bg-white hover:bg-slate-50 opacity-60'
                                     }`}
@@ -126,7 +126,7 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={() => { setSelectedRole('seller'); setValue('role', 'seller'); }}
-                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-all ${selectedRole === 'seller'
+                                className={`p-4 border-4 border-black flex flex-col items-center gap-2 transition-[background-color,transform,shadow] ${selectedRole === 'seller'
                                     ? 'bg-neo-red text-white shadow-[4px_4px_0_0_#000] translate-x-[-2px] translate-y-[-2px]'
                                     : 'bg-white hover:bg-slate-50 opacity-60 text-black'
                                     }`}
@@ -145,6 +145,7 @@ export default function RegisterPage() {
                                 {...register('firstName')}
                                 className="neo-input"
                                 placeholder="Ej. Juan"
+                                autoComplete="given-name"
                             />
                             {errors.firstName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.firstName.message}</p>}
                         </div>
@@ -154,6 +155,7 @@ export default function RegisterPage() {
                                 {...register('lastName')}
                                 className="neo-input"
                                 placeholder="Ej. Pérez"
+                                autoComplete="family-name"
                             />
                             {errors.lastName && <p className="text-xs font-black text-neo-red italic uppercase">{errors.lastName.message}</p>}
                         </div>
@@ -186,6 +188,8 @@ export default function RegisterPage() {
                                 type="email"
                                 className="neo-input"
                                 placeholder="correo@ejemplo.edu"
+                                autoComplete="email"
+                                spellCheck={false}
                             />
                             {errors.email && <p className="text-xs font-black text-neo-red italic uppercase">{errors.email.message}</p>}
                         </div>
@@ -196,6 +200,7 @@ export default function RegisterPage() {
                                 type="password"
                                 className="neo-input"
                                 placeholder="••••••••"
+                                autoComplete="new-password"
                             />
                             {errors.password && <p className="text-xs font-black text-neo-red italic uppercase">{errors.password.message}</p>}
                         </div>
@@ -203,7 +208,7 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        className="group w-full h-20 bg-black text-white text-xl font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all flex items-center justify-center gap-4 disabled:opacity-70"
+                        className="group w-full h-20 bg-black text-white text-xl font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-[transform,shadow,background-color] flex items-center justify-center gap-4 disabled:opacity-70"
                         disabled={isLoading}
                     >
                         {isLoading ? (
@@ -226,7 +231,7 @@ export default function RegisterPage() {
                         type="button"
                         onClick={() => googleLogin()}
                         disabled={isLoading || isGoogleLoading}
-                        className="group w-full h-20 bg-white text-black text-lg font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0_0_#94A3B8] hover:bg-slate-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-4 disabled:opacity-70 mt-6"
+                        className="group w-full h-20 bg-white text-black text-lg font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0_0_#94A3B8] hover:bg-slate-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-[transform,shadow,background-color] flex items-center justify-center gap-4 disabled:opacity-70 mt-6"
                     >
                         {isGoogleLoading ? (
                             <Loader2 className="h-8 w-8 animate-spin" />
@@ -243,7 +248,7 @@ export default function RegisterPage() {
                     <p className="font-bold text-slate-500 uppercase text-sm mb-4">¿Ya eres parte de la red?</p>
                     <Link
                         href="/login"
-                        className="inline-block px-10 py-3 bg-white border-4 border-black text-black font-black uppercase text-sm hover:bg-black hover:text-white transition-all shadow-[5px_5px_0_0_#000] hover:shadow-none"
+                        className="inline-block px-10 py-3 bg-white border-4 border-black text-black font-black uppercase text-sm hover:bg-black hover:text-white transition-[background-color,color] shadow-[5px_5px_0_0_#000] hover:shadow-none"
                     >
                         INICIAR SESIÓN
                     </Link>

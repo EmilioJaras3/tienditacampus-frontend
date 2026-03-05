@@ -109,6 +109,8 @@ export default function LoginPage() {
                                     className="neo-input"
                                     {...register('email')}
                                     disabled={isLoading}
+                                    autoComplete="email"
+                                    spellCheck={false}
                                 />
                                 <div className="absolute inset-0 border-4 border-black translate-x-1 translate-y-1 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
                             </div>
@@ -137,6 +139,7 @@ export default function LoginPage() {
                                     className="neo-input"
                                     {...register('password')}
                                     disabled={isLoading}
+                                    autoComplete="current-password"
                                 />
                                 <div className="absolute inset-0 border-4 border-black translate-x-1 translate-y-1 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
                             </div>
@@ -148,7 +151,7 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="group w-full h-16 bg-black text-white text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#FFC72C] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-70"
+                        className="group w-full h-16 bg-black text-white text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#FFC72C] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-[transform,shadow,background-color] flex items-center justify-center gap-3 disabled:opacity-70"
                         disabled={isLoading}
                     >
                         {isLoading ? (
@@ -171,7 +174,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => googleLogin()}
                         disabled={isLoading || isGoogleLoading}
-                        className="group w-full h-16 bg-white text-black text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#94A3B8] hover:bg-slate-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-70"
+                        className="group w-full h-16 bg-white text-black text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#94A3B8] hover:bg-slate-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-[transform,shadow,background-color] flex items-center justify-center gap-3 disabled:opacity-70"
                     >
                         {isGoogleLoading ? (
                             <Loader2 className="h-6 w-6 animate-spin" />
@@ -190,7 +193,7 @@ export default function LoginPage() {
                     </p>
                     <Link
                         href="/register"
-                        className="px-6 py-2 border-2 border-black bg-neo-yellow text-black font-black uppercase text-xs hover:bg-black hover:text-white transition-all shadow-[3px_3px_0_0_#000] hover:shadow-none translate-y-[-2px] active:translate-y-0"
+                        className="px-6 py-2 border-2 border-black bg-neo-yellow text-black font-black uppercase text-xs hover:bg-black hover:text-white transition-[background-color,color,transform,shadow] shadow-[3px_3px_0_0_#000] hover:shadow-none translate-y-[-2px] active:translate-y-0"
                     >
                         REGISTRARSE
                     </Link>

@@ -37,7 +37,7 @@ export default function Home() {
                             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                                 <Link
                                     href="/marketplace"
-                                    className="group relative px-8 py-4 bg-neo-red text-white font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-neo-yellow hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 text-center"
+                                    className="group relative px-8 py-4 bg-neo-red text-white font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-neo-yellow hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-[transform,shadow,background-color] duration-200 text-center"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         Explorar Tienda
@@ -46,7 +46,7 @@ export default function Home() {
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="group px-8 py-4 bg-neo-yellow text-slate-900 font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[3px_3px_0_0_#E31837] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 text-center"
+                                    className="group px-8 py-4 bg-neo-yellow text-slate-900 font-bold text-lg uppercase tracking-wide border-2 border-slate-900 dark:border-white shadow-[3px_3px_0_0_#E31837] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-[transform,shadow,background-color] duration-200 text-center"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         Crear Cuenta
@@ -69,7 +69,7 @@ export default function Home() {
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         alt="Estudiantes en el campus"
-                                        className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 mix-blend-overlay opacity-80"
+                                        className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-[filter,opacity] duration-500 mix-blend-overlay opacity-80"
                                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxEzEY2M4GQm7g3GYQ1_3hGxRrVBnGUcoif-ZCjsQSJGM65dCiQAY6Coqvs1tp1woZTTBSSAe-DjVH7vgz7HDHTaDTcvlAzvsFelYMetNJQoAdmJHXn7BLlV44Xx846vvvNAnqdOjSmRSeRTLROYAjzv1c67EQgtI0h-1e9eF-O8jiUYvCry_Yt6tR8kbsr8FYXE2kPEEjrZoHVYWsufSa24M7qGANqFivGMk30gza2haO8fNg4o9uO_zCK7qRBbzQD9SG-LXrMasz"
                                     />
                                     <div className="absolute inset-0 bg-neo-yellow/20 mix-blend-multiply pointer-events-none"></div>
@@ -80,7 +80,7 @@ export default function Home() {
                                         <div className="text-white font-bold text-lg">Brownies (Facultad de Artes)</div>
                                         <div className="flex justify-between items-end mt-2">
                                             <span className="text-2xl font-black text-neo-yellow">$25.00</span>
-                                            <button className="bg-neo-yellow text-slate-900 p-1 hover:bg-neo-red hover:text-white transition-colors">
+                                            <button className="bg-neo-yellow text-slate-900 p-1 hover:bg-neo-red hover:text-white transition-colors" aria-label="Ver detalles de la tienda">
                                                 <Store className="h-4 w-4" />
                                             </button>
                                         </div>
@@ -150,13 +150,13 @@ export default function Home() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/register"
-                            className="px-10 py-5 bg-neo-yellow text-black font-black text-xl uppercase border-4 border-white shadow-[6px_6px_0_0_#E31837] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all"
+                            className="px-10 py-5 bg-neo-yellow text-black font-black text-xl uppercase border-4 border-white shadow-[6px_6px_0_0_#E31837] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-[transform,shadow,background-color]"
                         >
                             Empezar Gratis
                         </Link>
                         <Link
                             href="/login"
-                            className="px-10 py-5 bg-transparent text-white font-black text-xl uppercase border-4 border-white hover:bg-white hover:text-black transition-all"
+                            className="px-10 py-5 bg-transparent text-white font-black text-xl uppercase border-4 border-white hover:bg-white hover:text-black transition-[background-color,color]"
                         >
                             Ya tengo cuenta
                         </Link>
