@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Accent colors for special elements */
+  --color-neo-sand: #E07A2F;
+  --color-neo-sage: #E9EDC9;
+  --color-neo-coffee: #1C1917;
+  --color-neo-cream: #FAFAF8;
+  --color-neo-moss: #7C9A5E;
+  --color-neo-primary: var(--primary);
+  --color-neo-secondary: var(--secondary); 
+
+  /* Shadows */
+  --shadow-neo: 0px 4px 14px 0px rgba(0, 0, 0, 0.08);
+  --shadow-neo-sm: 0px 2px 6px 0px rgba(0, 0, 0, 0.04);
+  --shadow-neo-lg: 0px 8px 28px 0px rgba(0, 0, 0, 0.12);
+  --font-sans: "Segoe UI", "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 
+  Utility Classes 
+*/
+@utility glass {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl;
+}
+
+@utility glass-dark {
+  @apply bg-black/30 backdrop-blur-lg border border-white/10 shadow-xl;
+}
+
+@utility text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)];
+}
+
+@utility hover-card {
+  @apply transition-all duration-300 hover:scale-[1.01] hover:shadow-neo hover:border-primary/20;
+}
+
+@utility neo-input {
+  @apply w-full h-14 px-4 border border-foreground/10 font-bold uppercase outline-none bg-background text-foreground placeholder:text-muted-foreground focus:border-primary/40 focus:bg-primary/5 transition-all rounded-xl;
+}
+
+@utility animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+:root {
+  /* Clean Light Mode — white base, warm accents */
+  --background: #FAFAF8;
+  --foreground: #1C1917;
+
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1917;
+
+  --primary: #E07A2F; /* Warm Orange — accent only */
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #F3F0EB; /* Warm Gray */
+  --secondary-foreground: #44403C;
+
+  --muted: #F5F3EF;
+  --muted-foreground: #78716C;
+
+  --accent: #E9EDC9; /* Soft Lime */
+  --accent-foreground: #3D3929;
+
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E7E5E0;
+  --input: #E7E5E0;
+  --ring: #E07A2F;
+
+  --radius: 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Modern Dark Mode — neutral, clean, NOT brown */
+    --background: #0F1117;
+    --foreground: #ECEDEE;
+
+    --card: #1A1D27;
+    --card-foreground: #ECEDEE;
+
+    --popover: #1A1D27;
+    --popover-foreground: #ECEDEE;
+
+    --primary: #F0943D; /* Vivid Warm Orange — accent */
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #252830;
+    --secondary-foreground: #ECEDEE;
+
+    --muted: #1E2028;
+    --muted-foreground: #9CA3AF;
+
+    --accent: #7C9A5E; /* Muted Green */
+    --accent-foreground: #FFFFFF;
+
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+
+    --border: #2A2D37;
+    --input: #2A2D37;
+    --ring: #F0943D;
+  }
+}
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-300;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
