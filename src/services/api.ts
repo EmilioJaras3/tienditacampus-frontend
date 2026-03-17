@@ -16,7 +16,7 @@ if (!API_BASE_URL) {
     );
 }
 
-const BASE_URL = API_BASE_URL || 'http://34.235.94.221:3001/api';
+const BASE_URL = '/api';
 
 // 2. Clase de Error Normalizada
 export class ApiError extends Error {
