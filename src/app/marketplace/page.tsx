@@ -176,9 +176,9 @@ export default function MarketplacePage() {
 
                                 {/* Image Placeholder / Preview */}
                                 <div className="aspect-square bg-foreground/5 relative overflow-hidden">
-                                    {product.imageUrl ? (
+                                    {product.imageUrl || product.image_url ? (
                                         <img
-                                            src={product.imageUrl}
+                                            src={product.imageUrl || product.image_url}
                                             alt={product.name}
                                             className="w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-110"
                                         />

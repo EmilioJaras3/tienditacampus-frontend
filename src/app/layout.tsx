@@ -6,8 +6,8 @@ import { GoogleProvider } from '@/components/providers/google-provider';
 import { TermsBlockingOverlay } from '@/components/terms-blocking-overlay';
 
 export const metadata: Metadata = {
-    title: 'Antigrabyty',
-    description: 'Compra snacks, apuntes y merch a tus compañeros universitarios. Vende tus productos sin intermediarios.',
+    title: 'Tiendita Campus',
+    description: 'Compra snacks y comida a tus compañeros universitarios. Vende tus productos sin intermediarios.',
     manifest: '/manifest.json',
 };
 

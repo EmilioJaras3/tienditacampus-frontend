@@ -35,7 +35,7 @@ export default function Home() {
             <div className="bg-primary text-primary-foreground overflow-hidden py-3 border-b border-foreground/5 z-40">
                 <div className="whitespace-nowrap flex animate-marquee font-bold text-[10px] tracking-[0.4em] uppercase">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                        <span key={i} className="mx-8">COMPRA SNACKS, APUNTES Y MERCH A TUS COMPAÑEROS UNIVERSITARIOS • VENDE TUS PRODUCTOS SIN INTERMEDIARIOS</span>
+                        <span key={i} className="mx-8">COMPRA SNACKS Y COMIDA A TUS COMPAÑEROS UNIVERSITARIOS • VENDE TUS PRODUCTOS SIN INTERMEDIARIOS</span>
                     ))}
                 </div>
             </div>
@@ -65,7 +65,7 @@ export default function Home() {
                                 variants={fadeInUp}
                                 className="text-lg md:text-xl text-foreground/40 max-w-lg font-bold leading-relaxed border-l-4 border-primary pl-8 py-2 uppercase tracking-tight"
                             >
-                                Compra snacks, apuntes y merch a tus compañeros universitarios. Vende tus productos sin intermediarios.
+                                Compra snacks y comida artesanal a tus compañeros universitarios. Vende tus productos sin intermediarios.
                             </motion.p>
                             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto pt-4">
                                 <Link href="/marketplace">
@@ -145,7 +145,7 @@ export default function Home() {
                         className="text-center mb-24"
                     >
                         <h2 className="text-5xl md:text-7xl font-bold text-foreground uppercase tracking-tighter italic mb-6">
-                            ¿POR QUÉ <span className="text-primary italic">ANTIGRABYTY?</span>
+                            ¿POR QUÉ <span className="text-primary italic">TIENDITA CAMPUS?</span>
                         </h2>
                         <p className="text-foreground/30 max-w-2xl mx-auto text-sm font-bold uppercase tracking-[0.2em] border-t border-foreground/5 pt-6">
                             Compra a compañeros, vende sin intermediarios.
@@ -248,7 +248,7 @@ export default function Home() {
                         >
                             <Store size={20} />
                         </motion.div>
-                        <span className="font-bold text-[10px] tracking-[0.3em] uppercase">Antigrabyty © 2026</span>
+                        <span className="font-bold text-[10px] tracking-[0.3em] uppercase">Tiendita Campus © 2026</span>
                     </div>
                     <div className="flex gap-8 text-[10px] font-bold uppercase tracking-[0.3em]">
                         <Link href="/marketplace" className="hover:text-primary transition-colors">Tienda</Link>

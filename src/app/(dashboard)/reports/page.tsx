@@ -217,12 +217,6 @@ export default function ReportsPage() {
                                     <td className="px-8 py-6">
                                         <div className="flex gap-4">
                                             <button 
-                                                onClick={() => handleDownloadCSV(report)}
-                                                className="p-3 bg-muted border border-foreground/5 hover:bg-primary hover:text-primary-foreground transition-all rounded-xl shadow-neo-sm"
-                                            >
-                                                <Download size={18} />
-                                            </button>
-                                            <button 
                                                 onClick={() => handleDeleteReport(report.id)}
                                                 className="p-3 bg-muted border border-foreground/5 hover:bg-destructive hover:text-destructive-foreground transition-all rounded-xl shadow-neo-sm"
                                             >

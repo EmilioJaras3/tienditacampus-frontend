@@ -9,6 +9,7 @@ export interface Product {
     isPerishable: boolean;
     shelfLifeDays?: number | null;
     imageUrl?: string;
+    image_url?: string;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
