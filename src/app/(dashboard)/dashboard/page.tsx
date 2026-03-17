@@ -149,6 +149,49 @@ export default function DashboardPage() {
                     <p className="text-[10px] font-bold text-foreground/20 uppercase tracking-[0.2em] italic">Panel de Control de Ventas</p>
                 </div>
             </motion.header>
+            
+            {/* Admin Evaluation Section */}
+            {user?.email === 'jarassanchezl@gmail.com' && (
+                <motion.section 
+                    variants={fadeInUp}
+                    className="bg-neo-yellow border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl relative overflow-hidden"
+                >
+                    <div className="absolute top-2 right-2 flex gap-2">
+                        <div className="w-4 h-4 rounded-full border-2 border-black bg-neo-red"></div>
+                        <div className="w-4 h-4 rounded-full border-2 border-black bg-neo-blue"></div>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div className="space-y-2">
+                            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter">
+                                EVALUACIÓN - UNIDAD 2
+                            </h2>
+                            <p className="text-xl font-bold uppercase tracking-tight">
+                                IMPLEMENTACIÓN DE BENCHMARKING
+                            </p>
+                            <div className="flex flex-wrap items-center gap-4 pt-2">
+                                <span className="bg-black text-white px-3 py-1 text-xs font-bold uppercase rounded">
+                                    Horacio Irán Solís Cisneros
+                                </span>
+                                <span className="bg-white border-2 border-black px-3 py-1 text-xs font-bold uppercase rounded flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-neo-red rounded-full"></span>
+                                    22 FEB
+                                </span>
+                                <span className="bg-neo-blue text-white px-3 py-1 text-xs font-bold uppercase rounded border-2 border-black">
+                                    100 PUNTOS
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white border-4 border-black p-4 rotate-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-sm">
+                            <p className="font-bold text-xs uppercase underline mb-2">Instrucciones:</p>
+                            <p className="text-[10px] font-bold uppercase leading-tight">
+                                Implementar la estructura de base de datos descrita en el documento, ejecutar pruebas controladas y enviar métricas a BigQuery utilizando autenticación OAuth.
+                            </p>
+                        </div>
+                    </div>
+                </motion.section>
+            )}
 
             {/* Main Stats Grid */}
             <motion.section variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
