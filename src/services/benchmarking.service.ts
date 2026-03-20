@@ -23,7 +23,20 @@ export const benchmarkingService = {
     async sendSnapshot(googleToken: string) {
         return api.post('/benchmarking/snapshot', {}, {
             headers: {
-                Authorization: `Bearer ${googleToken}`
+                'x-google-token': googleToken
+            }
+        });
+    },
+
+    /**
+     * Envía el snapshot histórico (ej. 30 días) a BigQuery.
+     * @param googleToken El token de acceso obtenido de Google OAuth.
+     * @param days Días a enviar (por defecto 30).
+     */
+    async sendHistoricalSnapshot(googleToken: string, days: number = 30) {
+        return api.post('/benchmarking/snapshot/historical', { days }, {
+            headers: {
+                'x-google-token': googleToken
             }
         });
     },
@@ -55,7 +68,7 @@ export const benchmarkingService = {
     async verifyStatus(googleToken: string) {
         return api.post('/benchmarking/verify-status', {}, {
             headers: {
-                Authorization: `Bearer ${googleToken}`
+                'x-google-token': googleToken
             }
         });
     }

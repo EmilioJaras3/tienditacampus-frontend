@@ -26,6 +26,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 export default function BenchmarkingPage() {
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [sendingHistorical, setSendingHistorical] = useState(false);
     const [metrics, setMetrics] = useState<QueryMetric[]>([]);
     const { token, googleToken, setGoogleToken, user } = useAuthStore();
 
@@ -81,6 +82,30 @@ export default function BenchmarkingPage() {
             }
         } finally {
             setSending(false);
+        }
+    };
+
+    const handleSendHistoricalSnapshot = async () => {
+        if (!googleToken) {
+            toast.info('Debes vincular tu cuenta de Google para enviar datos a BigQuery');
+            googleLogin();
+            return;
+        }
+
+        try {
+            setSendingHistorical(true);
+            await benchmarkingService.sendHistoricalSnapshot(googleToken, 30);
+            toast.success('Snapshot histórico (30 días) enviado correctamente a BigQuery');
+        } catch (error: any) {
+            console.error(error);
+            if (error?.message?.includes('authentication') || error?.message?.includes('token')) {
+                setGoogleToken(null);
+                toast.error('Token de Google expirado. Por favor, vincula de nuevo.');
+            } else {
+                toast.error(error?.message || 'Error al enviar snapshot histórico');
+            }
+        } finally {
+            setSendingHistorical(false);
         }
     };
 
@@ -229,12 +254,20 @@ export default function BenchmarkingPage() {
                         <Download size={18} /> EXPORTAR
                     </button>
                     <button 
+                        onClick={handleSendHistoricalSnapshot}
+                        disabled={sendingHistorical || sending}
+                        className="flex items-center gap-3 px-8 h-14 bg-foreground text-background border border-foreground/20 font-bold text-xs tracking-widest uppercase hover:opacity-90 transition-all rounded-xl shadow-neo disabled:opacity-50"
+                    >
+                        {sendingHistorical ? <Loader2 className="animate-spin" size={18} /> : <Database size={18} />}
+                        ENVIAR HISTÓRICO (30D)
+                    </button>
+                    <button 
                         onClick={handleSendSnapshot}
-                        disabled={sending}
+                        disabled={sending || sendingHistorical}
                         className="flex items-center gap-3 px-8 h-14 bg-primary text-primary-foreground border border-primary/20 font-bold text-xs tracking-widest uppercase hover:opacity-90 transition-all rounded-xl shadow-neo disabled:opacity-50"
                     >
                         {sending ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
-                        ENVIAR A BIGQUERY
+                        ENVIAR SNAPSHOT DIARIO
                     </button>
                 </div>
             </div>
@@ -354,6 +387,38 @@ export default function BenchmarkingPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Looker Studio / Data Studio Iframe */}
+                {isAdmin && (
+                    <div className="lg:col-span-3 mt-4 bg-card border-4 border-primary/20 p-8 shadow-neo-sm rounded-[2.5rem] flex flex-col gap-6 group">
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-bold tracking-tighter uppercase italic flex items-center gap-3 text-foreground">
+                                <BarChart3 className="text-primary" /> Visualización de Panel BigQuery
+                            </h3>
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest leading-relaxed border-l-2 border-primary/50 pl-3">
+                                Aquí puedes incrustar tu reporte interactivo de Looker Studio conectando directamente con las vistas de BigQuery.
+                            </p>
+                        </div>
+                        
+                        <div className="w-full h-[500px] bg-foreground/5 rounded-2xl flex items-center justify-center border-2 border-dashed border-foreground/20 relative overflow-hidden group-hover:border-primary/50 transition-colors">
+                            {/* ALUMNO: Reemplaza todo el contenido de este DIV con el iframe generado por Looker Studio */}
+                            {/* Ejemplo: <iframe width="100%" height="100%" src="https://lookerstudio.google.com/embed/reporting/tu-id/page/1" frameBorder="0" style={{border:0}} allowFullScreen></iframe> */}
+                            <div className="text-center space-y-4 px-6 relative z-10 p-6 bg-background/80 backdrop-blur-md rounded-xl shadow-xl border border-foreground/10">
+                                <div className="mx-auto w-16 h-16 bg-primary/20 text-primary rounded-2xl flex items-center justify-center animate-bounce">
+                                    <BarChart3 size={32} />
+                                </div>
+                                <h4 className="font-bold text-base uppercase tracking-widest">AÑADIR DASHBOARD LOOKER STUDIO</h4>
+                                <p className="text-xs text-muted-foreground font-medium max-w-sm mx-auto">
+                                    Ve a Looker Studio, conecta tu proyecto "data-from-software", crea tu reporte visual, genera el link de Inserción (Embed) y reemplaza este placeholder en el código del Frontend para visualizar los gráficos aquí.
+                                </p>
+                                <a href="https://lookerstudio.google.com/" target="_blank" rel="noreferrer" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:opacity-90 transition shadow-neo-sm">
+                                    Abrir Looker Studio
+                                </a>
+                            </div>
+                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
