@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: tc-database
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-tienditacampus}
+      - POSTGRES_USER=${POSTGRES_USER:-tc_admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-TienditaCampus2026DB!}
+    volumes:
+      - tc-pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - tc-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tc_admin} -d ${POSTGRES_DB:-tienditacampus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  tc-network:
+    name: tc-network
+    driver: bridge
+
+volumes:
+  tc-pgdata:
