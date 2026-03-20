@@ -32,7 +32,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"Test1234\",\n    \"firstName\": \"Emilio\",\n    \"lastName\": \"Jaras\"\n}",
+							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"emico311006L\",\n    \"firstName\": \"Emilio\",\n    \"lastName\": \"Jaras\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -70,7 +70,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"Test1234\"\n}",
+							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"emico311006L\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -445,6 +445,7 @@
 				{
 					"name": "1. Get Google Auth URL",
 					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
 						"method": "GET",
 						"url": {
 							"raw": "{{base_url}}/benchmarking/auth/google",
@@ -456,6 +457,7 @@
 				{
 					"name": "2. Run Benchmarking Queries",
 					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
 						"method": "POST",
 						"url": {
 							"raw": "{{base_url}}/benchmarking/run-queries",
@@ -468,6 +470,13 @@
 					"name": "3. Send Historical Snapshot to BigQuery",
 					"request": {
 						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"header": [
+							{
+								"key": "x-google-token",
+								"value": "{{google_token}}",
+								"type": "text"
+							}
+						],
 						"method": "POST",
 						"body": {
 							"mode": "raw",
@@ -517,6 +526,7 @@
 	"variable": [
 		{ "key": "base_url", "value": "http://98.88.194.19:3001/api", "type": "string" },
 		{ "key": "token", "value": "", "type": "string" },
+		{ "key": "google_token", "value": "TOKEN_GOOGLE_AQUI", "type": "string" },
 		{ "key": "my_user_id", "value": "", "type": "string" },
 		{ "key": "last_order_id", "value": "", "type": "string" }
 	]
