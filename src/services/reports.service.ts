@@ -2,12 +2,12 @@ import { api } from './api';
 
 export interface WeeklyReport {
     id: string;
-    week_number: number;
-    year: number;
-    total_sales: number;
-    total_profit: number;
-    total_waste: number;
-    roi_pct: number;
+    weekStart: string;
+    weekEnd: string;
+    totalRevenue: number;
+    totalProfit: number;
+    totalWasteCost: number;
+    lossPercentage: number;
     createdAt: string;
 }
 
