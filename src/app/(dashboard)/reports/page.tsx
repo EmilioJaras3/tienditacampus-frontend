@@ -75,12 +75,11 @@ export default function ReportsPage() {
     const handleDownloadCSV = (report: WeeklyReport) => {
         const headers = ['Métrica', 'Valor'];
         const rows = [
-            ['Semana', report.week_number.toString()],
-            ['Año', report.year.toString()],
-            ['Ventas Totales', report.total_sales.toString()],
-            ['Ganancia Total', report.total_profit.toString()],
-            ['Mermas (Waste)', report.total_waste.toString()],
-            ['ROI %', report.roi_pct.toString()],
+            ['Semana (Inicio)', new Date(report.weekStart).toLocaleDateString()],
+            ['Ventas Totales', report.totalRevenue?.toString()],
+            ['Ganancia Total', report.totalProfit?.toString()],
+            ['Mermas (Waste)', report.totalWasteCost?.toString()],
+            ['Mermas %', report.lossPercentage?.toString()],
             ['Fecha Generación', new Date(report.createdAt).toLocaleDateString()],
         ];
 
@@ -93,12 +92,12 @@ export default function ReportsPage() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `reporte_semana${report.week_number}_${report.year}.csv`);
+        link.setAttribute('download', `reporte_semana_${report.weekStart}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success(`Reporte Semana ${report.week_number} descargado`);
+        toast.success(`Reporte Semana de ${new Date(report.weekStart).toLocaleDateString()} descargado`);
     };
 
     if (loading && !stats) {
@@ -202,16 +201,16 @@ export default function ReportsPage() {
                                 <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-8 py-6">
                                         <div className="font-bold text-lg tracking-tighter uppercase italic text-foreground">
-                                            Semana {report.week_number} - {report.year}
+                                            Semana {new Date(report.weekStart).toLocaleDateString('es-MX', {day: '2-digit', month: 'short'})}
                                         </div>
                                         <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(report.createdAt).toLocaleDateString()}</span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.total_sales)}</span>
+                                        <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.totalRevenue)}</span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className={`text-xl font-bold tracking-tighter ${Number(report.total_profit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                                            ${toMoney(report.total_profit)}
+                                        <span className={`text-xl font-bold tracking-tighter ${Number(report.totalProfit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                                            ${toMoney(report.totalProfit)}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">
