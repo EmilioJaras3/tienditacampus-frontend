@@ -2,13 +2,21 @@ import { api } from './api';
 
 export interface WeeklyReport {
     id: string;
-    week_number: number;
-    year: number;
-    total_sales: number;
-    total_profit: number;
-    total_waste: number;
-    roi_pct: number;
+    weekStart: string;
+    weekEnd: string;
+    totalInvestment: number;
+    totalRevenue: number;
+    totalProfit: number;
+    avgProfitMargin: number;
+    totalWasteCost: number;
+    totalUnitsSold: number;
+    totalUnitsLost: number;
+    lossPercentage: number;
     createdAt: string;
+    bestSellingProduct?: {
+        id: string;
+        name: string;
+    } | null;
 }
 
 export const reportsService = {

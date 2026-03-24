@@ -75,12 +75,15 @@ export default function ReportsPage() {
     const handleDownloadCSV = (report: WeeklyReport) => {
         const headers = ['Métrica', 'Valor'];
         const rows = [
-            ['Semana', report.week_number.toString()],
-            ['Año', report.year.toString()],
-            ['Ventas Totales', report.total_sales.toString()],
-            ['Ganancia Total', report.total_profit.toString()],
-            ['Mermas (Waste)', report.total_waste.toString()],
-            ['ROI %', report.roi_pct.toString()],
+            ['Inicio Semana', report.weekStart],
+            ['Fin Semana', report.weekEnd],
+            ['Inversión (Costos)', report.totalInvestment.toString()],
+            ['Ventas Totales', report.totalRevenue.toString()],
+            ['Ganancia Neta', report.totalProfit.toString()],
+            ['Margen Promedio %', report.avgProfitMargin.toString()],
+            ['Costo Merma', report.totalWasteCost.toString()],
+            ['Pérdida (Unidades)', report.lossPercentage.toString() + '%'],
+            ['Producto Estrella', report.bestSellingProduct?.name || 'N/A'],
             ['Fecha Generación', new Date(report.createdAt).toLocaleDateString()],
         ];
 
@@ -93,12 +96,12 @@ export default function ReportsPage() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `reporte_semana${report.week_number}_${report.year}.csv`);
+        link.setAttribute('download', `reporte_semana_${report.weekStart}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success(`Reporte Semana ${report.week_number} descargado`);
+        toast.success(`Reporte del ${report.weekStart} descargado`);
     };
 
     if (loading && !stats) {
@@ -202,20 +205,28 @@ export default function ReportsPage() {
                                 <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-8 py-6">
                                         <div className="font-bold text-lg tracking-tighter uppercase italic text-foreground">
-                                            Semana {report.week_number} - {report.year}
+                                            {report.weekStart} <span className="text-muted-foreground font-normal text-sm">al</span> {report.weekEnd}
                                         </div>
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(report.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Gen: {new Date(report.createdAt).toLocaleDateString()}</span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.total_sales)}</span>
+                                        <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.totalRevenue)}</span>
+                                        <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">Margen: {report.avgProfitMargin}%</p>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className={`text-xl font-bold tracking-tighter ${Number(report.total_profit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                                            ${toMoney(report.total_profit)}
+                                        <span className={`text-xl font-bold tracking-tighter ${Number(report.totalProfit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                                            ${toMoney(report.totalProfit)}
                                         </span>
+                                        <p className="text-[10px] text-destructive uppercase font-bold mt-1">Merma: ${toMoney(report.totalWasteCost)}</p>
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => handleDownloadCSV(report)}
+                                                className="p-3 bg-muted border border-foreground/5 hover:text-primary transition-all rounded-xl shadow-neo-sm"
+                                            >
+                                                <Download size={18} />
+                                            </button>
                                             <button 
                                                 onClick={() => handleDeleteReport(report.id)}
                                                 className="p-3 bg-muted border border-foreground/5 hover:bg-destructive hover:text-destructive-foreground transition-all rounded-xl shadow-neo-sm"
