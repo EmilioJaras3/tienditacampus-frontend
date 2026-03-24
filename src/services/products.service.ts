@@ -26,8 +26,6 @@ export interface Product {
         id: string;
         name: string;
     };
-    wasteRate?: number;
-    breakEvenUnits?: number;
 }
 
 export interface Category {

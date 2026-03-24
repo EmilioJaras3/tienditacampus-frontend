@@ -41,12 +41,8 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?.role === 'buyer') {
-            window.location.href = '/mis-compras';
-            return;
-        }
         loadDashboardData();
-    }, [user]);
+    }, []);
 
     const loadDashboardData = async () => {
         setLoading(true);

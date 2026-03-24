@@ -110,7 +110,7 @@ const SidebarContent = ({ pathname, logout, user, setOpen, filteredRoutes }: Sid
                         {user?.firstName} {user?.lastName}
                     </p>
                     <p className="text-[9px] font-bold text-primary uppercase tracking-widest mt-1">
-                        Nivel {user?.role === 'admin' ? 'Master' : user?.role === 'seller' ? 'Vendedor' : 'Comprador'}
+                        Nivel {user?.role === 'admin' ? 'Master' : 'Vendedor'}
                     </p>
                 </div>
             </div>

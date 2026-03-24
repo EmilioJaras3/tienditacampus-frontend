@@ -34,7 +34,7 @@ export default function LoginPage() {
                 const response = await authService.loginWithGoogle(tokenResponse.access_token);
                 toast.success('¡Bienvenido con Google!');
                 if (response.user.role === 'buyer') {
-                    router.push('/mis-compras');
+                    router.push('/dashboard');
                 } else {
                     router.push('/dashboard');
                 }
@@ -64,7 +64,7 @@ export default function LoginPage() {
             const response = await authService.login(data);
             toast.success('¡Bienvenido de nuevo!');
             if (response.user.role === 'buyer') {
-                router.push('/mis-compras');
+                router.push('/dashboard');
             } else {
                 router.push('/dashboard');
             }

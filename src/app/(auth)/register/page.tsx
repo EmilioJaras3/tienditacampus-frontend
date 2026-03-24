@@ -161,38 +161,20 @@ export default function RegisterPage() {
                         {/* Académico */}
                         <div className="space-y-2">
                             <Label className="text-xs font-semibold text-foreground flex items-center gap-2"><MapPin size={14} /> Campus / Sede</Label>
-                            <select
+                            <Input
                                 {...register('campusLocation')}
-                                className="neo-input bg-background w-full h-12 px-3 border-2 border-foreground text-black"
-                                defaultValue=""
-                            >
-                                <option value="" disabled hidden>Selecciona tu sede</option>
-                                <option value="UD1">UD1</option>
-                                <option value="UD2">UD2</option>
-                                <option value="UD3">UD3</option>
-                                <option value="UD4">UD4</option>
-                            </select>
+                                className="neo-input"
+                                placeholder="Ej. Campus Norte"
+                            />
                             {errors.campusLocation && <p className="text-xs font-bold text-primary italic uppercase">{errors.campusLocation.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label className="text-xs font-semibold text-foreground flex items-center gap-2"><GraduationCap size={14} /> Carrera</Label>
-                            <select
+                            <Input
                                 {...register('major')}
-                                className="neo-input bg-background w-full h-12 px-3 border-2 border-foreground text-black"
-                                defaultValue=""
-                            >
-                                <option value="" disabled hidden>Selecciona tu carrera</option>
-                                <option value="Ingeniería en Nanotecnología">Ingeniería en Nanotecnología</option>
-                                <option value="Ingeniería Ambiental y Sustentabilidad">Ingeniería Ambiental y Sustentabilidad</option>
-                                <option value="Ingeniería en Manufactura Avanzada">Ingeniería en Manufactura Avanzada</option>
-                                <option value="Ingeniería en Energía y Desarrollo Sostenible">Ingeniería en Energía y Desarrollo Sostenible</option>
-                                <option value="Ingeniería en Alimentos">Ingeniería en Alimentos</option>
-                                <option value="Ingeniería Petrolera">Ingeniería Petrolera</option>
-                                <option value="Ingeniería en Tecnologías de la Información e Innovación Digital">Ingeniería en Tecnologías de la Información e Innovación Digital</option>
-                                <option value="Ingeniería Mecatrónica">Ingeniería Mecatrónica</option>
-                                <option value="Ingeniería Biomédica">Ingeniería Biomédica</option>
-                                <option value="Licenciatura en Administración">Licenciatura en Administración</option>
-                            </select>
+                                className="neo-input"
+                                placeholder="Ej. Ingeniería"
+                            />
                             {errors.major && <p className="text-xs font-bold text-primary italic uppercase">{errors.major.message}</p>}
                         </div>
 
