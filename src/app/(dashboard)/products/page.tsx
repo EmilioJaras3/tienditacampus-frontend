@@ -102,9 +102,7 @@ export default function ProductsPage() {
                         const isStockLow = (product.stock || 0) <= 5;
 
                         const totalInvestment = (product.stock || 0) * product.unitCost;
-                        const breakEvenUnits = margin > 0 && totalInvestment > 0
-                            ? Math.ceil(totalInvestment / margin)
-                            : 0;
+                        const breakEvenUnits = product.breakEvenUnits || 0;
 
                         return (
                             <div key={product.id} className="bg-background border-2 border-foreground/5 shadow-neo-sm hover:shadow-neo hover:-translate-y-1 transition-all group flex flex-col relative overflow-hidden rounded-[2.5rem]">
