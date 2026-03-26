@@ -1,0 +1,70 @@
+time="2026-03-26T05:00:35Z" level=warning msg="/home/ubuntu/tienditacampus-backend/docker-compose.api.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image tienditacampus-backend-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 556B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 373B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 107B done
+#4 DONE 0.0s
+
+#5 [builder 1/6] FROM docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa
+#5 resolve docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 8.70kB 0.0s done
+#6 DONE 0.0s
+
+#7 [builder 2/6] WORKDIR /app
+#7 CACHED
+
+#8 [builder 3/6] COPY package*.json ./
+#8 CACHED
+
+#9 [builder 4/6] RUN npm install
+#9 CACHED
+
+#10 [builder 5/6] COPY . .
+#10 DONE 0.4s
+
+#11 [builder 6/6] RUN npm run build
+#11 0.463 
+#11 0.463 > tienditacampus-backend@0.1.0 build
+#11 0.463 > nest build
+#11 0.463 
+#11 DONE 30.1s
+
+#12 [stage-1 3/5] COPY --from=builder /app/package*.json ./
+#12 CACHED
+
+#13 [stage-1 4/5] COPY --from=builder /app/node_modules ./node_modules
+#13 DONE 10.8s
+
+#14 [stage-1 5/5] COPY --from=builder /app/dist ./dist
+#14 DONE 0.4s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 17.6s done
+#15 exporting manifest sha256:e3a8ec42fc6c3a310e6b096d4968dfeb64c58f38d416467695c4cced4ba440b3 0.0s done
+#15 exporting config sha256:04fa5ceddba02432704376afb7f09a98d8b1b5ebba7a43cb3657eeba1a45493b 0.0s done
+#15 exporting attestation manifest sha256:4d4a42164bddffbdade048a49fbbd4cfa4bb7bf1b2decb7aada9cdade6ad46ec 0.0s done
+#15 exporting manifest list sha256:7d20de52fc9f6cbb0931bdb9a54d12d06beea6ca6b070972b13ba83208bff8d0
+#15 exporting manifest list sha256:7d20de52fc9f6cbb0931bdb9a54d12d06beea6ca6b070972b13ba83208bff8d0 0.0s done
+#15 naming to docker.io/library/tienditacampus-backend-backend:latest done
+#15 unpacking to docker.io/library/tienditacampus-backend-backend:latest
+#15 unpacking to docker.io/library/tienditacampus-backend-backend:latest 8.2s done
+#15 ERROR: failed to extract layer sha256:fd6532134a771b9e5307ea077e3de537ea0349a4bb5629471e53628ecdd00b37: write /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/245/fs/app/node_modules/googleapis/build/src/apis/apphub/v1.d.ts: no space left on device
+------
+ > exporting to image:
+------
+failed to solve: failed to extract layer sha256:fd6532134a771b9e5307ea077e3de537ea0349a4bb5629471e53628ecdd00b37: write /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/245/fs/app/node_modules/googleapis/build/src/apis/apphub/v1.d.ts: no space left on device
+
