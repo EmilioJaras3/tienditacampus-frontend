@@ -11,33 +11,32 @@ SELECT
     gen_random_uuid(),
     o.seller_id,
     o.created_at::date as sale_date,
-    SUM(o.total_price) as total_revenue,
-    SUM(o.total_price * 0.6) as total_investment, -- Asumimos 60% de costo
-    SUM(o.total_price * 0.05) as total_waste_cost, -- 5% de merma base
+    SUM(o.total_amount) as total_revenue,
+    SUM(o.total_amount * 0.6) as total_investment, -- Asumimos 60% de costo
+    SUM(o.total_amount * 0.05) as total_waste_cost, -- 5% de merma base
     MIN(o.created_at),
     MAX(o.created_at)
 FROM orders o
 WHERE o.status = 'completed'
 GROUP BY o.seller_id, o.created_at::date;
 
--- 3. Poblar sale_details (desglose por producto)
--- Nota: En este esquema simplificado, asumimos que cada orden tiene un producto principal en esta fase de seeding masivo
-INSERT INTO sale_details (id, daily_sale_id, product_id, quantity_sold, unit_price, unit_cost, waste_cost, created_at, updated_at)
+-- 3. Poblar sale_details (desglose por producto real)
+INSERT INTO sale_details (id, daily_sale_id, product_id, quantity_prepared, quantity_sold, unit_cost, unit_price, waste_cost, created_at)
 SELECT 
     gen_random_uuid(),
     ds.id,
-    p.id as product_id,
-    COUNT(o.id) as quantity_sold,
-    AVG(p.price) as unit_price,
-    AVG(p.price * 0.6) as unit_cost,
-    AVG(p.price * 0.05) as waste_cost,
-    ds.created_at,
-    ds.updated_at
+    oi.product_id,
+    SUM(oi.quantity) as quantity_prepared,
+    SUM(oi.quantity) as quantity_sold,
+    AVG(oi.unit_price * 0.6) as unit_cost,
+    AVG(oi.unit_price) as unit_price,
+    SUM(oi.unit_price * 0.05) as waste_cost,
+    ds.created_at
 FROM daily_sales ds
 JOIN orders o ON o.seller_id = ds.seller_id AND o.created_at::date = ds.sale_date
-JOIN products p ON p.seller_id = o.seller_id -- Join simplificado para el seeding
+JOIN order_items oi ON oi.order_id = o.id
 WHERE o.status = 'completed'
-GROUP BY ds.id, p.id, ds.created_at, ds.updated_at;
+GROUP BY ds.id, oi.product_id, ds.created_at;
 
 -- 4. PATCH DE REALISMO: Renombrar productos genéricos
 UPDATE products SET name = 'Chilaquiles Verdes Especiales' WHERE name LIKE '%Producto%' AND price > 80 LIMIT 1;
