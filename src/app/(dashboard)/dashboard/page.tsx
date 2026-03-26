@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Package, TrendingUp, ChevronRight, Loader2, DollarSign, ShoppingBasket, Rocket, Target, Trash2 } from "lucide-react";
+import { Package, TrendingUp, ChevronRight, Loader2, DollarSign, ShoppingBasket, Rocket, Target, Trash2, FlaskConical } from "lucide-react";
 import { salesService, RoiStats, DailySale } from '@/services/sales.service';
 import { ordersService, Order } from '@/services/orders.service';
 import { financeService, DashboardComparisonResponse } from '@/services/finance.service';
@@ -151,7 +151,7 @@ export default function DashboardPage() {
             </motion.header>
             
             {/* Admin Evaluation Section */}
-            {user?.email === 'jarassanchezl@gmail.com' && (
+            {['jarassanchezl@gmail.com', 'jarassabchezl@gmail.com'].includes(user?.email || '') && (
                 <motion.section 
                     variants={fadeInUp}
                     className="bg-neo-yellow border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl relative overflow-hidden"
@@ -180,6 +180,16 @@ export default function DashboardPage() {
                                 <span className="bg-neo-blue text-white px-3 py-1 text-xs font-bold uppercase rounded border-2 border-black">
                                     100 PUNTOS
                                 </span>
+                                <Link href="/hypothesis">
+                                    <motion.button 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="bg-black text-white px-4 py-1 text-[10px] font-black uppercase rounded flex items-center gap-2 hover:bg-neo-yellow hover:text-black transition-colors"
+                                    >
+                                        <FlaskConical size={14} />
+                                        LABORATORIO DE HIPÓTESIS
+                                    </motion.button>
+                                </Link>
                             </div>
                         </div>
                         
