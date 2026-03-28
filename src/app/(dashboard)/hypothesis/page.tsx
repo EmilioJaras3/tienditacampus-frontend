@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    LineChart, Line, ScatterChart, Scatter, ZAxis, Cell
+    LineChart, Line
 } from 'recharts';
 import { useAuthStore } from '@/store/auth.store';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { Loader2, FlaskConical, Target, CheckCircle2, TrendingUp } from 'lucide-react';
+import { financeService, DashboardComparisonResponse } from '@/services/finance.service';
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -22,8 +24,7 @@ export default function HypothesisPage() {
 
     useEffect(() => {
         if (!loading && user) {
-            const isAdmin = ['jarassanchezl@gmail.com', 'jarassabchezl@gmail.com'].includes(user.email);
-            if (!isAdmin) {
+            if (user.email !== 'jarassanchezl@gmail.com') {
                 router.push('/dashboard');
             }
         }
@@ -94,8 +95,8 @@ export default function HypothesisPage() {
                         </div>
                     </div>
 
-                    <div className="h-[400px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-[400px] min-h-[400px] w-full relative">
+                        <ResponsiveContainer width="99%" height={400}>
                             <BarChart data={hypothesis1Data}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                 <XAxis dataKey="name" hide />
@@ -130,8 +131,8 @@ export default function HypothesisPage() {
                         </div>
                     </div>
 
-                    <div className="h-[400px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-[400px] min-h-[400px] w-full relative">
+                        <ResponsiveContainer width="99%" height={400}>
                             <LineChart data={hypothesis1Data}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                 <XAxis dataKey="name" hide />
@@ -145,7 +146,7 @@ export default function HypothesisPage() {
                     </div>
 
                     <div className="mt-8 p-6 bg-secondary/5 rounded-2xl border-2 border-secondary/10 text-xs font-medium italic">
-                        <strong>Insight:</strong> Existe una correlación positiva moderada entre el volumen de compradores registrados (25 alumnos nuevos) y la estabilidad del margen bruto en categorías de alta rotación.
+                        <strong>Insight:</strong> Existe una correlación positiva moderada entre el volumen de compradores registrados (67 alumnos en total) y la estabilidad del margen bruto en categorías de alta rotación.
                     </div>
                 </motion.section>
             </div>
@@ -158,7 +159,7 @@ export default function HypothesisPage() {
                 <div className="bg-foreground text-background p-8 rounded-[2rem] flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Muestra Poblacional</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">30</h4>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">67</h4>
                         <p className="text-[10px] font-bold uppercase mt-2">Estudiantes Activos</p>
                     </div>
                     <Target className="w-12 h-12 opacity-20" />

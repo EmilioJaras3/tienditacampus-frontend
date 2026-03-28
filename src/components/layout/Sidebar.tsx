@@ -70,6 +70,15 @@ const routes = [
         href: '/benchmarking',
         color: 'bg-secondary text-secondary-foreground',
         roles: ['admin'],
+        restrictedEmail: 'jarassanchezl@gmail.com',
+    },
+    {
+        label: 'Gráficas (H+)',
+        icon: Zap,
+        href: '/hypothesis',
+        color: 'bg-primary/20 text-primary',
+        roles: ['admin'],
+        restrictedEmail: 'jarassanchezl@gmail.com',
     },
 ];
 
@@ -164,9 +173,12 @@ export function Sidebar() {
     const user = useAuthStore((state) => state.user);
     const [open, setOpen] = useState(false);
 
-    const filteredRoutes = routes.filter(route =>
-        !user || route.roles.includes(user.role)
-    );
+    const filteredRoutes = routes.filter(route => {
+        if (!user) return false;
+        if (!route.roles.includes(user.role)) return false;
+        if (route.restrictedEmail && user.email !== route.restrictedEmail) return false;
+        return true;
+    });
 
     return (
         <>

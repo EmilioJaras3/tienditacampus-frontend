@@ -24,7 +24,8 @@ export const benchmarkingService = {
         return api.post('/benchmarking/snapshot', {}, {
             headers: {
                 'x-google-token': googleToken
-            }
+            },
+            requiresAuth: true
         });
     },
 

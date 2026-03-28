@@ -8,15 +8,8 @@
 import { useAuthStore } from '../store/auth.store';
 
 // 1. Validación de Entorno
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
-if (!API_BASE_URL) {
-    console.warn(
-        'ATENCION: La variable NEXT_PUBLIC_API_URL no esta definida. Se usara http://98.88.194.19:3001/api como fallback. Asegurate de configurar tu archivo .env.local',
-    );
-}
-
-const BASE_URL = '/api';
 
 // 2. Clase de Error Normalizada
 export class ApiError extends Error {
@@ -61,11 +54,10 @@ class ApiClient {
             ...(fetchOptions.headers as Record<string, string>),
         };
 
-        // Inyectar token JWT solo si no viene ya un Authorization header explícito
-        // (ej: el benchmarking envía el Google OAuth token directamente)
-        if (requiresAuth && !headers['Authorization']) {
+        // Inyectar token JWT siempre que sea requerido
+        if (requiresAuth) {
             const token = useAuthStore.getState().token;
-            if (token) {
+            if (token && !headers['Authorization']) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
         }
@@ -77,7 +69,8 @@ class ApiClient {
             });
 
             // Manejo de 401: Sesión expirada
-            if (response.status === 401) {
+            // NOTA: No cerramos sesión si el error viene de benchmarking (puede ser el token de Google, no el JWT)
+            if (response.status === 401 && !url.includes('/benchmarking/')) {
                 useAuthStore.getState().logout();
                 throw new ApiError(401, 'Sesión expirada. Por favor, inicia sesión nuevamente.');
             }
