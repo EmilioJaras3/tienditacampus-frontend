@@ -1,0 +1,85 @@
+﻿time="2026-03-26T04:14:47Z" level=warning msg="/home/ubuntu/tienditacampus-backend/docker-compose.api.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image tienditacampus-backend-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 556B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 373B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 107B done
+#4 DONE 0.0s
+
+#5 [builder 1/6] FROM docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa
+#5 resolve docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa 0.0s done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 8.81kB 0.0s done
+#6 DONE 0.0s
+
+#7 [builder 2/6] WORKDIR /app
+#7 CACHED
+
+#8 [builder 3/6] COPY package*.json ./
+#8 CACHED
+
+#9 [builder 4/6] RUN npm install
+#9 CACHED
+
+#10 [builder 5/6] COPY . .
+#10 DONE 0.2s
+
+#11 [builder 6/6] RUN npm run build
+#11 0.461 
+#11 0.461 > tienditacampus-backend@0.1.0 build
+#11 0.461 > nest build
+#11 0.461 
+#11 33.16 [96msrc/modules/audit/schemas/audit-log.schema.ts[0m:[93m1[0m:[93m45[0m - [91merror[0m[90m TS2307: [0mCannot find module '@nestjs/mongoose' or its corresponding type declarations.
+#11 33.16 
+#11 33.16 [7m1[0m import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+#11 33.16 [7m [0m [91m                                            ~~~~~~~~~~~~~~~~~~[0m
+#11 33.16 [96msrc/modules/audit/schemas/audit-log.schema.ts[0m:[93m2[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module 'mongoose' or its corresponding type declarations.
+#11 33.16 
+#11 33.16 [7m2[0m import { Document } from 'mongoose';
+#11 33.16 [7m [0m [91m                         ~~~~~~~~~~[0m
+#11 33.16 
+#11 33.16 Found 2 error(s).
+#11 33.16 
+#11 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+------
+ > [builder 6/6] RUN npm run build:
+33.16 
+33.16 [7m1[0m import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+33.16 [7m [0m [91m                                            ~~~~~~~~~~~~~~~~~~[0m
+33.16 [96msrc/modules/audit/schemas/audit-log.schema.ts[0m:[93m2[0m:[93m26[0m - [91merror[0m[90m TS2307: [0mCannot find module 'mongoose' or its corresponding type declarations.
+33.16 
+33.16 [7m2[0m import { Document } from 'mongoose';
+33.16 [7m [0m [91m                         ~~~~~~~~~~[0m
+33.16 
+33.16 Found 2 error(s).
+33.16 
+------
+Dockerfile:6
+
+--------------------
+
+   4 |     RUN npm install
+
+   5 |     COPY . .
+
+   6 | >>> RUN npm run build
+
+   7 |     
+
+   8 |     FROM node:20-alpine
+
+--------------------
+
+failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+

@@ -34,7 +34,11 @@ export default function LoginPage() {
                 const response = await authService.loginWithGoogle(tokenResponse.access_token);
                 toast.success('¡Bienvenido con Google!');
                 if (response.user.role === 'buyer') {
+<<<<<<< HEAD
                     router.push('/dashboard');
+=======
+                    router.push('/mis-compras');
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
                 } else {
                     router.push('/dashboard');
                 }
@@ -64,7 +68,11 @@ export default function LoginPage() {
             const response = await authService.login(data);
             toast.success('¡Bienvenido de nuevo!');
             if (response.user.role === 'buyer') {
+<<<<<<< HEAD
                 router.push('/dashboard');
+=======
+                router.push('/mis-compras');
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
             } else {
                 router.push('/dashboard');
             }

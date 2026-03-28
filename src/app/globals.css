@@ -47,6 +47,10 @@
   --shadow-neo-sm: 0px 2px 6px 0px rgba(0, 0, 0, 0.04);
   --shadow-neo-lg: 0px 8px 28px 0px rgba(0, 0, 0, 0.12);
   --font-sans: "Segoe UI", "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+<<<<<<< HEAD
+=======
+  --font-display: "Oswald", "Inter", "Segoe UI", sans-serif;
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
 }
 
 /* 

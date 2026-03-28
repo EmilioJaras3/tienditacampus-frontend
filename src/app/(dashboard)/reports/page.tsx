@@ -75,6 +75,7 @@ export default function ReportsPage() {
     const handleDownloadCSV = (report: WeeklyReport) => {
         const headers = ['Métrica', 'Valor'];
         const rows = [
+<<<<<<< HEAD
             ['Inicio Semana', report.weekStart],
             ['Fin Semana', report.weekEnd],
             ['Inversión (Costos)', report.totalInvestment.toString()],
@@ -84,6 +85,13 @@ export default function ReportsPage() {
             ['Costo Merma', report.totalWasteCost.toString()],
             ['Pérdida (Unidades)', report.lossPercentage.toString() + '%'],
             ['Producto Estrella', report.bestSellingProduct?.name || 'N/A'],
+=======
+            ['Semana (Inicio)', new Date(report.weekStart).toLocaleDateString()],
+            ['Ventas Totales', report.totalRevenue?.toString()],
+            ['Ganancia Total', report.totalProfit?.toString()],
+            ['Mermas (Waste)', report.totalWasteCost?.toString()],
+            ['Mermas %', report.lossPercentage?.toString()],
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
             ['Fecha Generación', new Date(report.createdAt).toLocaleDateString()],
         ];
 
@@ -101,7 +109,11 @@ export default function ReportsPage() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+<<<<<<< HEAD
         toast.success(`Reporte del ${report.weekStart} descargado`);
+=======
+        toast.success(`Reporte Semana de ${new Date(report.weekStart).toLocaleDateString()} descargado`);
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
     };
 
     if (loading && !stats) {
@@ -205,7 +217,11 @@ export default function ReportsPage() {
                                 <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-8 py-6">
                                         <div className="font-bold text-lg tracking-tighter uppercase italic text-foreground">
+<<<<<<< HEAD
                                             {report.weekStart} <span className="text-muted-foreground font-normal text-sm">al</span> {report.weekEnd}
+=======
+                                            Semana {new Date(report.weekStart).toLocaleDateString('es-MX', {day: '2-digit', month: 'short'})}
+>>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
                                         </div>
                                         <span className="text-[10px] font-bold text-muted-foreground uppercase">Gen: {new Date(report.createdAt).toLocaleDateString()}</span>
                                     </td>

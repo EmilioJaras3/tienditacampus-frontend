@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
+		"name": "TienditaCampus SOA API - Full Collection",
+		"description": "Colección completa para probar todos los servicios de la arquitectura SOA de TienditaCampus, incluyendo ventas, inventario, reportes, pronósticos y analíticas.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "General",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"emico311006L\",\n    \"firstName\": \"Emilio\",\n    \"lastName\": \"Jaras\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.accessToken);",
+									"}",
+									"if (jsonData.user && jsonData.user.id) {",
+									"    pm.collectionVariables.set(\"my_user_id\", jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jarassanchezl@gmail.com\",\n    \"password\": \"emico311006L\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Public Profile",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/public/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", "public", ":id"],
+							"variable": [{"key": "id", "value": "{{my_user_id}}"}]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "List All Categories",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": ["{{base_url}}"],
+							"path": ["categories"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "List My Products",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": ["{{base_url}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Papas Caseras\",\n    \"description\": \"Papas fritas con sal de mar\",\n    \"categoryId\": \"e2c3cb65-235d-4466-b8ca-e6c327bc600c\",\n    \"salePrice\": 25.00,\n    \"unitCost\": 12.00,\n    \"isPerishable\": true,\n    \"shelfLifeDays\": 7\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": ["{{base_url}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Get Marketplace",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/products/marketplace",
+							"host": ["{{base_url}}"],
+							"path": ["products", "marketplace"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Add Stock",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"UUID_PRODUCT\",\n    \"quantity\": 20,\n    \"unitCost\": 12.00\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/inventory",
+							"host": ["{{base_url}}"],
+							"path": ["inventory"]
+						}
+					}
+				},
+				{
+					"name": "Get Product History",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/inventory/product/:id",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", "product", ":id"],
+							"variable": [{"key": "id", "value": "UUID"}]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Sales",
+			"item": [
+				{
+					"name": "Get Today Summary",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sales/today",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "today"]
+						}
+					}
+				},
+				{
+					"name": "Prepare Day",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"productId\": \"UUID_PRODUCT\",\n            \"quantityPrepared\": 15\n        }\n    ],\n    \"notes\": \"Venta de lunes\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/prepare",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "prepare"]
+						}
+					}
+				},
+				{
+					"name": "Track Product Sale",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"UUID_PRODUCT\",\n    \"quantitySold\": 1\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/track",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "track"]
+						}
+					}
+				},
+				{
+					"name": "Get ROI Analytics",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sales/roi?startDate=2024-03-01&endDate=2024-03-31",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "roi"],
+							"query": [
+								{ "key": "startDate", "value": "2024-03-01" },
+								{ "key": "endDate", "value": "2024-03-31" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Sales History",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/sales/history",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "history"]
+						}
+					}
+				},
+				{
+					"name": "Close Day",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"productId\": \"UUID_PRODUCT\",\n            \"waste\": 2,\n            \"wasteReason\": \"damaged\"\n        }\n    ]\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/close-day",
+							"host": ["{{base_url}}"],
+							"path": ["sales", "close-day"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Purchase (Create Order)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set(\"last_order_id\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sellerId\": \"{{my_user_id}}\",\n    \"items\": [\n        {\n            \"productId\": \"e2c3cb65-235d-4466-b8ca-e6c327bc600c\",\n            \"quantity\": 2\n        }\n    ],\n    \"deliveryMessage\": \"Entregar en la entrada principal\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/purchase",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "purchase"]
+						}
+					}
+				},
+				{
+					"name": "My Purchases",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/orders/my-purchases",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "my-purchases"]
+						}
+					}
+				},
+				{
+					"name": "Accept Order",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/orders/{{last_order_id}}/accept",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "{{last_order_id}}", "accept"],
+							"variable": [{"key": "id", "value": "UUID_ORDER"}]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Generate Weekly Report",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/reports/weekly/generate?weekStart=2024-03-18",
+							"host": ["{{base_url}}"],
+							"path": ["reports", "weekly", "generate"],
+							"query": [{"key": "weekStart", "value": "2024-03-18"}]
+						}
+					}
+				},
+				{
+					"name": "List Weekly Reports",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/reports/weekly",
+							"host": ["{{base_url}}"],
+							"path": ["reports", "weekly"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Analytics & AI",
+			"item": [
+				{
+					"name": "Break-Even Calculation",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"e2c3cb65-235d-4466-b8ca-e6c327bc600c\",\n    \"fixedCosts\": 500.00,\n    \"unitCost\": 10.00,\n    \"unitPrice\": 25.00\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/break-even/calculate",
+							"host": ["{{base_url}}"],
+							"path": ["break-even", "calculate"]
+						}
+					}
+				},
+				{
+					"name": "Get Forecast",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/forecast/:productId/day/:dayOfWeek",
+							"host": ["{{base_url}}"],
+							"path": ["forecast", ":productId", "day", ":dayOfWeek"],
+							"variable": [
+								{"key": "productId", "value": "UUID"},
+								{"key": "dayOfWeek", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Dashboard Comparison",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/dashboard/comparison?startDate=2024-03-01&endDate=2024-03-31",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "comparison"],
+							"query": [
+								{ "key": "startDate", "value": "2024-03-01" },
+								{ "key": "endDate", "value": "2024-03-31" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "BigQuery Benchmarking",
+			"item": [
+				{
+					"name": "1. Get Google Auth URL",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/benchmarking/auth/google",
+							"host": ["{{base_url}}"],
+							"path": ["benchmarking", "auth", "google"]
+						}
+					}
+				},
+				{
+					"name": "2. Run Benchmarking Queries",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/benchmarking/run-queries",
+							"host": ["{{base_url}}"],
+							"path": ["benchmarking", "run-queries"]
+						}
+					}
+				},
+				{
+					"name": "3. Send Historical Snapshot to BigQuery",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"header": [
+							{
+								"key": "x-google-token",
+								"value": "{{google_token}}",
+								"type": "text"
+							}
+						],
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"days\": 30\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/benchmarking/snapshot/historical",
+							"host": ["{{base_url}}"],
+							"path": ["benchmarking", "snapshot", "historical"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "System Audit",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/audit?limit=50",
+							"host": ["{{base_url}}"],
+							"path": ["audit"],
+							"query": [{"key": "limit", "value": "50"}]
+						}
+					}
+				},
+				{
+					"name": "Run Manual Expiration",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}] },
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/expiration/run-manual",
+							"host": ["{{base_url}}"],
+							"path": ["expiration", "run-manual"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{ "key": "base_url", "value": "http://98.88.194.19:3001/api", "type": "string" },
+		{ "key": "token", "value": "", "type": "string" },
+		{ "key": "google_token", "value": "TOKEN_GOOGLE_AQUI", "type": "string" },
+		{ "key": "my_user_id", "value": "", "type": "string" },
+		{ "key": "last_order_id", "value": "", "type": "string" }
+	]
+}
