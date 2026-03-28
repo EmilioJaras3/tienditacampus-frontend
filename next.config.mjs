@@ -37,11 +37,9 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-<<<<<<< HEAD
-                destination: 'http://localhost:3005/api/:path*',
-=======
-                destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://98.88.194.19:3001/api'}/:path*`,
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
+                destination: process.env.NODE_ENV === 'production' 
+                    ? 'http://98.88.194.19:3001/api/:path*' 
+                    : 'http://localhost:3005/api/:path*',
             },
         ];
     },
