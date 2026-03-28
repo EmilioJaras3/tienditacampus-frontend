@@ -24,7 +24,7 @@ export default function HypothesisPage() {
 
     useEffect(() => {
         if (!loading && user) {
-            if (user.email !== 'jarassanchezl@gmail.com') {
+            if (user.email !== 'master@tienditacampus.com') {
                 router.push('/dashboard');
             }
         }

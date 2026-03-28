@@ -160,7 +160,7 @@ export default function DashboardPage() {
             </motion.header>
             
             {/* Admin Evaluation Section */}
-            {user?.email === 'jarassanchezl@gmail.com' && (
+            {user?.email === 'master@tienditacampus.com' && (
                 <motion.section 
                     variants={fadeInUp}
                     className="bg-neo-yellow border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl relative overflow-hidden"
