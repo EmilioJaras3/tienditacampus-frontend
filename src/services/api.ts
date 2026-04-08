@@ -8,7 +8,8 @@
 import { useAuthStore } from '../store/auth.store';
 
 // 1. Validación de Entorno
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// 1. Validación de Entorno - Forzamos /api para usar el proxy de Vercel y evitar Mixed Content
+const BASE_URL = '/api';
 
 
 // 2. Clase de Error Normalizada

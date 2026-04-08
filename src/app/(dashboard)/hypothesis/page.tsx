@@ -159,7 +159,7 @@ export default function HypothesisPage() {
                 <div className="bg-foreground text-background p-8 rounded-[2rem] flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Muestra Poblacional</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">67</h4>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">30</h4>
                         <p className="text-[10px] font-bold uppercase mt-2">Estudiantes Activos</p>
                     </div>
                     <Target className="w-12 h-12 opacity-20" />
@@ -168,7 +168,7 @@ export default function HypothesisPage() {
                 <div className="bg-primary p-8 rounded-[2rem] text-primary-foreground flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Tasa de Conversión</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-background">84%</h4>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-background">92%</h4>
                         <p className="text-[10px] font-bold uppercase mt-2">Iteración Comprador-Vendedor</p>
                     </div>
                     <CheckCircle2 className="w-12 h-12 opacity-20" />

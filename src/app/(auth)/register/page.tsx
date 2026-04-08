@@ -24,13 +24,20 @@ import {
 import { useGoogleLogin } from '@react-oauth/google';
 
 const registerSchema = z.object({
-    firstName: z.string().min(2, { message: 'Nombre muy corto' }),
-    lastName: z.string().min(2, { message: 'Apellido muy corto' }),
-    email: z.string().email({ message: 'Email inválido' }),
-    password: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
-    campusLocation: z.string().min(3, { message: 'Requerido' }),
-    major: z.string().min(3, { message: 'Requerido' }),
-    role: z.enum(['buyer', 'seller']),
+  firstName: z.string().min(2, { message: 'Nombre muy corto' }),
+  lastName: z.string().min(2, { message: 'Apellido muy corto' }),
+  email: z.string().email({ message: 'Email inválido' }),
+  password: z.string()
+    .min(8, { message: 'Mínimo 8 caracteres' })
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, {
+      message: 'Debe incluir Mayúscula, Minúscula, Número y Especial (@$!%*?&)'
+    }),
+  campusLocation: z.string().min(3, { message: 'Requerido' }),
+  major: z.string().min(3, { message: 'Requerido' }),
+  role: z.enum(['buyer', 'seller']),
+  acceptTerms: z.literal(true, {
+    errorMap: () => ({ message: 'Debes aceptar los términos y condiciones' }),
+  }),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -161,13 +168,6 @@ export default function RegisterPage() {
                         {/* Académico */}
                         <div className="space-y-2">
                             <Label className="text-xs font-semibold text-foreground flex items-center gap-2"><MapPin size={14} /> Campus / Sede</Label>
-<<<<<<< HEAD
-                            <Input
-                                {...register('campusLocation')}
-                                className="neo-input"
-                                placeholder="Ej. Campus Norte"
-                            />
-=======
                             <select
                                 {...register('campusLocation')}
                                 className="neo-input bg-background w-full h-12 px-3 border-2 border-foreground text-black"
@@ -179,18 +179,10 @@ export default function RegisterPage() {
                                 <option value="UD3">UD3</option>
                                 <option value="UD4">UD4</option>
                             </select>
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
                             {errors.campusLocation && <p className="text-xs font-bold text-primary italic uppercase">{errors.campusLocation.message}</p>}
                         </div>
                         <div className="space-y-2">
                             <Label className="text-xs font-semibold text-foreground flex items-center gap-2"><GraduationCap size={14} /> Carrera</Label>
-<<<<<<< HEAD
-                            <Input
-                                {...register('major')}
-                                className="neo-input"
-                                placeholder="Ej. Ingeniería"
-                            />
-=======
                             <select
                                 {...register('major')}
                                 className="neo-input bg-background w-full h-12 px-3 border-2 border-foreground text-black"
@@ -208,7 +200,6 @@ export default function RegisterPage() {
                                 <option value="Ingeniería Biomédica">Ingeniería Biomédica</option>
                                 <option value="Licenciatura en Administración">Licenciatura en Administración</option>
                             </select>
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
                             {errors.major && <p className="text-xs font-bold text-primary italic uppercase">{errors.major.message}</p>}
                         </div>
 
@@ -233,6 +224,30 @@ export default function RegisterPage() {
                             />
                             {errors.password && <p className="text-xs font-bold text-primary italic uppercase">{errors.password.message}</p>}
                         </div>
+                    </div>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="space-y-4">
+                        <div className="flex items-start space-x-3 bg-primary/5 p-6 border border-primary/20 rounded-xl">
+                            <input
+                                type="checkbox"
+                                {...register('acceptTerms')}
+                                id="acceptTerms"
+                                className="mt-1 h-5 w-5 rounded border-foreground/20 text-primary focus:ring-primary accent-primary"
+                            />
+                            <div className="grid gap-2 leading-none">
+                                <label
+                                    htmlFor="acceptTerms"
+                                    className="text-xs font-bold uppercase tracking-widest text-foreground cursor-pointer"
+                                >
+                                    Acepto el <Link href="/terms" className="text-primary underline hover:text-foreground transition-colors">Marco Legal & Términos de Convivencia</Link>
+                                </label>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
+                                    He leído y comprendo mis responsabilidades dentro del campus.
+                                </p>
+                            </div>
+                        </div>
+                        {errors.acceptTerms && <p className="text-xs font-bold text-primary italic uppercase">{errors.acceptTerms.message}</p>}
                     </div>
 
                     <button
