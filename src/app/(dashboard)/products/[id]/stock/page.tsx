@@ -107,9 +107,9 @@ export default function StockManagementPage({ params }: { params: { id: string }
 
         try {
             setIsCalculatingBreakEven(true);
-            const totalFixedCosts = Math.max(0, 
-                (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) + 
-                (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) + 
+            const totalFixedCosts = Math.max(0,
+                (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) +
+                (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) +
                 (otherPeriod === 'semanal' ? otherCost * 4 : otherCost)
             );
             const result = await financeService.calculateBreakEven({
@@ -322,8 +322,8 @@ export default function StockManagementPage({ params }: { params: { id: string }
                             <p className="text-[9px] font-bold uppercase tracking-[0.2em]">Referencia de Venta</p>
                             <p className="text-2xl font-bold tracking-tighter">Precio: ${Number(product.salePrice).toFixed(2)}</p>
                         </div>
-                        <Button 
-                            onClick={handleCalculateBreakEven} 
+                        <Button
+                            onClick={handleCalculateBreakEven}
                             disabled={isCalculatingBreakEven}
                             className="h-20 px-12 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all"
                         >
@@ -340,7 +340,7 @@ export default function StockManagementPage({ params }: { params: { id: string }
                                 </div>
                                 <h4 className="text-2xl font-bold tracking-tighter uppercase italic">Resultado del Análisis</h4>
                             </div>
-                            
+
                             <div className="space-y-8">
                                 <p className="text-3xl font-bold leading-tight tracking-[0.02em]">
                                     Mensaje sencillo:<br />
@@ -348,7 +348,7 @@ export default function StockManagementPage({ params }: { params: { id: string }
                                         Necesitas vender {Math.max(0, Math.ceil(breakEvenResult.breakEvenUnits))} {product.name.toLowerCase()}s (al mes) para recuperar tus gastos fijos.
                                     </span>
                                 </p>
-                                
+
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-6 border-t border-background/10">
                                     <div>
                                         <p className="text-[9px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">Margen Neto Unitario</p>
@@ -356,9 +356,9 @@ export default function StockManagementPage({ params }: { params: { id: string }
                                     </div>
                                     <div>
                                         <p className="text-[9px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">Costo Fijo Mensual Proyectado</p>
-                                        <p className="text-xl font-bold">${Math.max(0, 
-                                            (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) + 
-                                            (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) + 
+                                        <p className="text-xl font-bold">${Math.max(0,
+                                            (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) +
+                                            (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) +
                                             (otherPeriod === 'semanal' ? otherCost * 4 : otherCost)
                                         ).toFixed(2)}</p>
                                     </div>
