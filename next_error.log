@@ -1,0 +1,176 @@
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./src/services/api.ts
+Error: 
+  [31mx[0m the name `BASE_URL` is defined multiple times
+     ,-[[36;1;4m/app/src/services/api.ts[0m:16:1]
+ [2m 16[0m |     );
+ [2m 17[0m | }
+ [2m 18[0m | 
+ [2m 19[0m | const BASE_URL = '/api';
+     : [31;1m      ^^^^|^^^[0m
+     :           [31;1m`-- [31;1mprevious definition of `BASE_URL` here[0m[0m
+ [2m 20[0m | 
+ [2m 21[0m | // 2. Clase de Error Normalizada
+ [2m 22[0m | export class ApiError extends Error {
+ [2m 23[0m |     public status: number;
+ [2m 24[0m |     public data: any;
+ [2m 25[0m | 
+ [2m 26[0m |     constructor(status: number, message: string, data?: any) {
+ [2m 27[0m |         super(message);
+ [2m 28[0m |         this.name = 'ApiError';
+ [2m 29[0m |         this.status = status;
+ [2m 30[0m |         this.data = data;
+ [2m 31[0m |     }
+ [2m 32[0m | }
+ [2m 33[0m | 
+ [2m 34[0m | interface RequestOptions extends RequestInit {
+ [2m 35[0m |     params?: Record<string, string>;
+ [2m 36[0m |     requiresAuth?: boolean;
+ [2m 37[0m | }
+ [2m 38[0m | 
+ [2m 39[0m | class ApiClient {
+ [2m 40[0m |     private baseUrl: string;
+ [2m 41[0m | 
+ [2m 42[0m |     constructor(baseUrl: string) {
+ [2m 43[0m |         this.baseUrl = baseUrl;
+ [2m 44[0m |     }
+ [2m 45[0m | 
+ [2m 46[0m |     private async request<T>(
+ [2m 47[0m |         endpoint: string,
+ [2m 48[0m |         options: RequestOptions = {},
+ [2m 49[0m |     ): Promise<T> {
+ [2m 50[0m |         const { params, requiresAuth = true, ...fetchOptions } = options;
+ [2m 51[0m | 
+ [2m 52[0m |         let url = `${this.baseUrl}${endpoint}`;
+ [2m 53[0m |         if (params) {
+ [2m 54[0m |             const searchParams = new URLSearchParams(params);
+ [2m 55[0m |             url += `?${searchParams.toString()}`;
+ [2m 56[0m |         }
+ [2m 57[0m | 
+ [2m 58[0m |         // Configuración de Headers segura
+ [2m 59[0m |         const headers: Record<string, string> = {
+ [2m 60[0m |             'Content-Type': 'application/json',
+ [2m 61[0m |             ...(fetchOptions.headers as Record<string, string>),
+ [2m 62[0m |         };
+ [2m 63[0m | 
+ [2m 64[0m |         // Inyectar token JWT siempre que sea requerido
+ [2m 65[0m |         if (requiresAuth) {
+ [2m 66[0m |             const token = useAuthStore.getState().token;
+ [2m 67[0m |             if (token && !headers['Authorization']) {
+ [2m 68[0m |                 headers['Authorization'] = `Bearer ${token}`;
+ [2m 69[0m |             }
+ [2m 70[0m |         }
+ [2m 71[0m | 
+ [2m 72[0m |         try {
+ [2m 73[0m |             const response = await fetch(url, {
+ [2m 74[0m |                 ...fetchOptions,
+ [2m 75[0m |                 headers,
+ [2m 76[0m |             });
+ [2m 77[0m | 
+ [2m 78[0m |             // Manejo de 401: Sesión expirada
+ [2m 79[0m |             // NOTA: No cerramos sesión si el error viene de benchmarking (puede ser el token de Google, no el JWT)
+ [2m 80[0m |             if (response.status === 401 && !url.includes('/benchmarking/')) {
+ [2m 81[0m |                 useAuthStore.getState().logout();
+ [2m 82[0m |                 throw new ApiError(401, 'Sesión expirada. Por favor, inicia sesión nuevamente.');
+ [2m 83[0m |             }
+ [2m 84[0m | 
+ [2m 85[0m |             // Normalización de Errores (4xx, 5xx)
+ [2m 86[0m |             if (!response.ok) {
+ [2m 87[0m |                 let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+ [2m 88[0m |                 let errorData = null;
+ [2m 89[0m | 
+ [2m 90[0m |                 try {
+ [2m 91[0m |                     errorData = await response.json();
+ [2m 92[0m |                     if (errorData && errorData.message) {
+ [2m 93[0m |                         errorMessage = Array.isArray(errorData.message)
+ [2m 94[0m |                             ? errorData.message.join(', ')
+ [2m 95[0m |                             : errorData.message;
+ [2m 96[0m |                     }
+ [2m 97[0m |                 } catch (e) {
+ [2m 98[0m |                     // Si no es JSON, nos quedamos con el mensaje genérico
+ [2m 99[0m |                 }
+ [2m100[0m | 
+ [2m101[0m |                 throw new ApiError(response.status, errorMessage, errorData);
+ [2m102[0m |             }
+ [2m103[0m | 
+ [2m104[0m |             // Respuesta exitosa (siempre intenta parsear JSON, o retorna null si está vacío)
+ [2m105[0m |             if (response.status === 204) {
+ [2m106[0m |                 return {} as T;
+ [2m107[0m |             }
+ [2m108[0m | 
+ [2m109[0m |             const text = await response.text();
+ [2m110[0m |             if (!text || text.length === 0) {
+ [2m111[0m |                 return null as T;
+ [2m112[0m |             }
+ [2m113[0m | 
+ [2m114[0m |             try {
+ [2m115[0m |                 return JSON.parse(text);
+ [2m116[0m |             } catch {
+ [2m117[0m |                 return text as unknown as T;
+ [2m118[0m |             }
+ [2m119[0m | 
+ [2m120[0m |         } catch (error) {
+ [2m121[0m |             if (error instanceof ApiError) {
+ [2m122[0m |                 throw error;
+ [2m123[0m |             }
+ [2m124[0m |             // Error de red o algo inesperado en el fetch
+ [2m125[0m |             throw new ApiError(500, error instanceof Error ? error.message : 'Error desconocido de red');
+ [2m126[0m |         }
+ [2m127[0m |     }
+ [2m128[0m | 
+ [2m129[0m |     get<T>(endpoint: string, options?: RequestOptions) {
+ [2m130[0m |         return this.request<T>(endpoint, { ...options, method: 'GET' });
+ [2m131[0m |     }
+ [2m132[0m | 
+ [2m133[0m |     post<T>(endpoint: string, data?: unknown, options?: RequestOptions) {
+ [2m134[0m |         return this.request<T>(endpoint, {
+ [2m135[0m |             ...options,
+ [2m136[0m |             method: 'POST',
+ [2m137[0m |             body: JSON.stringify(data),
+ [2m138[0m |         });
+ [2m139[0m |     }
+ [2m140[0m | 
+ [2m141[0m |     put<T>(endpoint: string, data?: unknown, options?: RequestOptions) {
+ [2m142[0m |         return this.request<T>(endpoint, {
+ [2m143[0m |             ...options,
+ [2m144[0m |             method: 'PUT',
+ [2m145[0m |             body: JSON.stringify(data),
+ [2m146[0m |         });
+ [2m147[0m |     }
+ [2m148[0m | 
+ [2m149[0m |     patch<T>(endpoint: string, data?: unknown, options?: RequestOptions) {
+ [2m150[0m |         return this.request<T>(endpoint, {
+ [2m151[0m |             ...options,
+ [2m152[0m |             method: 'PATCH',
+ [2m153[0m |             body: JSON.stringify(data),
+ [2m154[0m |         });
+ [2m155[0m |     }
+ [2m156[0m | 
+ [2m157[0m |     delete<T>(endpoint: string, options?: RequestOptions) {
+ [2m158[0m |         return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+ [2m159[0m |     }
+ [2m160[0m | }
+ [2m161[0m | 
+ [2m162[0m | const BASE_URL = API_BASE_URL || '/api';
+     : [33;1m      ^^^^|^^^[0m
+     :           [33;1m`-- [33;1m`BASE_URL` redefined here[0m[0m
+ [2m163[0m | 
+ [2m164[0m | export const api = new ApiClient(BASE_URL);
+     `----
+
+Import trace for requested module:
+./src/services/api.ts
+./src/services/auth.service.ts
+./src/app/(auth)/login/page.tsx
+
+
+> Build failed because of webpack errors

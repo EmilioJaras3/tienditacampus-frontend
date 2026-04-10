@@ -24,13 +24,20 @@ import {
 import { useGoogleLogin } from '@react-oauth/google';
 
 const registerSchema = z.object({
-    firstName: z.string().min(2, { message: 'Nombre muy corto' }),
-    lastName: z.string().min(2, { message: 'Apellido muy corto' }),
-    email: z.string().email({ message: 'Email inválido' }),
-    password: z.string().min(6, { message: 'Mínimo 6 caracteres' }),
-    campusLocation: z.string().min(3, { message: 'Requerido' }),
-    major: z.string().min(3, { message: 'Requerido' }),
-    role: z.enum(['buyer', 'seller']),
+  firstName: z.string().min(2, { message: 'Nombre muy corto' }),
+  lastName: z.string().min(2, { message: 'Apellido muy corto' }),
+  email: z.string().email({ message: 'Email inválido' }),
+  password: z.string()
+    .min(8, { message: 'Mínimo 8 caracteres' })
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, {
+      message: 'Debe incluir Mayúscula, Minúscula, Número y Especial (@$!%*?&)'
+    }),
+  campusLocation: z.string().min(3, { message: 'Requerido' }),
+  major: z.string().min(3, { message: 'Requerido' }),
+  role: z.enum(['buyer', 'seller']),
+  acceptTerms: z.literal(true, {
+    errorMap: () => ({ message: 'Debes aceptar los términos y condiciones' }),
+  }),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -217,6 +224,30 @@ export default function RegisterPage() {
                             />
                             {errors.password && <p className="text-xs font-bold text-primary italic uppercase">{errors.password.message}</p>}
                         </div>
+                    </div>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="space-y-4">
+                        <div className="flex items-start space-x-3 bg-primary/5 p-6 border border-primary/20 rounded-xl">
+                            <input
+                                type="checkbox"
+                                {...register('acceptTerms')}
+                                id="acceptTerms"
+                                className="mt-1 h-5 w-5 rounded border-foreground/20 text-primary focus:ring-primary accent-primary"
+                            />
+                            <div className="grid gap-2 leading-none">
+                                <label
+                                    htmlFor="acceptTerms"
+                                    className="text-xs font-bold uppercase tracking-widest text-foreground cursor-pointer"
+                                >
+                                    Acepto el <Link href="/terms" className="text-primary underline hover:text-foreground transition-colors">Marco Legal & Términos de Convivencia</Link>
+                                </label>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-tight">
+                                    He leído y comprendo mis responsabilidades dentro del campus.
+                                </p>
+                            </div>
+                        </div>
+                        {errors.acceptTerms && <p className="text-xs font-bold text-primary italic uppercase">{errors.acceptTerms.message}</p>}
                     </div>
 
                     <button

@@ -76,10 +76,14 @@ export default function ReportsPage() {
         const headers = ['Métrica', 'Valor'];
         const rows = [
             ['Semana (Inicio)', new Date(report.weekStart).toLocaleDateString()],
-            ['Ventas Totales', report.totalRevenue?.toString()],
-            ['Ganancia Total', report.totalProfit?.toString()],
-            ['Mermas (Waste)', report.totalWasteCost?.toString()],
-            ['Mermas %', report.lossPercentage?.toString()],
+            ['Fin Semana', report.weekEnd],
+            ['Inversión (Costos)', report.totalInvestment.toString()],
+            ['Ventas Totales', report.totalRevenue?.toString() || report.totalRevenue.toString()],
+            ['Ganancia Neta', report.totalProfit?.toString() || report.totalProfit.toString()],
+            ['Margen Promedio %', report.avgProfitMargin.toString()],
+            ['Costo Merma', report.totalWasteCost?.toString() || report.totalWasteCost.toString()],
+            ['Pérdida (Unidades)', report.lossPercentage?.toString() + '%' || report.lossPercentage.toString() + '%'],
+            ['Producto Estrella', report.bestSellingProduct?.name || 'N/A'],
             ['Fecha Generación', new Date(report.createdAt).toLocaleDateString()],
         ];
 
@@ -201,20 +205,28 @@ export default function ReportsPage() {
                                 <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-8 py-6">
                                         <div className="font-bold text-lg tracking-tighter uppercase italic text-foreground">
-                                            Semana {new Date(report.weekStart).toLocaleDateString('es-MX', {day: '2-digit', month: 'short'})}
+                                            {report.weekStart} <span className="text-muted-foreground font-normal text-sm">al</span> {report.weekEnd}
                                         </div>
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(report.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Gen: {new Date(report.createdAt).toLocaleDateString()}</span>
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.totalRevenue)}</span>
+                                        <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">Margen: {report.avgProfitMargin}%</p>
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className={`text-xl font-bold tracking-tighter ${Number(report.totalProfit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
                                             ${toMoney(report.totalProfit)}
                                         </span>
+                                        <p className="text-[10px] text-destructive uppercase font-bold mt-1">Merma: ${toMoney(report.totalWasteCost)}</p>
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => handleDownloadCSV(report)}
+                                                className="p-3 bg-muted border border-foreground/5 hover:text-primary transition-all rounded-xl shadow-neo-sm"
+                                            >
+                                                <Download size={18} />
+                                            </button>
                                             <button 
                                                 onClick={() => handleDeleteReport(report.id)}
                                                 className="p-3 bg-muted border border-foreground/5 hover:bg-destructive hover:text-destructive-foreground transition-all rounded-xl shadow-neo-sm"

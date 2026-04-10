@@ -4,11 +4,19 @@ export interface WeeklyReport {
     id: string;
     weekStart: string;
     weekEnd: string;
+    totalInvestment: number;
     totalRevenue: number;
     totalProfit: number;
+    avgProfitMargin: number;
     totalWasteCost: number;
+    totalUnitsSold: number;
+    totalUnitsLost: number;
     lossPercentage: number;
     createdAt: string;
+    bestSellingProduct?: {
+        id: string;
+        name: string;
+    } | null;
 }
 
 export const reportsService = {

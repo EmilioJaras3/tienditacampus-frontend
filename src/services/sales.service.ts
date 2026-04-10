@@ -60,12 +60,8 @@ export const salesService = {
     /**
      * Obtener ROI y estadisticas financieras acumuladas
      */
-    async getRoiStats(startDate?: string, endDate?: string): Promise<RoiStats> {
-        const params: Record<string, string> = {};
-        if (startDate) params.startDate = startDate;
-        if (endDate) params.endDate = endDate;
-
-        return api.get<RoiStats>('/sales/roi', { params });
+    async getRoiStats(): Promise<RoiStats> {
+        return api.get<RoiStats>('/sales/roi');
     },
 
     /**
@@ -89,12 +85,8 @@ export const salesService = {
         return api.get<{ productName: string; suggested: number; confidence: number } | null>('/sales/prediction');
     },
 
-    async getWeekdayAnalytics(startDate?: string, endDate?: string): Promise<WeekdayAnalyticsItem[]> {
-        const params: Record<string, string> = {};
-        if (startDate) params.startDate = startDate;
-        if (endDate) params.endDate = endDate;
-
-        return api.get<WeekdayAnalyticsItem[]>('/sales/analytics/by-weekday', { params });
+    async getWeekdayAnalytics(): Promise<WeekdayAnalyticsItem[]> {
+        return api.get<WeekdayAnalyticsItem[]>('/sales/analytics/by-weekday');
     },
 
     /**

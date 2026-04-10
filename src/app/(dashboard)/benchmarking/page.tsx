@@ -29,7 +29,7 @@ export default function BenchmarkingPage() {
     const [metrics, setMetrics] = useState<QueryMetric[]>([]);
     const { token, googleToken, setGoogleToken, user } = useAuthStore();
 
-    const isAdmin = user?.email === 'jarassanchezl@gmail.com';
+    const isAdmin = user?.role === 'admin';
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
