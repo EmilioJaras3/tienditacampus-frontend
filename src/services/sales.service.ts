@@ -68,7 +68,8 @@ export const salesService = {
      * Obtener historial de ventas diario para graficas
      */
     async getHistory(): Promise<DailySale[]> {
-        return api.get<DailySale[]>('/sales/history');
+        const response = await api.get<{ data: DailySale[]; total: number; page: number; limit: number }>('/sales/history');
+        return response.data;
     },
 
     /**

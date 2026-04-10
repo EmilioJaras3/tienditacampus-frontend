@@ -1,5 +1,12 @@
 import { api } from './api';
 
+export interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -53,7 +60,8 @@ export const productsService = {
      * Obtener todos los productos del usuario
      */
     async getAll(): Promise<Product[]> {
-        return api.get<Product[]>('/products');
+        const response = await api.get<PaginatedResponse<Product>>('/products');
+        return response.data;
     },
 
     /**
@@ -65,10 +73,11 @@ export const productsService = {
         if (sellerId) params.seller = sellerId;
         if (category) params.category = category;
 
-        return api.get<Product[]>('/products/marketplace', {
+        const response = await api.get<PaginatedResponse<Product>>('/products/marketplace', {
             params,
             requiresAuth: false
         });
+        return response.data;
     },
 
     /**

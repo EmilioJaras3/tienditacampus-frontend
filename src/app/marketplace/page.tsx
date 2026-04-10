@@ -5,6 +5,7 @@ import { productsService, Product, Category } from '@/services/products.service'
 import { ProductCard } from '@/components/product-card';
 import { Input } from '@/components/ui/input';
 import { Loader2, Search, ShoppingBag, Filter } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -30,6 +31,9 @@ export default function MarketplacePage() {
             setCategories(categoriesData);
         } catch (error) {
             console.error('Error fetching marketplace data:', error);
+            toast.error('Error al cargar el marketplace', {
+                description: 'Verifica tu conexión e intenta de nuevo.'
+            });
         } finally {
             setLoading(false);
         }
@@ -43,6 +47,7 @@ export default function MarketplacePage() {
             setProducts(data);
         } catch (error) {
             console.error('Error searching products:', error);
+            toast.error('Error al buscar productos');
         } finally {
             setLoading(false);
         }

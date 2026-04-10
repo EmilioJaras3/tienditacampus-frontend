@@ -79,7 +79,7 @@ export default function MisComprasPage() {
                             MIS <br /><span className="text-primary italic">COMPRAS</span>
                         </h1>
                         <p className="text-xs font-bold text-foreground/30 uppercase tracking-widest pt-2">
-                             {user?.firstName} {user?.lastName} • Membresía Smart
+                             {user?.firstName} {user?.lastName} • {user?.role === 'seller' ? 'Vendedor' : user?.role === 'admin' ? 'Administrador' : 'Comprador'}
                         </p>
                     </div>
                 </div>

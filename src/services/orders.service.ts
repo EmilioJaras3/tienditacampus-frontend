@@ -1,6 +1,13 @@
 import { api } from './api';
 import { Product } from './products.service';
 
+interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 export interface Order {
     id: string;
     buyerId: string;
@@ -49,34 +56,36 @@ export const ordersService = {
      * Obtener compras del usuario (Buyer)
      */
     async getMyPurchases(): Promise<Order[]> {
-        return api.get<Order[]>('/orders/my-purchases');
+        const response = await api.get<PaginatedResponse<Order>>('/orders/my-purchases');
+        return response.data;
     },
 
     /**
      * Obtener ventas para gestionar (Seller)
      */
     async getIncomingOrders(): Promise<Order[]> {
-        return api.get<Order[]>('/orders/seller-sales');
+        const response = await api.get<PaginatedResponse<Order>>('/orders/seller-sales');
+        return response.data;
     },
 
     /**
      * Aceptar una orden (Seller)
      */
     async acceptOrder(id: string): Promise<Order> {
-        return api.post<Order>(`/orders/${id}/accept`);
+        return api.patch<Order>(`/orders/${id}/accept`);
     },
 
     /**
      * Rechazar una orden (Seller)
      */
     async rejectOrder(id: string): Promise<Order> {
-        return api.post<Order>(`/orders/${id}/reject`);
+        return api.patch<Order>(`/orders/${id}/reject`);
     },
 
     /**
      * Marcar como entregada (Seller o Buyer)
      */
     async markAsDelivered(id: string): Promise<Order> {
-        return api.post<Order>(`/orders/${id}/deliver`);
+        return api.patch<Order>(`/orders/${id}/deliver`);
     }
 };

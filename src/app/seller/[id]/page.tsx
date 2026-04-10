@@ -9,6 +9,7 @@ import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 export default function SellerProfilePage({ params }: { params: { id: string } }) {
     const [seller, setSeller] = useState<PublicUser | null>(null);
@@ -111,7 +112,7 @@ export default function SellerProfilePage({ params }: { params: { id: string } }
 
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 pt-2">
                                     <span className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest italic">
-                                        <Store size={16} className="text-primary" /> Vendedor Verificado
+                                        <Store size={16} className="text-primary" /> Vendedor Campus
                                     </span>
                                     <span className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest italic">
                                         <Calendar size={16} className="text-foreground/20" /> Miembro desde {joinedDate}
@@ -120,7 +121,9 @@ export default function SellerProfilePage({ params }: { params: { id: string } }
                             </div>
 
                             <div className="flex gap-4">
-                                <button className="h-14 px-8 bg-primary text-primary-foreground border border-foreground/5 shadow-neo-sm hover:shadow-neo hover:-translate-y-1 transition-all rounded-2xl font-bold text-xs tracking-[0.2em] uppercase flex items-center gap-3">
+                                <button
+                                    onClick={() => toast.info('Función de mensajería próximamente disponible')}
+                                    className="h-14 px-8 bg-primary text-primary-foreground border border-foreground/5 shadow-neo-sm hover:shadow-neo hover:-translate-y-1 transition-all rounded-2xl font-bold text-xs tracking-[0.2em] uppercase flex items-center gap-3">
                                     <MessageCircle size={20} />
                                     Contactar
                                 </button>
