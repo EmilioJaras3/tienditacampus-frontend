@@ -25,17 +25,18 @@ services:
     container_name: tc-backend
     restart: always
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-tienditacampus}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       JWT_SECRET: ${JWT_SECRET:-super-secret-key}
+      POSTGRES_SYNCHRONIZE: "true"
       BACKEND_PORT: 3001
       PORT: 3001
     ports:
-      - "3002:3001"
+      - "3005:3001"
     depends_on:
       db:
         condition: service_healthy
@@ -50,11 +51,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3005/api}
     container_name: tc-frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3005/api}
       PORT: 3000
     ports:
       - "9090:3000"

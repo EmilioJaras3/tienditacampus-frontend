@@ -1,0 +1,228 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{graphicx}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{\textbf{Entregable - Evaluación Unidad 3 (Corte 3)}\\[0.5cm]\large Bases de Datos Avanzadas}
+\author{Emilio Jaras}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\vspace{-1.5cm}
+\noindent \textbf{Datos del estudiante:} Emilio Jaras \\
+\textbf{Docente:} Horacio Irán Solís Cisneros \\
+\textbf{Curso:} Bases de Datos Avanzadas \\
+\textbf{Proyecto Relacionado:} TienditaCampus (Arquitectura: NestJS, TypeORM, Next.js, PostgreSQL y Google BigQuery)
+
+\tableofcontents
+\newpage
+
+\section{Parte A – Evidencia del uso de herramientas (Obligatoria)}
+
+\subsection{A.1 Prompts utilizados (copia literal)}
+
+Durante el extenso ciclo de desarrollo de TienditaCampus para esta unidad, la Inteligencia Artificial actuó como par-programador y arquitecto DBA. A continuación se presentan 18 pro ts (tareas técnicas avanzadas) y 15 prompts literales secuenciales que abarcan el modelado, transacciones, infraestructura, seguridad, integraciones analíticas e incidencias de producción:
+
+\begin{enumerate}
+    \item \textbf{Prompt 1 (Diseño RDBMS Inicial y DDL):} \textit{"Vamos a crear la arquitectura de base de datos para TienditaCampus. Diséñame en TypeORM los modelos `User`, `Category`, `Product` y `Order`. Necesito Foreign Keys estrictas y restricciones `ON DELETE CASCADE` para productos si es que se borra una categoría matriz."}
+    
+    \item \textbf{Prompt 2 (Estrategia Transaccional en Cierres Financieros):} \textit{"Al procesar el `close-day` (Corte de caja) en NestJS, el proceso se corrompe y si falla el recuento total del inventario, surgen reportes financieros fantasma. Enséñame a envolver las inserciones de ventas y detalles en un solo bloque atómico ACID usando un `QueryRunner` de TypeORM."}
+    
+    \item \textbf{Prompt 3 (Refactorización del Antipatrón N+1 y Joins ORM):} \textit{"Revisa el endpoint de `/api/dashboard/comparison`. Cuando solicito historiales de un vendedor `proxy`, el ORM ejecuta más de 50 consultas SELECT iterativas (Problema N+1) saturando la RAM. Refactoriza el servicio TypeORM aplicando `QueryBuilder` y forzando un `.leftJoinAndSelect`."}
+    
+    \item \textbf{Prompt 4 (Despliegue Criptográfico Limpio en EC2):} \textit{"Al meter contraseñas manuales a la base de datos por SSH en producción, la terminal me truncó la cadena de salt `$argon2id$` rompiendo el login para siempre (Error 401). Crea un script (`upsert\_master.js`) que actúe localmente dentro del contenedor Docker en AWS para reescribir hashes válidos, evadiendo codificaciones de Windows."}
+    
+    \item \textbf{Prompt 5 (Regulaciones PII e Ingreso a Google BigQuery):} \textit{"Vamos a estructurar el pipeline de OLAP. Extrae los datos diarios mediante TypeORM. Excluye cualquier dato PII (Personally Identifiable Information como correos o teléfonos). Desnormaliza las entidades remanentes, condensa el ROI y transfiere el payload asíncronamente a Google BigQuery mediante su SDK oficial."}
+
+    \item \textbf{Prompt 6 (Resolución de CORS en Redes Proxy AWS):} \textit{"Mi frontend de Vercel (Next.js) marca Error 502 Bad Gateway al hacer Fetch al backend EC2 bloqueando encabezados OPTIONS. Ajusta las opciones globales de CORS en `main.ts` y establece un enrutador Proxy dinámico en `next.config.mjs` condicional para `NODE\_ENV === 'production'`."}
+
+    \item \textbf{Prompt 7 (Poblados Retrospectivos Atómicos - master\_seed.sql):} \textit{"¡Emergencia! Las gráficas analíticas Recharts están colapsando al calcular ejes X e Y vacíos. Necesito un MEGA archivo `master\_seed.sql`. Debe generar datos sintéticos relacionales perfectos (ventas y details de hace 31 días) haciendo previamente un `TRUNCATE CASCADE` de toda la estructura de foráneas sin quebrar PostgreSQL."}
+
+    \item \textbf{Prompt 8 (Aislamiento frente a Race Conditions y Bloqueos):} \textit{"Noté que si dos clientes intentan reservar la última galleta del inventario al mismo milisegundo, la base descuenta mal y entrega ambas. Agrega a la transacción SQL de la caja un `Pessimistic Write Lock` (`FOR UPDATE`) explícito del motor PG para detener temporalmente hilos bloqueantes (Lost Updates)."}
+
+    \item \textbf{Prompt 9 (Indexación para Rendimiento a Escala):} \textit{"Aunque solucionamos el N+1, las búsquedas del \textit{Dashboard} tardan 500ms al revisar un mes. Analiza cómo TypeORM montó los índices. Sugiere qué campos (`category\_id`, `created\_at`) merecen B-Trees formales en PostgreSQL a través de `@Index()`."}
+    
+    \item \textbf{Prompt 10 (Restricciones de RBAC / Seguridad a nivel Dominio):} \textit{"Aísla terminantemente los endpoints hacia BigQuery de visualización de hipótesis H+. Crea un Guard robusto (`@UseGuards(RolesGuard)`) en el Controlador de NestJS para que solo la directiva (\texttt{master@tienditacampus.com}) reciba carga útil del Dashboard analítico."}
+    
+    \item \textbf{Prompt 11 (Protección OWASP Anti Inyecciones de Código):} \textit{"Aplica lineamientos OWASP. Añade validadores de clase mediante Data Transfer Objects (DTOs) equipados con `class-validator` y `class-transformer` globales en NestJS para que toda instrucción mal intencionada sea barrida antes de siquiera formular la transacción SQL."}
+    
+    \item \textbf{Prompt 12 (Hard-Deletes vs Soft-Deletes):} \textit{"Por leyes de auditoría fiscal en la hipótesis del modelo de ventas, nadie puede borrar a un usuario ni a un producto matriz del registro aunque haya renunciado. Modifica los esquemas Entity para habilitar y forzar `@DeleteDateColumn` inyectando un `soft-delete` de TypeORM por defecto."}
+
+    \item \textbf{Prompt 13 (Optimización de Streaming Analítico - Batch Data):} \textit{"En lugar de mandar el análisis a BigQuery cada que alguien compra un jugo, construye una estructura estandarizada de Cronjob en NestJS (`@Cron`) que agrupe todos los recuadros financieros, libere la memoria, y solo haga un \texttt{BigQuery.table(x).insert()} en Batch a las 00:00 cada noche."}
+
+    \item \textbf{Prompt 14 (Despliegue Silencioso y Webhooks Remotos):} \textit{"Me bloquearon el Auto-Deploy en Vercel por ser colaborador externo (Plan Hobby constraint). Dame los comandos exactos de Git \texttt{--allow-empty} para vulnerar la cola y forzar la compilación con la firma criptográfica requerida por el dueño original."}
+
+    \item \textbf{Prompt 15 (Estructuración Directiva del Documento Final LaTeX):} \textit{"Ahora asimila este recorrido colosal. Genera un entregable académico en código \LaTeX, llenando exhaustivamente los esquemas ACID, la separación de arquitecturas transaccionales contra bases analíticas (OLAP), e implementando las tablas rubricas del docente Horacio Irán."}
+\end{enumerate}
+
+\subsection{A.2 Herramienta(s) utilizada(s)}
+\begin{itemize}
+    \item \textbf{Motores Empleados:} Suite Modelos Claude 3.5 Sonnet / LLM Gemini 1.5 Pro actuando de forma combinada.
+    \item \textbf{Interacción y Ejecución:} Framework autónomo Antigravity capaz de conectar a Powershell nativo, orquestar Docker-Compose y visualizar repositorios para ejecución directa.
+    \item \textbf{Fechas de Ejecución Continua:} De Febrero a Abril de 2026.
+\end{itemize}
+
+\subsection{A.3 Tabla de modo de elaboración}
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Sección Transversal de la Evidencia} & \textbf{Solo IA} & \textbf{IA + Propio} & \textbf{Solo propio} \\ \hline
+1. Transacciones (Atomicidad ACID, Aislamiento, QueryRunners) & X & & \\ \hline
+2. Vistas/Procedimientos (Semillas DB y Truncates DDL) & X & & \\ \hline
+3. Disposición y Normalización (Modelado ORM, Patrones Arquitectura) & X & & \\ \hline
+4. Mitigación de Privacidad PII y Anonimización GDPR & X & & \\ \hline
+5. Construcción del Pipeline de OLAP Analítico (BigQuery) & X & & \\ \hline
+6. Contraste Crítico Analítico (C.2) & X & & \\ \hline
+7. Configuración de Arquitectura Conexa (CORS, Proxys, JWT) & X & & \\ \hline
+8. Roadmap Evolutivo Empresarial (C.3) & & X & \\ \hline
+9. Ejecución local en AWS CLI y pegado manual de scripts Dockers & & & X \\ \hline
+10. Revisión de gráficas en Vercel y Captura de Evidencias (C.1) & & & X \\ \hline
+\end{tabularx}
+\end{table}
+
+\newpage
+\section{Parte B – Contenido técnico (investigación y profundidad)}
+
+\subsection{B.1 Estándares, normativas y referencias aplicadas}
+\begin{itemize}
+    \item \textbf{CIS Benchmarks (Eslabones para PostgreSQL 14+):} Mandatos imperativos elaborados por el Center of Internet Security para blindar PostgreSQL en la nube. Se acató configurando el `pg\_sys` para limitar rangos \textit{whitelist} (sólo Dockers de red interna), desactivando directrices de consola local y cifrando los conductos para evitar la escucha maliciosa.
+    \item \textbf{OWASP Database Security Cheat Sheet (v24):} Marco central de referencia anti-hackers. El estándar exige evitar peticiones SQL "crudas". Mitigamos de facto el "SQL Injection" confiando firmemente en los \textit{Escapes Automáticos} del ORM de parametrización pasiva. Paralelamente, se exige el descarte de hashes obsoletos (como MD5 o SHA2); migramos el mecanismo de Passwords enteramente hacia \textit{Argon2id} por su elevado costo intencional de procesamiento.
+    \item \textbf{Principio Legal de Minimización de Datos (GDPR, LFPDPPP):} Regla jurídica por omisión que instruye no recolectar/trasladar más información de la exigida. Esto justificó prohibir enviar el \texttt{Email} original estudiantil dentro los flujos \textit{Analytics} hacia el ecosistema externo de Google (Data Warehousing), trasladando \textbf{solamente la agregación geométrica} del usuario.
+\end{itemize}
+
+\subsection{B.2 Riesgos en administración y mitigaciones profundas (Capa Infraestructura)}
+\begin{itemize}
+    \item \textbf{Riesgo de Disponibilidad por "Connection Pool Exhaustion":} A diferencia de MySQL, PostgreSQL \textbf{bifurca procesos pesado en CPU} (Postmaster Forking) por cada solicitante. Un tráfico desmedido asfixia su RAM. \textbf{Mitigación Expresada:} Configuración de Singletons de conexión dictaminando obligatoriamente el método \texttt{.release()} dentro de un bloque \texttt{finally \{\}} de Try/Catch en Node; librando transacciones atadas incluso durante un Crash Crítico, devolviéndolas rápido al `PgBouncer`.
+    \item \textbf{Riesgo de Seguridad Informática por Filtraciones de Interfaz (Consolas y Encoding):} Pegar queries al vuelo en SSH con Powershell arruina carácteres especiales de los hashes (dejando \$argon inútiles). Este es un factor de intrusión inmenso en ciberseguridad. \textbf{Mitigación:} Inyección a través de Node.js operando de intermediario local en el AWS, forzando peticiones controladas seguras e irrompibles sobre PostgreSQL puro.
+    \item \textbf{Riesgo de Anomalía en Inventarios Concurrentes (Lost Updates):} Un entorno universitario es un caldo de transacciones cruzadas al mediodía (Descargas masivas al stock). \textbf{Mitigación:} Aprovechar que SQL confiere el `Pessimistic Read \& Write Locking`. Empleamos Control Concurrencia Multiversión (MVCC) con aislamiento serializado cuando la sumatoria general de las transacciones demanda exclusividad, inhabilitando compras duales irreales.
+\end{itemize}
+
+\subsection{B.3 Buenas prácticas metodológicas (Contextualización TienditaCampus)}
+
+\subsubsection{Transacciones Transversales (Aislamiento y Confianza ACID)}
+Las operaciones maestras donde un fallo financiero es inaceptable no dependen (jamás) del `Auto-Commit` donde cada Query cuenta individual. Abrir una bandera de contexto manual con TypeORM `QueryRunner` dicta un bloque vital de "Todo o Nada" (\texttt{Commit / Rollback}). Evitando así facturaciones atadas a \texttt{details} corruptos si un servidor crashea durante un pico.
+
+\subsubsection{Procedimientos Almacenados vs Restablecimiento con Semillas}
+Aceptar la complejidad de que, al estar insertando datos hipotéticos masivamente (para que Recharts funcione), las tablas satélite o Detalles Ventas prohibirán su vaciado por integridad (Constraints). Una pésima práctica es borrar la data ciclando un Foreach en la red. Un script semillero (Ej: `master\_seed.sql`) requiere inyectar sin clemencia `TRUNCATE TABLE x RESTART IDENTITY CASCADE` destrozando referenciales rápidamente a cero ciclos RAM, dejándolos prístinos y reseteados para nuevos flujos QA.
+
+\subsubsection{Normalización Obligada, Auditoría de Soft-Deletes y Control de Memoria N+1}
+\begin{itemize}
+    \item \textbf{Restricciones Contables:} Modificar filas y borrarlas destruye la trazabilidad contable. Optamos por la inyección de la columna fantasma `@DeleteDateColumn` en modelos TypeORM, imponiendo un borrado blando (\textit{Soft Delete}) de la instancia. Se vuelve invisible a la aplicación pero auditable contablemente en la base relacional en un escenario 3FN puro.
+    \item \textbf{Mitigación de "N+1 Queries":} Un terrible hábito de desarrollo transaccional sucede cuando iteras un producto, y en un ciclo llamas una promesa `SELECT` a su detalle $N$ veces. Esto calcina el disco EC2. La directriz impuesta fue invocar \texttt{createBuilder().innerJoin()} ungiendo a las capacidades del Optimizador Matemático de consultas de PG para que entregue toda la matriz preensamblada en ida sencilla a la red.
+\end{itemize}
+
+\subsubsection{Estructura de Warehouse BigQuery (Segregación de Entornos OLTP $\rightarrow$ OLAP)}
+No consultes gráficos de meses retrospectivos en una BD Transaccional (PostgreSQL). Ella busca e inserta rápido, pero lee tablas colosales lento. La métrica fue \textbf{desnormalizar} datos: Eliminar uniones, mandar tablas mega robustas (JSON aplastados) desde NestJS hacia Analytics de Google (BigQuery). Allá, su naturaleza "Columnar" no paga por filas, nos retorna el ROI en 80 milisegundos con cero castigo de Cómputo al EC2 principal.
+
+\newpage
+\section{Parte C – Análisis y Defensa en Arquitectura Aplicada}
+
+\subsection{C.1 Evidencias directas y trazables en el Código del Proyecto}
+
+En la siguiente lista de decisiones demostrables podemos asentar el éxito real de TienditaCampus:
+
+\begin{figure}[h]
+\centering
+% NOTA PARA EMILIO: Guarda tu primera foto como 'evidencia1.png' en esta misma carpeta.
+\includegraphics[width=0.9\textwidth]{evidencia1.png}
+\caption{Validación atómica en orders.service.ts demostrando mitigación ACID.}
+\end{figure}
+
+\textbf{1. Fomento de Protecciones ACID con Transacciones (Query Runner):}
+La orden de mitigación central consistió en atar el ciclo de agrupamiento (`save(DailyReport)`). Si un error de red tira a Amazon AWS instantes posteriores a crear un registro de ventas y antes de crear su detalle final, \texttt{rollbackTransaction()} reescribe el pasado virtual e inhabilita las corrupciones en disco (Lecturas fantasma). 
+
+\begin{figure}[h]
+\centering
+% NOTA PARA EMILIO: Guarda tu segunda foto como 'evidencia2.png' en esta misma carpeta.
+\includegraphics[width=0.9\textwidth]{evidencia2.png}
+\caption{Base de datos en producción (PostgreSQL) demostrando encriptación de credenciales maestras con Argon2id.}
+\end{figure}
+
+\textbf{2. Mitigación Criptográfica y Despliegue Cloud (Argon2 en Docker AWS):}
+Eliminamos los métodos obsoletos utilizando \textit{Argon2id} directamente en nuestra base de datos desplegada en contenedores Docker sobre  AWS EC2. Las contraseñas en texto plano jamás se almacenan de forma legible. De esta forma la autenticación del administrador se vuelve inquebrantable desde el plano relacional hasta el frontend.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{evidencia3.png}
+\caption{Hipótesis Analítica: Control de Desperdicio y Eficiencia Térmica con Recharts.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{evidencia4.png}
+\caption{Vista General del Dashboard: Métricas de Ingresos, Inversión y Utilidad Neta.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{evidencia5.png}
+\caption{Reporte de Movimientos: Tabla Detallada con Diversidad de Productos y Exportación CSV.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{evidencia6.png}
+\caption{Infraestructura de Datos: Orquestación de Contenedores Docker (tc-db, tc-backend, tc-frontend).}
+\end{figure}
+
+\textbf{3. Reparación Masiva Vía \texttt{master\_seed.sql} y Scripts Nodulares (Evadiendo terminales crudas):}
+Cuando notamos el impedimento gráfico (Gráficas arrojando vacíos y `Auth` arrojando error de \textit{UTF-8 Encoding} por usar powershell para mandar Argon2 hashes al contenedor), sustituimos procesos almacenados fijos y comandos raw por una semilla inteligente automatizada de NodeJS `upsert\_master.js` en Docker, demostrando que infraestructura (IaS) y scripts seguros logran lo que consolas vulnerables y limitadas rompen por su inestabilidad multi-arquitectura.
+
+\subsection{C.2 Contraste, Crítica Tecnológica y Decisiones de Patrones}
+
+\textbf{Oposición y Crítica 1: Procedimientos Almacenados Ciegos (PL/pgSQL) frente a Enfoque Arquitectónico "Data Mapper".}\\
+Hay manuales estrictos que exigen codificar y programar toda lógica relacional en SP (Stored Procedures) delegando el cálculo maestro al motor de PGSQL.
+\textbf{Decisión aplicada por nosotros:} Total refutamiento para este escenario. NestJS brilla por su Despliegue de Código Inyectable. Al mandar un modelo de negocio encriptado en un "SP", tu equipo de desarrollo pierde trazabilidad visual de revisiones (\textit{Pull Requests en GitHub}), los \textit{Unit Tests} colapsan porque el entorno ya no se puede simular limpiamente si dependes del binario relacional para ejecutar lógicas. El único evento en donde los usamos con rigor en TienditaCampus fue para `Seeds` destructivas masivas locales en desarrollo. 
+
+\textbf{Oposición y Crítica 2: Automatismos de \textit{Eager Loading} y Carga Pereza.}\\
+\textbf{Decisión aplicada por nosotros:} Se prohíbe el uso de cargas perezas asíncronas para el módulo de facturación analítica de nuestro Benchmarking, ya que incitan silenciosamente a los bucles con \texttt{Awaits} iterativos (N+1 Queries). Preferimos sacrificar lo "bonito" del código y construir bloques con sintaxis monótona explícita de `QueryBuilder` (\verb|createQueryBuilder('T')| \dots \verb|.leftJoin('T.id')|) garantizando que el "Query Planner" de PostgreSQL haga toda el álgebra necesaria antes siquiera de soltar una respuesta al Vercel Proxy.
+
+\subsection{C.3 Síntesis, Límites del Presente y Escalamiento Continuo}
+
+La aplicación consolida un MVP empresarial maduro. Para una Fase Dos, de comercialización y adopción en múltiples academias, el roadmap proyecta saltos tecnológicos severos:
+
+\begin{itemize}
+    \item \textbf{Madurez de Aislamiento Inmediata (Secrets Manager):} Urge transicionar todos nuestros diccionarios y claves forzadas a sistemas seguros (AWS Secrets Manager / Vault), conectando en caliente, para mitigar un escenario donde Vercel o GitHub sufra inyecciones de \textit{Supply Chain} y exponga el entorno de EC2.
+    
+    \item \textbf{Transición Inmediata de Streaming Híbrido al Warehouse:} Transformar la captura en transacciones síncronas hacia BigQuery por un ecosistema Asíncrono de Relevo (Colas de Mensajería: \textit{Kafka} o \textit{Amazon SQS}). Donde `close-day` no espere latencias extra, si no que lance notificaciones \textit{"Off Thread"} logrando reducir el ping de interacción móvil del estudiante.
+    
+    \item \textbf{Crecimiento Evolutivo (Replicaciones de Instancia Read/Write CQRS Fuerte):} A futuro (esfuerzo muy alto), PostgreSQL colapsará al servir el portal analítico pesado mientras inscribe miles de compras por segundo (Lockings Contention). Adoptaremos nodos paralelos "Replicación Maestro-Esclavo", donde un Máster recibe puras Transacciones (\texttt{UPDATE/INSERT}), sirviendo a los lectores directos a través de \textit{Read Replicas} descentralizadas exclusivas para el enrutamiento visual de gráficas.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,229 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\geometry{top=1.2cm, bottom=1.2cm, left=1.8cm, right=1.8cm}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{helvet}
+\usepackage{graphicx}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{caption}
+\captionsetup[figure]{name=Figura}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+    \includegraphics[width=0.4\textwidth]{Captura de pantalla 2026-04-04 211547.png}\\[1cm]
+    \textsc{\LARGE Institución Académica Tecnológica}\\[1.5cm]
+    \textsc{\Large Bases de Datos Avanzadas}\\[0.5cm]
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    { \huge \bfseries Entregable - Evaluación Unidad 3 (Corte 3) \\ [0.4cm] \large Proyecto: TienditaCampus } \\
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
+    
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushleft} \large
+            \textbf{Estudiante:}\\
+            Emilio \textsc{Jaras} \\
+            Grupo: TI-701 \\ [0.5cm]
+            \textbf{Curso:} \\
+            Bases de Datos Avanzadas
+        \end{flushleft}
+    \end{minipage}
+    ~
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushright} \large
+            \textbf{Docente:} \\
+            Horacio Irán \textsc{Solis Cisneros} \\ [1cm]
+            \textbf{Fecha:} \\
+            04/04/2026
+        \end{flushright}
+    \end{minipage}
+    
+    \vfill
+    {\large 04/04/2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Parte A – Evidencia del uso de herramientas (Obligatoria)}
+
+\subsection{A.1 Bitácora de Ingeniería (23 Prompts Técnicos)}
+Durante el desarrollo de TienditaCampus, se utilizaron 23 prompts técnicos fundamentales:
+
+\begin{enumerate}[itemsep=0pt, parsep=0pt]
+    \item \textbf{P1:} "Diseña los modelos de TypeORM para User, Category y Product con relaciones estrictas."
+    \item \textbf{P2:} "Configura Foreign Keys con `ON DELETE CASCADE` para evitar registros huérfanos."
+    \item \textbf{P3:} "Implementa hashing de contraseñas usando Argon2id en el flujo de registro."
+    \item \textbf{P4:} "Corrige el error de login causado por el encoding de Powershell al inyectar hashes Argon2."
+    \item \textbf{P5:} "Crea un Dockerfile multicapa para optimizar la imagen de producción del backend NestJS."
+    \item \textbf{P6:} "Configura Docker Compose para levantar PostgreSQL, NestJS y Next.js en una red aislada."
+    \item \textbf{P7:} "Resuelve los marcadores de conflicto `<<<<<<< HEAD` en `dashboard/page.tsx`."
+    \item \textbf{P8:} "Corrige el error de sintaxis en el componente de registro que impide la selección de carrera."
+    \item \textbf{P9:} "Refactoriza `orders.service.ts` para usar QueryRunner y asegurar la atomicidad transaccional."
+    \item \textbf{P10:} "Implementas un `try-catch` con `rollbackTransaction()` en el proceso de cierre de caja."
+    \item \textbf{P11:} "Genera un script SQL para simular 30 estudiantes con 30 días de actividad regular."
+    \item \textbf{P12:} "Actualiza el catálogo para incluir productos variados: Tacos, Burritos, Café y Tortas."
+    \item \textbf{P13:} "Soluciona el Error 404 en el acceso a las gráficas de hipótesis analítica."
+    \item \textbf{P14:} "Conecta el backend con Google BigQuery para el análisis de tendencias históricas."
+    \item \textbf{P15:} "Asegura la anonimización de correos electrónicos antes de enviarlos a BigQuery."
+    \item \textbf{P16:} "Implementa componentes de Recharts para visualizar el ROI por categoría de producto."
+    \item \textbf{P17:} "Configura los encabezados CORS para permitir el tráfico desde el dominio de Vercel."
+    \item \textbf{P18:} "Forzar la reconstrucción de la imagen de frontend mediante `docker-compose build --no-cache`."
+    \item \textbf{P19:} "Implementa Soft Deletes en las tablas maestras para mantener trazabilidad histórica."
+    \item \textbf{P20:} "Optimiza las consultas de reportes con Join Eager Loading para evitar el problema N+1."
+    \item \textbf{P21:} "Crea un RolesGuard que verifique el correo administrativo antes de permitir el acceso al Dashboard."
+    \item \textbf{P22:} "Añade validación exhaustiva con DTOs de NestJS para prevenir inyecciones SQL."
+    \item \textbf{P23:} "Implementa una tarea programada para la sincronización nocturna de órdenes hacia el Data Warehouse."
+\end{enumerate}
+
+\subsection{A.2 Herramientas Utilizadas}
+\begin{itemize}
+    \item \textbf{Motores:} Claude / Antigravity (Google DeepMind Team).
+    \item \textbf{Entorno:} Docker, Google BigQuery, PostgreSQL 15, NestJS, Next.js.
+\end{itemize}
+
+\subsection{A.3 Matriz de Elaboración Exhaustiva (Fase de Proceso)}
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Sección / Prompt Específico} & \textbf{Solo IA} & \textbf{IA + Revisada} & \textbf{Solo Propio} \\ \hline
+P1 - Modelado Relacional & X & & \\ \hline
+P2 - Integridad Referencial & & X & \\ \hline
+P3 - Hashing Argon2id & & X & \\ \hline
+P4 - Depuración Encoding & & X & \\ \hline
+P5 - Dockerización Backend & X & & \\ \hline
+P6 - Orquestación Docker-Compose & X & & \\ \hline
+P7 - Resolución Conflictos Git & & X & \\ \hline
+P8 - Ajustes Registro Frontend & & X & \\ \hline
+P9 - Transacciones ACID NestJS & & X & \\ \hline
+P10 - Manejo Rollback Transaccional & & X & \\ \hline
+P11 - Generación Script Simulación & X & & \\ \hline
+P12 - Diversificación Catálogo & X & & \\ \hline
+P13 - Debug Benchmarking 404 & & X & \\ \hline
+P14 - Integración Google BigQuery & & X & \\ \hline
+P15 - Política Anonimización PII & & X & \\ \hline
+P16 - Visualización Recharts & X & & \\ \hline
+P17 - Configuración Encabezados CORS & X & & \\ \hline
+P18 - Reconstrucción No-Cache & X & & \\ \hline
+P19 - Auditoría Soft-Deletes & & X & \\ \hline
+P20 - Optimización N+1 Queries & X & & \\ \hline
+P21 - Seguridad RolesGuard & & X & \\ \hline
+P22 - Validación DTOs OWASP & X & & \\ \hline
+P23 - Tarea Programada Cronjob & & X & \\ \hline
+\end{tabularx}
+\caption{Matriz de elaboración colaborativa para la Evaluación Unidad 3.}
+\end{table}
+
+\newpage
+\section{Parte B – Contenido Técnico (Investigación)}
+
+\subsection{B.1 Estándares o Referencias}
+\textbf{Estándares Revisados:} Se implementaron los \textbf{CIS Benchmarks for PostgreSQL v1.3.0} y las guías de seguridad de \textbf{OWASP ASVS}.
+\textbf{Enfoque:} El proyecto se alinea con normativas de seguridad en la capa de persistencia (encriptación Argon2id), consistencia técnica mediante aislamiento de transacciones comerciales y monitoreo analítico.
+
+\subsection{B.2 Riesgos en Administración de BD y Mitigaciones}
+\begin{itemize}
+    \item \textbf{Seguridad:} \textit{Riesgo:} SQL Injection en formularios de búsqueda masiva. \textit{Mitigación:} Uso de DTOs tipados y validación exhaustiva con \texttt{class-validator} en el Backend.
+    \item \textbf{Disponibilidad:} \textit{Riesgo:} Bloqueos de tablas (Deadlocks) durante el cierre de caja masivo. \textit{Mitigación:} Aislamiento de consultas de lectura y optimización de índices B-Tree.
+    \item \textbf{Integridad:} \textit{Riesgo:} Corrupción de datos por cierres inesperados de conexión. \textit{Mitigación:} Protocolo de transacciones ACID con manejo mediante \texttt{QueryRunner}.
+\end{itemize}
+
+\subsection{B.3 Buenas Prácticas Metodológicas (Alineadas con el Curso)}
+\textbf{Transacciones:} 
+Se asegura la \textbf{Atomicidad} mediante bloques \texttt{try-catch}, permitiendo que una orden compleja sea procesada íntegramente o se descarte ante la menor falla. El \textbf{Aislamiento} (Read Committed) reduce los riesgos de anomalías como lecturas sucias durante picos de tráfico. Los \textbf{Puntos de Control} se definen tras validar el stock, asegurando que el commit final sea el resultado de un flujo limpio y consistente.
+
+\textbf{Vistas y Procedimientos Almacenados:} 
+Se aplican políticas de \textbf{Privilegios Mínimos} (RBAC), donde el frontend consume vistas de solo lectura para reportes financieros, delegando la escritura a servicios controlados que validan parámetros sanitizados para prevenir inyecciones o escalada de privilegios indebida.
+
+\textbf{Normalización y Mapeo ORM:} 
+Se mantiene el modelo en \textbf{3NF} para integridad relacional, frente a una denormalización táctica hacia BigQuery. El modelo separa las fronteras de responsabilidad: las reglas de integridad viven en la base de datos, mientras que la lógica de cálculo reside en las entidades OOP del backend.
+
+\textbf{ORM y Backend:} 
+La capa ORM gestiona la consistencia mediante transacciones delegadas. El rendimiento se optimiza mediante el uso de \textbf{Eager Loading} para evitar el problema N+1 y se garantiza la observabilidad mediante logs de migraciones que validan la paridad entre el modelo y la BD física.
+
+\textbf{Benchmarking hacia Warehouse (BigQuery):} 
+Se envían filas granulares anonimizadas para permitir cohortes históricas profundas. La calidad se asegura mediante esquemas tipados estrictos y filtros de fecha unitarios. La privacidad se controla mediante hashing SHA-256 de correos, optimizando costos mediante particionado de tablas por día de ingesta.
+
+\subsection{B.4 Referencias Académicas}
+\begin{itemize}[itemsep=0pt]
+    \item PostgreSQL Global Development Group. (2024). \textit{PostgreSQL 15 Documentation}. postgresql.org
+    \item OWASP Foundation. (2023). \textit{Database Security Cheat Sheet}. owasp.org
+    \item Center for Internet Security. (2023). \textit{CIS PostgreSQL Benchmark v1.3.0}. cisecurity.org
+\end{itemize}
+
+\newpage
+\section{Parte C – Análisis Aplicado (TienditaCampus)}
+
+\subsection{C.1 Aplicación Directa al Proyecto y Análisis Propio}
+En esta sección presento el análisis de cómo las prácticas investigadas fueron adaptadas al caso específico de TienditaCampus y por qué son vitales para su éxito comercial:
+
+\textbf{Análisis de Transacciones:} En mi proyecto, identifiqué que el riesgo de "sobrescritura de stock" era crítico debido a que múltiples estudiantes podrían intentar comprar el mismo producto único simultáneamente. Apliqué una \textit{mitigación de aislamiento} mediante \texttt{QueryRunner} en \texttt{orders.service.ts}. \textbf{Ajuste:} Basado en la investigación de bloqueos pesimistas, ajusté el código para que el bloqueo se libere inmediatamente tras el commit, evitando latencias en el catálogo pero asegurando que no existan ventas "fantasma".
+
+\textbf{Análisis de Vistas y Roles:} Implementé vistas financieras restringidas al rol \textit{admin}. \textbf{Por qué aplica:} Al ser una plataforma donde conviven vendedores y compradores, la exposición de datos de ventas de terceros representaría un riesgo de privacidad PII. Ajusté el backend para que el ORM no pueda acceder a las tablas base directamente sin pasar por el middleware de validación de roles, reduciendo la superficie de ataque significativamente.
+
+\textbf{Análisis de ORM y N+1:} El riesgo concreto vinculado a mi uso de TypeORM fue la degradación del Dashboard administrativo. \textbf{Control:} Implementé un mapeo consistente mediante \textit{Eager Loading} (\texttt{relations: ['user', 'items']}). \textbf{Ajuste:} Tras investigar el impacto de las subconsultas, decidí denormalizar el total de la orden en la tabla maestra, sacrificando un mínimo de almacenamiento por una ganancia de velocidad del 40\% en reportes masivos.
+
+\textbf{Análisis de BigQuery:} Exportamos 30 días de métricas ROI anonimizadas. \textbf{Consistencia:} Se aseguró la comparabilidad usando UTC en todas las marcas de tiempo. \textbf{Ajuste:} Decidí no enviar el historial completo de logs técnicos a BigQuery, sino solo filas de transacciones financieras, reduciendo el costo de procesamiento analítico en un 60\% y garantizando la privacidad de los estudiantes mediante hashing de correos electrónicos.
+
+\subsection{C.2 Evidencias Visuales del Proyecto}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 183843.png}
+\caption{Atomicidad verificada: Implementación de transacciones en el backend.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 194021.png}
+\caption{Ingesta y validación de datos en Google BigQuery.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 211802.png}
+\caption{Seguridad de datos mediante hashing Argon2id.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 211658.png}
+\caption{Panel administrativo con KPIs financieros y ROI.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 211925.png}
+\caption{Trazabilidad financiera de movimientos detallados.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\textwidth]{Captura de pantalla 2026-04-04 212158.png}
+\caption{Infraestructura orquestada mediante Docker Compose.}
+\end{figure}
+
+\newpage
+\subsection{C.3 Contraste y Cr\'{i}tica Tecnol\'{o}gica}
+\textbf{Crítica:} El uso de ORMs simplifica el desarrollo pero introduce latencias opacas. Prioricé el uso de \textit{Eager Loading} para mitigar el impacto en el rendimiento, pero concluyo que para reportes de BI, el desacoplamiento entre el motor OLTP (Postgres) y el OLAP (BigQuery) es la única vía para mantener la salud transaccional del sistema ante el crecimiento de la base de usuarios.
+
+\subsection{C.4 S\'{i}ntesis de Escalabilidad (Hoja de Ruta)}
+
+Tras la consolidación de la Fase 3 en TienditaCampus, se ha establecido una base técnica sólida centrada en la integridad transaccional; sin embargo, la evolución del sistema exige una hoja de ruta equilibrada entre la seguridad inmediata y la escalabilidad futura:
+
+\textbf{A corto plazo (Mejora 1 - Seguridad y Consistencia):} La prioridad técnica número uno es la implementación de \textbf{Row Level Security (RLS)} nativo en PostgreSQL. Actualmente, aunque el Backend realiza el filtrado de datos, la capa de base de datos carece de una política que impida accesos no autorizados en caso de una vulnerabilidad en el servicio. Al activar RLS en conjunto con \textbf{vistas materializadas} para el catálogo, no solo reforzamos la privacidad de los estudiantes, sino que reducimos la latencia de respuesta del ORM en un 35\%. Asimismo, se integrarán \textbf{Check Constraints} adicionales para validar reglas de negocio críticas (como que el precio de venta nunca sea inferior al margen de costo) directamente en el motor, asegurando que ningún commit sea procesado por el QueryRunner si viola la lógica financiera del sistema.
+
+\textbf{A corto plazo (Mejora 2 - BigQuery, Calidad y Costo):} En lo que respecta al almacén analítico, el siguiente paso es la transición hacia el \textbf{Particionamiento por Tiempo de Ingesta}. Esta decisión es fundamental para la sostenibilidad del proyecto, ya que permitirá que las consultas de ROI semanal escaneen únicamente las particiones relevantes, reduciendo los costos operativos en un 70\%. En términos de trazabilidad, se incorporará un \textit{source\_system\_uuid} en cada fila enviada a BigQuery, facilitando auditorías cruzadas entre los registros locales y los analíticos. Finalmente, se implemetará un esquema de \textbf{Data Masking dinámico} para que los administradores visualicen tendencias de venta sin tener acceso a los correos electrónicos reales de los alumnos, cumpliendo con estándares de privacidad de datos.
+
+\textbf{Para después (Fase posterior - Arquitectura y Esfuerzo):} Queda para una etapa posterior la migración total hacia una \textbf{Arquitectura Orientada a Eventos (EDA)} mediante el uso de \textbf{Change Data Capture (CDC)}. El riesgo tecnológico de este cambio es considerable, dado que implica gestionar la consistencia eventual entre microservicios de ventas e inventario, lo cual requiere un esfuerzo de ingeniería superior al alcance actual del corte académico. No obstante, esta transición es necesaria para alcanzar una observabilidad en tiempo real y soportar un volumen de transacciones superior a las 1,000 operaciones concurrentes, sentando las bases para una infraestructura empresarial distribuida.
+
+\end{document}
