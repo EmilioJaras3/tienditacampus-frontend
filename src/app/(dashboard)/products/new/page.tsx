@@ -257,6 +257,7 @@ export default function NewProductPage() {
                                     $ <input
                                         type="number"
                                         step="0.01"
+                                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                         {...form.register('unitCost')}
                                         className="bg-transparent border-b-4 border-foreground w-full outline-none text-foreground focus:text-green-600 transition-colors placeholder:text-foreground/20"
                                     />
@@ -277,6 +278,7 @@ export default function NewProductPage() {
                                     $ <input
                                         type="number"
                                         step="0.01"
+                                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                         {...form.register('salePrice')}
                                         className="bg-transparent border-b-4 border-foreground/30 w-full outline-none text-white focus:text-neo-red transition-colors placeholder:text-white/20"
                                     />
