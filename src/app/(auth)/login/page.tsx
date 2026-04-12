@@ -27,6 +27,10 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+    const [emailCache, setEmailCache] = useState('');
+    const [showTwoFactor, setShowTwoFactor] = useState(false);
+    const [twoFactorCode, setTwoFactorCode] = useState('');
+
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             setIsGoogleLoading(true);
@@ -62,14 +66,42 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             const response = await authService.login(data);
+            if (response.requiresTwoFactor) {
+                setEmailCache(data.email);
+                setShowTwoFactor(true);
+                toast.success('Petición exitosa, ingresa el código OTP enviado a tu correo');
+            } else if (response.user) {
+                toast.success('¡Bienvenido de nuevo!');
+                if (response.user.role === 'buyer') {
+                    router.push('/mis-compras');
+                } else {
+                    router.push('/dashboard');
+                }
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Error al iniciar sesión');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleVerify2FA = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!twoFactorCode) {
+            toast.error('Ingresa el código OTP');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const response = await authService.verify2FA({ email: emailCache, code: twoFactorCode });
             toast.success('¡Bienvenido de nuevo!');
-            if (response.user.role === 'buyer') {
+            if (response.user?.role === 'buyer') {
                 router.push('/mis-compras');
             } else {
                 router.push('/dashboard');
             }
         } catch (error: any) {
-            toast.error(error.message || 'Error al iniciar sesión');
+            toast.error(error.message || 'Código OTP inválido o expirado');
         } finally {
             setIsLoading(false);
         }
@@ -95,6 +127,47 @@ export default function LoginPage() {
                 {/* Elemento decorativo */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary text-primary-foreground/10 -mr-12 -mt-12 rotate-45 border-b-4 border-foreground"></div>
 
+                {showTwoFactor ? (
+                    <form onSubmit={handleVerify2FA} className="space-y-6 relative z-10">
+                        <div className="space-y-5">
+                            <div className="space-y-2">
+                                <Label htmlFor="twoFactorCode" className="text-sm font-semibold tracking-widest text-foreground flex items-center gap-2">
+                                    <ShieldCheck size={16} /> Código 2FA
+                                </Label>
+                                <div className="relative group">
+                                    <Input
+                                        id="twoFactorCode"
+                                        type="text"
+                                        placeholder="123456"
+                                        maxLength={6}
+                                        value={twoFactorCode}
+                                        onChange={(e) => setTwoFactorCode(e.target.value)}
+                                        className="h-14 border-2 border-foreground bg-background text-center text-foreground font-bold text-2xl tracking-[0.5em] rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                                <p className="text-xs font-semibold text-muted-foreground mt-2">
+                                    Enviado a <span className="text-foreground">{emailCache}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="group w-full h-20 bg-foreground text-background text-2xl font-bold tracking-widest border-2 border-foreground shadow-neo-sm hover:shadow-neo hover:-translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-4 disabled:opacity-70 rounded-2xl"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <Loader2 className="h-8 w-8 animate-spin" />
+                            ) : (
+                                <>
+                                    VERIFICAR
+                                    <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-10">
                     <div className="space-y-5">
                         <div className="space-y-2">
@@ -183,6 +256,7 @@ export default function LoginPage() {
                         )}
                     </button>
                 </form>
+                )}
 
                 <div className="mt-12 pt-8 border-t-4 border-foreground/5 flex flex-col sm:flex-row items-center justify-between gap-6">
                     <p className="text-sm font-bold text-muted-foreground uppercase tracking-tight italic">

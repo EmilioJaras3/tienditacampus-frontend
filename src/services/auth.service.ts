@@ -30,8 +30,14 @@ export interface User {
 }
 
 export interface AuthResponse {
-    user: User;
-    accessToken: string;
+    user?: User;
+    accessToken?: string;
+    requiresTwoFactor?: boolean;
+}
+
+export interface Verify2FADto {
+    email: string;
+    code: string;
 }
 
 export interface UserProfile extends User {
@@ -52,8 +58,22 @@ export const authService = {
             requiresAuth: false,
         });
 
-        // Guardar en store
-        useAuthStore.getState().login(response.accessToken, response.user);
+        // Guardar en store SOLO si se retorna accessToken
+        if (!response.requiresTwoFactor && response.accessToken && response.user) {
+            useAuthStore.getState().login(response.accessToken, response.user);
+        }
+
+        return response;
+    },
+
+    async verify2FA(data: Verify2FADto): Promise<AuthResponse> {
+        const response = await api.post<AuthResponse>('/auth/verify-2fa', data, {
+            requiresAuth: false,
+        });
+
+        if (response.accessToken && response.user) {
+            useAuthStore.getState().login(response.accessToken, response.user);
+        }
 
         return response;
     },

@@ -37,7 +37,7 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-                destination: process.env.BACKEND_PROXY_URL || 'http://tc-backend:3001/api/:path*',
+                destination: process.env.BACKEND_PROXY_URL || 'http://localhost:3001/api/:path*',
             },
         ];
     },

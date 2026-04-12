@@ -1,74 +1,42 @@
-<<<<<<< HEAD
-version: "3.9"
-
-services:
-=======
 services:
   db:
     image: postgres:16-alpine
     container_name: tc-db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-tc_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TienditaCampus2026DB!}
       POSTGRES_DB: ${POSTGRES_DB:-tienditacampus}
     command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U tc_admin"]
       interval: 10s
       timeout: 5s
       retries: 5
 
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: tc-backend
-<<<<<<< HEAD
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - BACKEND_PORT=3001
-      - POSTGRES_HOST=${POSTGRES_HOST:-database}
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-tienditacampus}
-      - POSTGRES_USER=${POSTGRES_USER:-tc_admin}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-TienditaCampus2026DB!}
-      - JWT_SECRET=${JWT_SECRET:-mi-secreto-jwt-super-seguro}
-      - JWT_EXPIRATION=7d
-      - ARGON2_MEMORY_COST=19456
-      - ARGON2_TIME_COST=2
-      - ARGON2_PARALLELISM=1
-    ports:
-      - "3001:3001"
-    networks:
-      - tc-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-=======
     restart: always
     environment:
       NODE_ENV: development
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-tienditacampus}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      JWT_SECRET: ${JWT_SECRET:-super-secret-key}
+      POSTGRES_USER: ${POSTGRES_USER:-tc_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-TienditaCampus2026DB!}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-tienditacampus-2026}
       POSTGRES_SYNCHRONIZE: "true"
       BACKEND_PORT: 3001
       PORT: 3001
     ports:
-      - "3005:3001"
+      - "3001:3001"
     depends_on:
       db:
         condition: service_healthy
@@ -77,47 +45,26 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-<<<<<<< HEAD
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3005/api}
-=======
-<<<<<<< HEAD
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
-    container_name: tc-frontend
-    restart: unless-stopped
-    environment:
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api}
-    networks:
-      - tc-network
-=======
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3002/api}
->>>>>>> 65738a3591830a8f8e6143c3065338cd76a7b4a5
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
     container_name: tc-frontend
     restart: always
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3005/api}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
       PORT: 3000
     ports:
-      - "9090:3000"
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
+      - "3000:3000"
     depends_on:
       - backend
 
 networks:
-<<<<<<< HEAD
-  tc-network:
-    name: tc-network
-    external: true
-=======
   default:
     name: tc-network
 
 volumes:
   postgres_data:
->>>>>>> 7581f339f92426519e3db14454fa784b8a17ce53
