@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Habilitar standalone output para Docker
-    output: 'standalone',
+    // Vercel maneja el output automáticamente (no usar 'standalone' en Vercel)
     eslint: {
         ignoreDuringBuilds: true,
     },
