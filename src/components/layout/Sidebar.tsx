@@ -70,7 +70,6 @@ const routes = [
         href: '/benchmarking',
         color: 'bg-secondary text-secondary-foreground',
         roles: ['admin'],
-        restrictedEmail: 'jarassanchezl@gmail.com',
     },
     {
         label: 'Gráficas (H+)',
@@ -78,7 +77,6 @@ const routes = [
         href: '/hypothesis',
         color: 'bg-primary/20 text-primary',
         roles: ['admin'],
-        restrictedEmail: 'jarassanchezl@gmail.com',
     },
 ];
 
