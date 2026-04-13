@@ -51,13 +51,14 @@ export default function DashboardPage() {
     const loadDashboardData = async () => {
         setLoading(true);
         try {
+            // Cargar datos con fallback para admin (que no tiene ventas propias)
             const [statsData, ordersData, todayData] = await Promise.all([
-                salesService.getRoiStats('', ''),
-                ordersService.getIncomingOrders(),
-                salesService.getToday()
+                salesService.getRoiStats('', '').catch(() => ({ investment: 0, revenue: 0, netProfit: 0, roi: 0 })),
+                ordersService.getIncomingOrders().catch(() => []),
+                salesService.getToday().catch(() => null)
             ]);
 
-            const comparisonData = await financeService.getDashboardComparison();
+            const comparisonData = await financeService.getDashboardComparison().catch(() => null);
             setStats(statsData);
             setOrders(ordersData);
             setTodaySale(todayData);
@@ -155,7 +156,7 @@ export default function DashboardPage() {
             </motion.header>
             
             {/* Admin Evaluation Section */}
-            {user?.email === 'master@tienditacampus.com' && (
+            {user?.role === 'admin' && (
                 <motion.section 
                     variants={fadeInUp}
                     className="bg-neo-yellow border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl relative overflow-hidden"
