@@ -327,7 +327,7 @@ export default function HypothesisPage() {
                     </div>
 
                     <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={350} minWidth={350}>
                             <BarChart data={ciData} barGap={4}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                 <XAxis dataKey="name" tick={{ fontSize: 9, fontWeight: 'bold' }} interval={0} angle={-20} textAnchor="end" height={60} />
@@ -371,7 +371,7 @@ export default function HypothesisPage() {
                     </div>
 
                     <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={350} minWidth={350}>
                             <LineChart data={wasteReductionData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                 <XAxis dataKey="month" tick={{ fontSize: 11, fontWeight: 'bold' }} />
@@ -417,7 +417,7 @@ export default function HypothesisPage() {
                     </div>
 
                     <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={350} minWidth={350}>
                             <AreaChart data={marginStabilityData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                 <XAxis dataKey="day" tick={{ fontSize: 10, fontWeight: 'bold' }} />
@@ -465,7 +465,7 @@ export default function HypothesisPage() {
                     </div>
 
                     <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={350} minWidth={350}>
                             <ScatterChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
                                 <XAxis type="number" dataKey="index" tick={{ fontSize: 9 }} name="Observación" label={{ value: 'Observaciones', position: 'bottom', style: { fontSize: 10, fontWeight: 'bold' } }} />

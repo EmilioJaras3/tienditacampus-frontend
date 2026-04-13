@@ -195,6 +195,16 @@ export default function DashboardPage() {
                                         LABORATORIO DE HIPÓTESIS
                                     </motion.button>
                                 </Link>
+                                <Link href="/benchmarking">
+                                    <motion.button 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="bg-neo-blue text-white border-2 border-black px-4 py-1 text-[10px] font-black uppercase rounded flex items-center gap-2 hover:bg-neo-red transition-colors"
+                                    >
+                                        <TrendingUp size={14} />
+                                        Rendimiento y BQ
+                                    </motion.button>
+                                </Link>
                             </div>
                         </div>
                         
