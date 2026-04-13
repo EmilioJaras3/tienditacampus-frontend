@@ -7,9 +7,8 @@
 
 import { useAuthStore } from '../store/auth.store';
 
-// 1. Validación de Entorno
-// 1. Validación de Entorno - Forzamos /api para usar el proxy de Vercel y evitar Mixed Content
-const BASE_URL = '/nexus';
+// BASE_URL apunta a /api/proxy para que Vercel lo trate como serverless function
+const BASE_URL = '/api/proxy';
 
 
 // 2. Clase de Error Normalizada
