@@ -200,7 +200,7 @@ export function ProductCard({ product }: { product: Product }) {
                                 {stockAvailable > 0 ? 'Solicitar Compra' : 'Agotado'}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto w-[95vw] rounded-xl">
                             <DialogHeader>
                                 <DialogTitle>Solicitar Compra</DialogTitle>
                                 <DialogDescription>
