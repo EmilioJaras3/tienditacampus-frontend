@@ -34,6 +34,18 @@ export interface AuthResponse {
     accessToken: string;
 }
 
+// Respuesta del login cuando 2FA está habilitado
+export interface LoginResponse {
+    user: User;
+    accessToken?: string;
+    requiresTwoFactor?: boolean;
+}
+
+export interface Verify2FADto {
+    email: string;
+    code: string;
+}
+
 export interface UserProfile extends User {
     phone?: string;
     avatarUrl?: string;
@@ -45,17 +57,42 @@ export interface UserProfile extends User {
 
 export const authService = {
     /**
-     * Iniciar sesión y guardar estado en store
+     * Iniciar sesión - puede requerir 2FA
      */
-    async login(credentials: LoginDto): Promise<AuthResponse> {
-        const response = await api.post<AuthResponse>('/auth/login', credentials, {
+    async login(credentials: LoginDto): Promise<LoginResponse> {
+        const response = await api.post<LoginResponse>('/auth/login', credentials, {
             requiresAuth: false,
         });
 
-        // Guardar en store
+        // Si NO requiere 2FA, guardar token directamente
+        if (!response.requiresTwoFactor && response.accessToken) {
+            useAuthStore.getState().login(response.accessToken, response.user);
+        }
+
+        return response;
+    },
+
+    /**
+     * Verificar código 2FA y completar login
+     */
+    async verify2FA(data: Verify2FADto): Promise<AuthResponse> {
+        const response = await api.post<AuthResponse>('/auth/verify-2fa', data, {
+            requiresAuth: false,
+        });
+
+        // Guardar token tras verificación exitosa
         useAuthStore.getState().login(response.accessToken, response.user);
 
         return response;
+    },
+
+    /**
+     * Reenviar código 2FA
+     */
+    async resend2FA(email: string): Promise<void> {
+        await api.post('/auth/resend-2fa', { email }, {
+            requiresAuth: false,
+        });
     },
 
     /**
