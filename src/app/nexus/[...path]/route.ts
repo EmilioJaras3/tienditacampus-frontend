@@ -3,41 +3,52 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * Puente Proxy Nexus (Server-side)
  * 
- * Actúa como intermediario entre Vercel y AWS EC2 para evitar errores de red 502/503.
+ * Actúa como intermediario entre Vercel y AWS EC2.
+ * Compatible con Next.js 14.2+ (params puede ser Promise).
  */
 
 const BACKEND_URL = 'http://52.201.136.58/api';
 
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
-    return proxyRequest(request, params);
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+export async function GET(request: NextRequest, context: any) {
+    return proxyRequest(request, context);
 }
 
-export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
-    return proxyRequest(request, params);
+export async function POST(request: NextRequest, context: any) {
+    return proxyRequest(request, context);
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { path: string[] } }) {
-    return proxyRequest(request, params);
+export async function PUT(request: NextRequest, context: any) {
+    return proxyRequest(request, context);
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { path: string[] } }) {
-    return proxyRequest(request, params);
+export async function PATCH(request: NextRequest, context: any) {
+    return proxyRequest(request, context);
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
-    return proxyRequest(request, params);
+export async function DELETE(request: NextRequest, context: any) {
+    return proxyRequest(request, context);
 }
 
-async function proxyRequest(request: NextRequest, params: { path: string[] }) {
-    const path = params.path.join('/');
+async function proxyRequest(request: NextRequest, context: any) {
+    // Handle both sync and async params (Next.js 14 vs 15 compatibility)
+    const resolvedParams = context.params instanceof Promise 
+        ? await context.params 
+        : context.params;
+    
+    const pathSegments = resolvedParams?.path || [];
+    const path = pathSegments.join('/');
     const searchParams = request.nextUrl.search;
     const targetUrl = `${BACKEND_URL}/${path}${searchParams}`;
 
-    console.log(`[Nexus Bridge] Forwarding ${request.method} to: ${targetUrl}`);
+    console.log(`[Nexus Bridge] ${request.method} -> ${targetUrl}`);
 
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('connection');
+    headers.delete('transfer-encoding');
 
     try {
         const fetchOptions: RequestInit = {
@@ -47,29 +58,36 @@ async function proxyRequest(request: NextRequest, params: { path: string[] }) {
         };
 
         if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
-            const body = await request.blob();
-            if (body.size > 0) {
-                fetchOptions.body = body;
+            try {
+                const body = await request.text();
+                if (body && body.length > 0) {
+                    fetchOptions.body = body;
+                }
+            } catch {
+                // Empty body is ok for some requests
             }
         }
 
         const response = await fetch(targetUrl, fetchOptions);
-        const data = await response.blob();
+        const responseBody = await response.text();
 
-        const responseHeaders = new Headers(response.headers);
-        responseHeaders.delete('content-encoding');
-        responseHeaders.delete('content-length');
+        const responseHeaders = new Headers();
+        response.headers.forEach((value, key) => {
+            if (!['content-encoding', 'transfer-encoding', 'content-length'].includes(key.toLowerCase())) {
+                responseHeaders.set(key, value);
+            }
+        });
 
-        return new NextResponse(data, {
+        return new NextResponse(responseBody, {
             status: response.status,
             statusText: response.statusText,
             headers: responseHeaders,
         });
 
     } catch (error: any) {
-        console.error(`[Nexus Bridge ERROR]:`, error);
+        console.error(`[Nexus Bridge ERROR]:`, error?.message || error);
         return NextResponse.json(
-            { error: 'Connection to AWS Backend Failed', details: error.message },
+            { error: 'Backend connection failed', details: error?.message || 'Unknown error', target: targetUrl },
             { status: 502 }
         );
     }
