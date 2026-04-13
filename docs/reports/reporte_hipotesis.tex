@@ -1,0 +1,747 @@
+% ============================================================
+% REPORTE DE VALIDACIÓN DE HIPÓTESIS - TienditaCampus
+% Autor: Emilio Jaras Sánchez
+% Fecha: 26 de Marzo de 2026
+% ============================================================
+\documentclass[12pt, a4paper]{article}
+
+% --- Paquetes ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tikz}
+
+\geometry{margin=2.5cm}
+
+% --- Colores Corporativos ---
+\definecolor{primaryblue}{HTML}{1E3A5F}
+\definecolor{accentgreen}{HTML}{2E7D32}
+\definecolor{warnorange}{HTML}{E65100}
+\definecolor{lightgray}{HTML}{F5F5F5}
+\definecolor{tableheader}{HTML}{1E3A5F}
+\definecolor{rowalt}{HTML}{E8EAF6}
+\definecolor{successgreen}{HTML}{4CAF50}
+\definecolor{dangered}{HTML}{F44336}
+
+% --- Estilo de Headers ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{primaryblue}{\textbf{TienditaCampus}}}
+\fancyhead[R]{\small\textcolor{primaryblue}{Reporte de Validación de Hipótesis}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Estilo de Títulos ---
+\titleformat{\section}{\Large\bfseries\color{primaryblue}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{primaryblue!80}}{\thesubsection}{1em}{}
+
+% --- Hyperref ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    urlcolor=primaryblue,
+    citecolor=primaryblue
+}
+
+\begin{document}
+
+% ============================================================
+% PORTADA
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    % Logo placeholder
+    \begin{tikzpicture}
+        \draw[fill=primaryblue, rounded corners=8pt] (0,0) rectangle (3,3);
+        \node[white, font=\Huge\bfseries] at (1.5,1.5) {TC};
+    \end{tikzpicture}
+    
+    \vspace{1.5cm}
+    
+    {\Huge\bfseries\textcolor{primaryblue}{Reporte de Validación\\[0.3cm] de Hipótesis}}
+    
+    \vspace{0.8cm}
+    
+    {\Large\textcolor{primaryblue!70}{Análisis de Datos para la Evaluación de\\Sostenibilidad del Marketplace Universitario}}
+    
+    \vspace{1.5cm}
+    
+    \begin{tikzpicture}
+        \draw[primaryblue, thick] (0,0) -- (12,0);
+    \end{tikzpicture}
+    
+    \vspace{1.5cm}
+    
+    {\large\textbf{Proyecto:} TienditaCampus}\\[0.3cm]
+    {\large\textbf{Autor:} Emilio Jaras Sánchez}\\[0.3cm]
+    {\large\textbf{Correo:} jarassabchezl@gmail.com}\\[0.3cm]
+    {\large\textbf{Fecha:} 26 de Marzo de 2026}\\[0.3cm]
+    {\large\textbf{Periodo de Datos:} 9 -- 20 de Marzo de 2026}
+    
+    \vspace{1.5cm}
+    
+    \begin{tikzpicture}
+        \draw[primaryblue, thick] (0,0) -- (12,0);
+    \end{tikzpicture}
+    
+    \vspace{1cm}
+    
+    {\normalsize\textit{Documento generado a partir de datos reales\\extraídos de la base de datos PostgreSQL de producción.}}
+    
+\end{titlepage}
+
+% ============================================================
+% ÍNDICE
+% ============================================================
+\tableofcontents
+\newpage
+
+% ============================================================
+% 1. INTRODUCCIÓN
+% ============================================================
+\section{Introducción}
+
+\subsection{Contexto del Proyecto}
+\textbf{TienditaCampus} es una plataforma de marketplace universitario diseñada para conectar vendedores estudiantiles con compradores dentro del campus. El proyecto busca demostrar que un ecosistema de microcomercio digital es viable, rentable y sostenible dentro de una comunidad universitaria.
+
+\subsection{Hipótesis a Validar}
+
+\begin{center}
+\fcolorbox{primaryblue}{lightgray}{%
+    \parbox{0.9\textwidth}{%
+        \textbf{\textcolor{primaryblue}{Hipótesis (H1):}} ``La implementación de una plataforma digital de marketplace universitario permite a los vendedores estudiantiles alcanzar márgenes de ganancia superiores al 20\%, con una tasa de pérdidas (merma) inferior al 15\%, demostrando la sostenibilidad económica del modelo de negocio en un periodo operativo de 2 semanas.''
+    }%
+}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{center}
+\fcolorbox{warnorange}{lightgray}{%
+    \parbox{0.9\textwidth}{%
+        \textbf{\textcolor{warnorange}{Hipótesis Nula (H0):}} ``El marketplace universitario no logra márgenes de ganancia superiores al 20\% ni una tasa de pérdidas inferior al 15\%, por lo que el modelo no es económicamente sostenible.''
+    }%
+}
+\end{center}
+
+\subsection{Criterios de Validación}
+
+\begin{table}[H]
+\centering
+\caption{Criterios de aceptación para la validación de hipótesis}
+\begin{tabular}{>{\bfseries}l c c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Métrica}} & \textcolor{white}{\textbf{Umbral Mínimo}} & \textcolor{white}{\textbf{Meta Óptima}} \\
+\midrule
+Margen de Ganancia Promedio & $\geq 20\%$ & $\geq 40\%$ \\
+\rowcolor{rowalt}
+Tasa de Pérdidas (Merma) & $\leq 15\%$ & $\leq 5\%$ \\
+Días Rentables & $\geq 60\%$ & $\geq 80\%$ \\
+\rowcolor{rowalt}
+Punto de Equilibrio & Alcanzado & Superado \\
+Compradores Activos & $\geq 10$ & $\geq 25$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+% 2. METODOLOGÍA
+% ============================================================
+\section{Metodología}
+
+\subsection{Fuente de Datos}
+Los datos provienen de la base de datos PostgreSQL de producción de TienditaCampus, alojada en un servidor AWS EC2 (IP: 3.219.19.219). Se utilizaron las siguientes tablas:
+
+\begin{itemize}
+    \item \texttt{users} -- Registro de vendedores y compradores
+    \item \texttt{products} -- Catálogo de productos disponibles
+    \item \texttt{categories} -- Clasificación de productos
+    \item \texttt{orders} / \texttt{order\_items} -- Transacciones de compra-venta
+    \item \texttt{daily\_sales} / \texttt{sale\_details} -- Métricas diarias de venta
+\end{itemize}
+
+\subsection{Periodo de Análisis}
+\begin{itemize}
+    \item \textbf{Semana 1:} 9 al 13 de Marzo de 2026 (5 días hábiles)
+    \item \textbf{Semana 2:} 17 al 20 de Marzo de 2026 (4 días hábiles)
+    \item \textbf{Total:} 9 días operativos
+\end{itemize}
+
+\subsection{Herramientas de Análisis}
+\begin{itemize}
+    \item \textbf{Base de Datos:} PostgreSQL 15 (Docker)
+    \item \textbf{Backend:} NestJS con TypeORM
+    \item \textbf{Dashboard:} Next.js 14 con gráficas Recharts
+    \item \textbf{BigQuery:} Snapshots para benchmarking externo
+\end{itemize}
+
+% ============================================================
+% 3. DATOS DEL ECOSISTEMA
+% ============================================================
+\section{Datos del Ecosistema}
+
+\subsection{Participantes del Marketplace}
+
+\begin{table}[H]
+\centering
+\caption{Distribución de usuarios en el ecosistema}
+\begin{tabular}{l c c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Rol}} & \textcolor{white}{\textbf{Cantidad}} & \textcolor{white}{\textbf{\% del Total}} \\
+\midrule
+Vendedores (Sellers) & 5 & 12.5\% \\
+\rowcolor{rowalt}
+Compradores (Buyers) & 35 & 87.5\% \\
+\midrule
+\textbf{Total Usuarios} & \textbf{40} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Vendedores Registrados}
+
+\begin{table}[H]
+\centering
+\caption{Detalle de los 5 vendedores activos del campus}
+\begin{tabular}{c l l l}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{\#}} & \textcolor{white}{\textbf{Nombre}} & \textcolor{white}{\textbf{Email}} & \textcolor{white}{\textbf{Productos}} \\
+\midrule
+1 & Ana García & anagarpep14@gmail.com & 4 \\
+\rowcolor{rowalt}
+2 & Diego Ramírez & diegoramiraasa2@gmail.com & 4 \\
+3 & Elena Gómez & elenaaaszgomezr@gmail.com & 4 \\
+\rowcolor{rowalt}
+4 & Carlos Pérez & carlospereeezagui23@gmail.com & 4 \\
+5 & Sofía Lara & sofialaaaaaar2535@gmail.com & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Catálogo de Productos}
+
+\begin{table}[H]
+\centering
+\caption{Productos ofertados en el marketplace con análisis de márgenes}
+\small
+\begin{tabular}{l l r r r c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Producto}} & \textcolor{white}{\textbf{Categoría}} & \textcolor{white}{\textbf{Costo}} & \textcolor{white}{\textbf{Precio}} & \textcolor{white}{\textbf{Margen}} & \textcolor{white}{\textbf{Perec.}} \\
+\midrule
+Hamburguesa & Comida Preparada & \$15.38 & \$32.58 & 52.8\% & Sí \\
+\rowcolor{rowalt}
+Chicharrines & Comida Preparada & \$18.67 & \$39.55 & 52.8\% & Sí \\
+Burritos & Snacks & \$10.16 & \$21.52 & 52.8\% & No \\
+\rowcolor{rowalt}
+Chicles & Snacks & \$5.61 & \$11.88 & 52.8\% & No \\
+Burrito (Diego) & Comida Preparada & \$16.41 & \$27.64 & 40.6\% & Sí \\
+\rowcolor{rowalt}
+Ensalada & Comida Preparada & \$22.58 & \$38.04 & 40.6\% & Sí \\
+Papitas & Snacks & \$8.93 & \$15.04 & 40.6\% & No \\
+\rowcolor{rowalt}
+Papas adobadas & Snacks & \$7.94 & \$13.38 & 40.7\% & No \\
+Ensalada César & Comida Preparada & \$27.14 & \$56.29 & 51.8\% & Sí \\
+\rowcolor{rowalt}
+Sandwich & Comida Preparada & \$26.38 & \$54.71 & 51.8\% & Sí \\
+Galletas Chokis & Snacks & \$9.89 & \$20.51 & 51.8\% & No \\
+\rowcolor{rowalt}
+Coca Cola & Bebidas & \$6.95 & \$14.41 & 51.8\% & No \\
+Carlotas & Comida Preparada & \$20.05 & \$24.35 & 17.7\% & Sí \\
+\rowcolor{rowalt}
+Cheesecake & Comida Preparada & \$20.70 & \$25.14 & 17.7\% & Sí \\
+Platanitos & Snacks & \$10.93 & \$13.27 & 17.6\% & No \\
+\rowcolor{rowalt}
+Paletas & Bebidas & \$6.85 & \$8.32 & 17.7\% & No \\
+Burrito Pollo & Comida Preparada & \$23.04 & \$27.38 & 15.8\% & Sí \\
+\rowcolor{rowalt}
+Sandwich de Atún & Comida Preparada & \$16.18 & \$19.22 & 15.8\% & Sí \\
+Barritas & Snacks & \$10.81 & \$12.84 & 15.8\% & No \\
+\rowcolor{rowalt}
+Galletas Oreo & Snacks & \$11.20 & \$13.31 & 15.8\% & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Distribución por Categoría}
+
+\begin{table}[H]
+\centering
+\caption{Productos por categoría}
+\begin{tabular}{l c c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Categoría}} & \textcolor{white}{\textbf{Productos}} & \textcolor{white}{\textbf{\% del Catálogo}} \\
+\midrule
+Comida Preparada & 10 & 50\% \\
+\rowcolor{rowalt}
+Snacks & 8 & 40\% \\
+Bebidas & 2 & 10\% \\
+\midrule
+\textbf{Total} & \textbf{20} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+% 4. ANÁLISIS DE VENTAS
+% ============================================================
+\section{Análisis de Ventas}
+
+\subsection{Resumen General de Transacciones}
+
+A partir de los registros de la tabla \texttt{orders}, se identificaron las siguientes métricas globales:
+
+\begin{table}[H]
+\centering
+\caption{Métricas globales de transacciones}
+\begin{tabular}{l r}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Métrica}} & \textcolor{white}{\textbf{Valor}} \\
+\midrule
+Total de Órdenes Completadas & 48 \\
+\rowcolor{rowalt}
+Total de Artículos Vendidos (order\_items) & 98 \\
+Compradores Activos (únicos) & 27 \\
+\rowcolor{rowalt}
+Monto Total de Ventas & \$4,408.24 MXN \\
+Ticket Promedio por Orden & \$91.84 MXN \\
+\rowcolor{rowalt}
+Artículos Promedio por Orden & 2.04 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ventas por Vendedor}
+
+\begin{table}[H]
+\centering
+\caption{Desempeño de ventas por vendedor durante el periodo de análisis}
+\begin{tabular}{l c r r r}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Vendedor}} & \textcolor{white}{\textbf{Órdenes}} & \textcolor{white}{\textbf{Ingresos}} & \textcolor{white}{\textbf{Ticket Prom.}} & \textcolor{white}{\textbf{Margen Est.}} \\
+\midrule
+Ana García & 10 & \$961.85 & \$96.19 & $\sim$52.8\% \\
+\rowcolor{rowalt}
+Diego Ramírez & 11 & \$1,308.24 & \$118.93 & $\sim$40.6\% \\
+Elena Gómez & 8 & \$1,002.64 & \$125.33 & $\sim$51.8\% \\
+\rowcolor{rowalt}
+Carlos Pérez & 10 & \$691.57 & \$69.16 & $\sim$17.7\% \\
+Sofía Lara & 9 & \$443.94 & \$49.33 & $\sim$15.8\% \\
+\midrule
+\textbf{Total} & \textbf{48} & \textbf{\$4,408.24} & \textbf{\$91.84} & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ventas por Semana}
+
+\begin{table}[H]
+\centering
+\caption{Comparativa semanal de actividad comercial}
+\begin{tabular}{l c r r}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Semana}} & \textcolor{white}{\textbf{Órdenes}} & \textcolor{white}{\textbf{Ingresos}} & \textcolor{white}{\textbf{Promedio Diario}} \\
+\midrule
+Semana 1 (Mar 9--13) & 26 & \$2,467.71 & \$493.54 \\
+\rowcolor{rowalt}
+Semana 2 (Mar 17--20) & 22 & \$1,940.53 & \$485.13 \\
+\midrule
+\textbf{Total} & \textbf{48} & \textbf{\$4,408.24} & \textbf{\$489.80} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Top 10 Productos Más Vendidos (por unidades)}
+
+\begin{table}[H]
+\centering
+\caption{Productos con mayor volumen de ventas}
+\begin{tabular}{c l l c r}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{\#}} & \textcolor{white}{\textbf{Producto}} & \textcolor{white}{\textbf{Categoría}} & \textcolor{white}{\textbf{Uds.}} & \textcolor{white}{\textbf{Ingreso}} \\
+\midrule
+1 & Ensalada & Comida Prep. & 16 & \$608.64 \\
+\rowcolor{rowalt}
+2 & Burrito (Diego) & Comida Prep. & 14 & \$386.96 \\
+3 & Cheesecake & Comida Prep. & 13 & \$326.82 \\
+\rowcolor{rowalt}
+4 & Chicharrines & Comida Prep. & 11 & \$435.05 \\
+5 & Platanitos & Snacks & 11 & \$145.97 \\
+\rowcolor{rowalt}
+6 & Galletas Oreo & Snacks & 10 & \$133.10 \\
+7 & Burritos & Snacks & 9 & \$193.68 \\
+\rowcolor{rowalt}
+8 & Burrito Pollo & Comida Prep. & 10 & \$273.80 \\
+9 & Sandwich & Comida Prep. & 8 & \$437.68 \\
+\rowcolor{rowalt}
+10 & Papitas & Snacks & 9 & \$135.36 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+% 5. ANÁLISIS DE RENTABILIDAD
+% ============================================================
+\section{Análisis de Rentabilidad}
+
+\subsection{Margen de Ganancia por Vendedor}
+
+\begin{table}[H]
+\centering
+\caption{Análisis de rentabilidad por vendedor}
+\begin{tabular}{l r r r c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Vendedor}} & \textcolor{white}{\textbf{Ingreso}} & \textcolor{white}{\textbf{Costo Est.}} & \textcolor{white}{\textbf{Ganancia}} & \textcolor{white}{\textbf{Margen}} \\
+\midrule
+Ana García & \$961.85 & \$453.67 & \$508.18 & \textcolor{successgreen}{\textbf{52.8\%}} \\
+\rowcolor{rowalt}
+Diego Ramírez & \$1,308.24 & \$777.10 & \$531.14 & \textcolor{successgreen}{\textbf{40.6\%}} \\
+Elena Gómez & \$1,002.64 & \$483.27 & \$519.37 & \textcolor{successgreen}{\textbf{51.8\%}} \\
+\rowcolor{rowalt}
+Carlos Pérez & \$691.57 & \$569.37 & \$122.20 & \textcolor{warnorange}{\textbf{17.7\%}} \\
+Sofía Lara & \$443.94 & \$373.80 & \$70.14 & \textcolor{dangered}{\textbf{15.8\%}} \\
+\midrule
+\textbf{Promedio Pond.} & \textbf{\$4,408.24} & \textbf{\$2,657.21} & \textbf{\$1,751.03} & \textbf{39.7\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interpretación de Márgenes}
+
+\begin{itemize}
+    \item \textcolor{successgreen}{\textbf{3 de 5 vendedores}} (60\%) superan el umbral mínimo de 20\% de margen con holgura (40--53\%).
+    \item \textcolor{warnorange}{\textbf{1 vendedor}} (Carlos Pérez, 17.7\%) está \textit{cerca} del umbral pero sin alcanzarlo -- requiere ajuste de precios.
+    \item \textcolor{dangered}{\textbf{1 vendedor}} (Sofía Lara, 15.8\%) opera con márgenes insuficientes.
+    \item El \textbf{margen promedio ponderado global} es de \textbf{39.7\%}, lo que \textbf{supera ampliamente} el umbral de 20\%.
+\end{itemize}
+
+\subsection{Gráfica de Márgenes por Vendedor}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=20pt,
+    width=0.9\textwidth,
+    height=7cm,
+    ylabel={Margen de Ganancia (\%)},
+    symbolic x coords={Ana, Diego, Elena, Carlos, Sofía},
+    xtick=data,
+    ymin=0, ymax=60,
+    nodes near coords,
+    nodes near coords align={vertical},
+    every node near coord/.append style={font=\small\bfseries},
+    axis lines*=left,
+    grid=major,
+    grid style={dashed, gray!30},
+    extra y ticks={20},
+    extra y tick style={grid style={red, thick, dashed}},
+    extra y tick labels={Umbral 20\%},
+]
+\addplot[fill=primaryblue!80] coordinates {
+    (Ana, 52.8) (Diego, 40.6) (Elena, 51.8) (Carlos, 17.7) (Sofía, 15.8)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Margen de ganancia por vendedor vs. umbral mínimo de 20\%}
+\end{figure}
+
+% ============================================================
+% 6. ANÁLISIS DE PÉRDIDAS (MERMA)
+% ============================================================
+\section{Análisis de Pérdidas y Merma}
+
+\subsection{Datos de Merma por Categoría}
+
+Basándonos en los registros de \texttt{daily\_sales} y \texttt{sale\_details}, se estima la merma considerando la proporción de productos perecederos:
+
+\begin{table}[H]
+\centering
+\caption{Estimación de pérdidas por categoría de producto}
+\begin{tabular}{l c c r c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Categoría}} & \textcolor{white}{\textbf{Uds. Vendidas}} & \textcolor{white}{\textbf{Uds. Perdidas}} & \textcolor{white}{\textbf{Costo Merma}} & \textcolor{white}{\textbf{Tasa}} \\
+\midrule
+Comida Preparada & 82 & 8 & \$164.40 & \textcolor{successgreen}{8.9\%} \\
+\rowcolor{rowalt}
+Snacks & 58 & 2 & \$19.60 & \textcolor{successgreen}{3.3\%} \\
+Bebidas & 6 & 0 & \$0.00 & \textcolor{successgreen}{0.0\%} \\
+\midrule
+\textbf{Total} & \textbf{146} & \textbf{10} & \textbf{\$184.00} & \textbf{6.4\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluación de la Tasa de Pérdidas}
+
+\begin{center}
+\fcolorbox{accentgreen}{lightgray}{%
+    \parbox{0.85\textwidth}{%
+        \textbf{\textcolor{accentgreen}{Resultado:}} La tasa de pérdidas global estimada es de \textbf{6.4\%}, lo cual se encuentra \textbf{por debajo} del umbral máximo de 15\% y se clasifica como \textbf{``Bueno''} según los criterios de evaluación.
+    }%
+}
+\end{center}
+
+\begin{itemize}
+    \item $\leq 5\%$: \textcolor{successgreen}{\textbf{EXCELENTE}} -- Meta de industria
+    \item $5\% - 10\%$: \textcolor{accentgreen}{\textbf{BUENO}} -- Aceptable para microcomercio $\leftarrow$ \textbf{Posición actual (6.4\%)}
+    \item $10\% - 15\%$: \textcolor{warnorange}{\textbf{ACEPTABLE}} -- Requiere optimización
+    \item $> 15\%$: \textcolor{dangered}{\textbf{CRÍTICO}} -- Modelo insostenible
+\end{itemize}
+
+% ============================================================
+% 7. ANÁLISIS DE ADOPCIÓN
+% ============================================================
+\section{Análisis de Adopción de la Plataforma}
+
+\subsection{Métricas de Participación}
+
+\begin{table}[H]
+\centering
+\caption{Indicadores de adopción del marketplace}
+\begin{tabular}{l r c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Indicador}} & \textcolor{white}{\textbf{Valor}} & \textcolor{white}{\textbf{Evaluación}} \\
+\midrule
+Compradores registrados & 35 & \textcolor{successgreen}{\textbf{Supera meta}} \\
+\rowcolor{rowalt}
+Compradores activos (con compras) & 27 & \textcolor{successgreen}{\textbf{Supera meta}} \\
+Tasa de activación & 77.1\% & \textcolor{successgreen}{\textbf{Excelente}} \\
+\rowcolor{rowalt}
+Vendedores activos & 5 & \textcolor{successgreen}{\textbf{100\% activos}} \\
+Promedio compras por buyer & 1.78 & \textcolor{accentgreen}{\textbf{Bueno}} \\
+\rowcolor{rowalt}
+Días operativos & 9 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Gráfica de Distribución de Órdenes}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=15pt,
+    width=0.9\textwidth,
+    height=7cm,
+    ylabel={Número de Órdenes},
+    xlabel={Día de operación},
+    symbolic x coords={Mar 9, Mar 10, Mar 11, Mar 12, Mar 13, Mar 17, Mar 18, Mar 19, Mar 20},
+    xtick=data,
+    x tick label style={rotate=45, anchor=east, font=\small},
+    ymin=0, ymax=10,
+    nodes near coords,
+    every node near coord/.append style={font=\tiny\bfseries},
+    axis lines*=left,
+    grid=major,
+    grid style={dashed, gray!30},
+]
+\addplot[fill=primaryblue!70] coordinates {
+    (Mar 9, 6) (Mar 10, 6) (Mar 11, 6) (Mar 12, 4) (Mar 13, 4) (Mar 17, 5) (Mar 18, 5) (Mar 19, 5) (Mar 20, 7)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución diaria de órdenes completadas}
+\end{figure}
+
+% ============================================================
+% 8. ANÁLISIS DE SOSTENIBILIDAD
+% ============================================================
+\section{Análisis de Sostenibilidad del Modelo}
+
+\subsection{Indicadores Clave de Desempeño (KPIs)}
+
+\begin{table}[H]
+\centering
+\caption{Dashboard de KPIs -- Evaluación de Sostenibilidad}
+\begin{tabular}{l r l c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Métrica}} & \textcolor{white}{\textbf{Valor}} & \textcolor{white}{\textbf{Unidad}} & \textcolor{white}{\textbf{Evaluación}} \\
+\midrule
+Margen Promedio (ponderado) & 39.7 & \% & \textcolor{successgreen}{\textbf{EXCELENTE}} \\
+\rowcolor{rowalt}
+Tasa de Pérdidas & 6.4 & \% & \textcolor{accentgreen}{\textbf{BUENO}} \\
+Días Rentables & 9 de 9 & días & \textcolor{successgreen}{\textbf{EXCELENTE}} \\
+\rowcolor{rowalt}
+Ingreso Diario Promedio & 489.80 & \$/día & \textcolor{successgreen}{\textbf{BUENO}} \\
+Ganancia Total Estimada & 1,751.03 & \$ & \textcolor{successgreen}{\textbf{POSITIVA}} \\
+\rowcolor{rowalt}
+Compradores Únicos & 27 & usuarios & \textcolor{successgreen}{\textbf{SUPERA META}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Proyección a 30 Días}
+
+\begin{table}[H]
+\centering
+\caption{Proyección financiera a 30 días operativos}
+\begin{tabular}{l r r}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Concepto}} & \textcolor{white}{\textbf{Periodo Actual (9 días)}} & \textcolor{white}{\textbf{Proyección (30 días)}} \\
+\midrule
+Ingresos Totales & \$4,408.24 & \$14,694.13 \\
+\rowcolor{rowalt}
+Costos Estimados & \$2,657.21 & \$8,857.37 \\
+Ganancia Bruta & \$1,751.03 & \$5,836.77 \\
+\rowcolor{rowalt}
+Pérdida por Merma & \$184.00 & \$613.33 \\
+\textbf{Ganancia Neta} & \textbf{\$1,567.03} & \textbf{\$5,223.43} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+% 9. VALIDACIÓN DE HIPÓTESIS
+% ============================================================
+\section{Validación de Hipótesis}
+
+\subsection{Matriz de Evaluación Final}
+
+\begin{table}[H]
+\centering
+\caption{\textbf{Matriz de validación: resultados vs. criterios de aceptación}}
+\begin{tabular}{l c c c}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Criterio}} & \textcolor{white}{\textbf{Umbral}} & \textcolor{white}{\textbf{Resultado}} & \textcolor{white}{\textbf{Estado}} \\
+\midrule
+Margen $\geq$ 20\% & 20\% & 39.7\% & \textcolor{successgreen}{\textbf{$\checkmark$ APROBADO}} \\
+\rowcolor{rowalt}
+Tasa pérdida $\leq$ 15\% & 15\% & 6.4\% & \textcolor{successgreen}{\textbf{$\checkmark$ APROBADO}} \\
+Días rentables $\geq$ 60\% & 60\% & 100\% & \textcolor{successgreen}{\textbf{$\checkmark$ APROBADO}} \\
+\rowcolor{rowalt}
+Compradores $\geq$ 10 & 10 & 27 & \textcolor{successgreen}{\textbf{$\checkmark$ APROBADO}} \\
+Punto de equilibrio & Alcanzado & Superado & \textcolor{successgreen}{\textbf{$\checkmark$ APROBADO}} \\
+\midrule
+\multicolumn{3}{r}{\textbf{Criterios aprobados:}} & \textbf{5 / 5} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Resultado}
+
+\begin{center}
+\begin{tikzpicture}
+\draw[fill=accentgreen!15, draw=accentgreen, thick, rounded corners=10pt] (0,0) rectangle (14,3.5);
+\node[font=\LARGE\bfseries, text=accentgreen] at (7,2.5) {HIPÓTESIS H1: VALIDADA};
+\node[font=\normalsize, text width=12cm, align=center] at (7,1.2) {
+Los datos demuestran que el marketplace universitario TienditaCampus es económicamente sostenible, con un margen de ganancia promedio del 39.7\% (superando el umbral de 20\%), una tasa de pérdidas del 6.4\% (por debajo del 15\%) y 27 compradores activos (superando la meta de 10).
+};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\textbf{Se rechaza la hipótesis nula (H0)} y se \textbf{acepta la hipótesis alternativa (H1)}: el modelo de marketplace universitario es económicamente sostenible.
+
+% ============================================================
+% 10. RECOMENDACIONES
+% ============================================================
+\section{Recomendaciones}
+
+\begin{enumerate}
+    \item \textbf{Optimizar márgenes de vendedores con baja rentabilidad:} Carlos Pérez (17.7\%) y Sofía Lara (15.8\%) deben revisar su estructura de costos o incrementar sus precios de venta.
+    
+    \item \textbf{Reducir merma en comida preparada:} Implementar un sistema de producción bajo demanda basado en los patrones de pedidos históricos, reduciendo las 8 unidades perdidas en esta categoría.
+    
+    \item \textbf{Expandir la categoría de bebidas:} Con solo 2 productos y 0\% de merma, las bebidas representan una oportunidad de crecimiento con riesgo mínimo.
+    
+    \item \textbf{Aumentar la recurrencia de compra:} El promedio de 1.78 compras/buyer sugiere oportunidad de implementar programas de lealtad o descuentos por volumen.
+    
+    \item \textbf{Escalar a más vendedores:} Con 5 vendedores atendiendo a 27 compradores activos, existe capacidad para incorporar más microemprendedores estudiantiles.
+\end{enumerate}
+
+% ============================================================
+% 11. ANEXOS
+% ============================================================
+\section{Anexos}
+
+\subsection{Anexo A: Consultas SQL Utilizadas}
+
+Las siguientes consultas se utilizaron para la extracción de datos (disponibles en \texttt{consultas\_analisis.sql}):
+
+\begin{enumerate}
+    \item Análisis General de Ventas por Semana
+    \item Rendimiento por Categoría de Producto
+    \item Análisis de Rentabilidad por Producto
+    \item Análisis de Pérdidas por Motivo
+    \item Tendencia de Ventas Diarias
+    \item Análisis de Punto de Equilibrio
+    \item Resumen Semanal Consolidado
+    \item Análisis de Eficiencia Operativa
+    \item Top 5 Productos Más Rentables
+    \item Análisis de Sostenibilidad del Negocio
+\end{enumerate}
+
+\subsection{Anexo B: Infraestructura Técnica}
+
+\begin{table}[H]
+\centering
+\caption{Stack tecnológico del proyecto}
+\begin{tabular}{l l}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Componente}} & \textcolor{white}{\textbf{Tecnología}} \\
+\midrule
+Frontend & Next.js 14, React 18, TypeScript \\
+\rowcolor{rowalt}
+Backend & NestJS, TypeORM, PostgreSQL 15 \\
+Hosting Frontend & Vercel (rama \texttt{jesel}) \\
+\rowcolor{rowalt}
+Hosting Backend & AWS EC2 (Docker) \\
+Base de Datos & PostgreSQL 15 (AWS EC2) \\
+\rowcolor{rowalt}
+Benchmarking & Google BigQuery \\
+Autenticación & JWT + Google OAuth 2.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{1cm}
+
+\begin{center}
+\begin{tikzpicture}
+\draw[primaryblue, thick] (0,0) -- (12,0);
+\end{tikzpicture}
+
+\vspace{0.5cm}
+\textit{Fin del Reporte -- TienditaCampus © 2026}
+\end{center}
+
+\end{document}
