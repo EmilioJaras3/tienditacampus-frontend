@@ -89,7 +89,8 @@ export default function DashboardPage() {
         }
     };
 
-    const pendingOrders = orders.filter((o: Order) => o.status === 'requested' || o.status === 'accepted' || o.status === 'pending');
+    const pendingOrders = (orders || []).filter((o: Order) => o.status === 'requested' || o.status === 'accepted' || o.status === 'pending');
+
 
     const toMoney = (value?: string | number) => Number(value || 0).toFixed(2);
 

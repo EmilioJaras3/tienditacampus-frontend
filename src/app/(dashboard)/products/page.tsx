@@ -39,7 +39,8 @@ export default function ProductsPage() {
         }
     };
 
-    const filteredProducts = products.filter(product =>
+    const filteredProducts = (products || []).filter(product =>
+
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

@@ -43,7 +43,8 @@ export default function MisComprasPage() {
         }
     };
 
-    const filteredOrders = orders.filter((order: Order) => {
+    const filteredOrders = (orders || []).filter((order: Order) => {
+
         if (filter === 'activos') return ['requested', 'accepted', 'pending'].includes(order.status);
         if (filter === 'completados') return ['completed', 'delivered'].includes(order.status);
         if (filter === 'cancelados') return order.status === 'rejected';
@@ -95,8 +96,9 @@ export default function MisComprasPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             { label: 'Total Pedidos', value: orders.length, color: 'text-foreground' },
-                            { label: 'En Camino', value: orders.filter((o: any) => ['requested', 'accepted', 'pending'].includes(o.status)).length, color: 'text-primary' },
-                            { label: 'Completados', value: orders.filter((o: any) => ['completed', 'delivered'].includes(o.status)).length, color: 'text-secondary' },
+                            { label: 'En Camino', value: (orders || []).filter((o: any) => ['requested', 'accepted', 'pending'].includes(o.status)).length, color: 'text-primary' },
+                            { label: 'Completados', value: (orders || []).filter((o: any) => ['completed', 'delivered'].includes(o.status)).length, color: 'text-secondary' },
+
                             { label: 'Inversión Total', value: `$${orders.reduce((acc: any, o: any) => acc + Number(o.totalAmount), 0).toFixed(0)}`, color: 'text-primary' }
                         ].map((stat, i) => (
                             <div key={i} className="bg-card border border-foreground/5 p-8 shadow-neo-sm hover:shadow-neo hover:-translate-y-1 transition-all rounded-[2.5rem]">

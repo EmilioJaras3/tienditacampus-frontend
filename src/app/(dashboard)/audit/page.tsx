@@ -47,7 +47,8 @@ export default function AuditPage() {
         }
     };
 
-    const filteredLogs = logs.filter(log => {
+    const filteredLogs = (logs || []).filter(log => {
+
         const userName = log.user ? `${log.user.firstName} ${log.user.lastName}` : 'Sistema';
         return (
             log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||

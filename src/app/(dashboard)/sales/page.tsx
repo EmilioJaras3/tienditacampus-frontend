@@ -63,7 +63,8 @@ export default function ManageOrdersPage() {
         }
     };
 
-    const filteredOrders = orders.filter(o => {
+    const filteredOrders = (orders || []).filter(o => {
+
         if (activeTab === 'all') return true;
         if (activeTab === 'completed') return ['completed', 'delivered'].includes(o.status);
         if (activeTab === 'accepted') return ['accepted', 'pending'].includes(o.status);
@@ -114,9 +115,10 @@ export default function ManageOrdersPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                     { id: 'all', label: 'TODOS', count: orders.length, color: 'bg-card', text: 'text-foreground' },
-                    { id: 'requested', label: 'PENDIENTES', count: orders.filter(o => o.status === 'requested').length, color: 'bg-secondary', text: 'text-secondary-foreground' },
-                    { id: 'accepted', label: 'PREPARANDO', count: orders.filter(o => o.status === 'accepted' || o.status === 'pending').length, color: 'bg-primary', text: 'text-primary-foreground' },
-                    { id: 'completed', label: 'COMPLETADOS', count: orders.filter(o => ['completed', 'delivered'].includes(o.status)).length, color: 'bg-accent', text: 'text-accent-foreground' }
+                    { id: 'requested', label: 'PENDIENTES', count: (orders || []).filter(o => o.status === 'requested').length, color: 'bg-secondary', text: 'text-secondary-foreground' },
+                    { id: 'accepted', label: 'PREPARANDO', count: (orders || []).filter(o => o.status === 'accepted' || o.status === 'pending').length, color: 'bg-primary', text: 'text-primary-foreground' },
+                    { id: 'completed', label: 'COMPLETADOS', count: (orders || []).filter(o => ['completed', 'delivered'].includes(o.status)).length, color: 'bg-accent', text: 'text-accent-foreground' }
+
                 ].map((tab) => (
                     <button
                         key={tab.id}
