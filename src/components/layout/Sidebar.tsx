@@ -65,6 +65,13 @@ const routes = [
         roles: ['seller', 'admin'],
     },
     {
+        label: 'Seguridad & Auditoría',
+        icon: ShieldCheck,
+        href: '/audit',
+        color: 'bg-primary/20 text-primary',
+        roles: ['admin'],
+    },
+    {
         label: 'Benchmarking',
         icon: TrendingUp,
         href: '/benchmarking',
@@ -81,6 +88,7 @@ const routes = [
         restrictedEmail: 'master@tienditacampus.com',
     },
 ];
+
 
 interface SidebarContentProps {
     pathname: string;
