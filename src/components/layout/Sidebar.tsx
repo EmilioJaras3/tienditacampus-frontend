@@ -77,7 +77,6 @@ const routes = [
         href: '/benchmarking',
         color: 'bg-secondary text-secondary-foreground',
         roles: ['admin'],
-        restrictedEmail: 'master@tienditacampus.com',
     },
     {
         label: 'Gráficas (H+)',
@@ -85,7 +84,6 @@ const routes = [
         href: '/hypothesis',
         color: 'bg-primary/20 text-primary',
         roles: ['admin'],
-        restrictedEmail: 'master@tienditacampus.com',
     },
 ];
 
@@ -184,7 +182,6 @@ export function Sidebar() {
     const filteredRoutes = routes.filter(route => {
         if (!user) return false;
         if (!route.roles.includes(user.role)) return false;
-        if (route.restrictedEmail && user.email !== route.restrictedEmail) return false;
         return true;
     });
 
