@@ -37,7 +37,7 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-                destination: process.env.BACKEND_PROXY_URL || 'http://52.201.136.58/api/:path*',
+                destination: process.env.BACKEND_PROXY_URL || 'http://52.201.136.58:3001/api/:path*',
             },
         ];
     },
