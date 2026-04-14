@@ -1,0 +1,5 @@
+- [x] Backend: RolesGuard en Auditoria  
+- [x] Frontend: Vista de Auditoria  
+- [/] Master Recovery (Desbloqueo)  
+- [ ] Business Simulation (Prueba Flujo)  
+- [ ] Verificacion Final Deployed 

@@ -22,13 +22,7 @@ export default function HypothesisPage() {
     const [data, setData] = useState<DashboardComparisonResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (!loading && user) {
-            if (user.email !== 'master@tienditacampus.com') {
-                router.push('/dashboard');
-            }
-        }
-    }, [user, loading, router]);
+    // Acceso permitido para cualquier admin autenticado
 
     useEffect(() => {
         loadData();
