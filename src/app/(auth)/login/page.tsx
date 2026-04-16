@@ -26,6 +26,7 @@ export default function LoginPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [isResendingCode, setIsResendingCode] = useState(false);
 
     const [emailCache, setEmailCache] = useState('');
     const [showTwoFactor, setShowTwoFactor] = useState(false);
@@ -107,6 +108,23 @@ export default function LoginPage() {
         }
     };
 
+    const handleResend2FA = async () => {
+        if (!emailCache) {
+            toast.error('Primero intenta iniciar sesión con tu correo y contraseña');
+            return;
+        }
+
+        setIsResendingCode(true);
+        try {
+            const response = await authService.resend2FA(emailCache);
+            toast.success(response.message || 'Se envió un nuevo código OTP');
+        } catch (error: any) {
+            toast.error(error.message || 'No se pudo reenviar el código OTP');
+        } finally {
+            setIsResendingCode(false);
+        }
+    };
+
     return (
         <div className="w-full max-w-md mx-auto">
             {/* Header Neo-Brutalista */}
@@ -140,6 +158,8 @@ export default function LoginPage() {
                                         type="text"
                                         placeholder="123456"
                                         maxLength={6}
+                                        inputMode="numeric"
+                                        autoComplete="one-time-code"
                                         value={twoFactorCode}
                                         onChange={(e) => setTwoFactorCode(e.target.value)}
                                         className="h-14 border-2 border-foreground bg-background text-center text-foreground font-bold text-2xl tracking-[0.5em] rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
@@ -166,6 +186,15 @@ export default function LoginPage() {
                                 </>
                             )}
                         </button>
+
+                        <button
+                            type="button"
+                            onClick={handleResend2FA}
+                            disabled={isLoading || isResendingCode}
+                            className="w-full h-12 border-2 border-foreground bg-background text-foreground text-sm font-bold tracking-widest hover:bg-foreground hover:text-background transition-all disabled:opacity-70 rounded-xl"
+                        >
+                            {isResendingCode ? 'REENVIANDO...' : 'REENVIAR CÓDIGO'}
+                        </button>
                     </form>
                 ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-10">
@@ -179,6 +208,7 @@ export default function LoginPage() {
                                     id="email"
                                     type="email"
                                     placeholder="tu@correo.com"
+                                    autoComplete="email"
                                     className="h-14 border-2 border-foreground bg-background text-foreground font-bold text-lg rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
                                     {...register('email')}
                                     disabled={isLoading}
@@ -207,6 +237,7 @@ export default function LoginPage() {
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
+                                    autoComplete="current-password"
                                     className="h-14 border-2 border-foreground bg-background text-foreground font-bold text-lg rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
                                     {...register('password')}
                                     disabled={isLoading}

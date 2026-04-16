@@ -78,6 +78,16 @@ export const authService = {
         return response;
     },
 
+    async resend2FA(email: string): Promise<{ message: string }> {
+        return api.post<{ message: string }>(
+            '/auth/resend-2fa',
+            { email },
+            {
+                requiresAuth: false,
+            },
+        );
+    },
+
     /**
      * Iniciar sesión / Registro Automático con Google OAuth2
      */
