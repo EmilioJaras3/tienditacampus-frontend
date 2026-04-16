@@ -1,0 +1,90 @@
+{
+  "info": {
+    "name": "TienditaCampus - MASTER PRODUCTION 2026",
+    "description": "Colección TOTAL para TienditaCampus.\nServidor: http://44.194.142.223:3001\n\nIncluye: Ventas, ROI, Forecast de demanda, Benchmarking con BigQuery, Reportes y Auditoría.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@upchiapas.edu.mx\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"Carlos\",\n  \"lastName\": \"González\",\n  \"role\": \"seller\",\n  \"campusLocation\": \"UD1\",\n  \"major\": \"ITI\",\n  \"acceptTerms\": true\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register" }
+          }
+        },
+        {
+          "name": "Login Step 1",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@upchiapas.edu.mx\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login" }
+          }
+        },
+        {
+          "name": "Login Step 2 (Verify 2FA)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["const j = pm.response.json(); if(j.accessToken) pm.environment.set('token', j.accessToken);"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@upchiapas.edu.mx\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/verify-2fa" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Sales & Tracking",
+      "item": [
+        { "name": "Prepare Day", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"initialBalance\": 500,\n  \"items\": [{ \"productId\": \"id\", \"quantity\": 10 }]\n}" }, "url": { "raw": "{{base_url}}/sales/prepare" } } },
+        { "name": "Track Product Sale", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"productId\": \"id\",\n  \"quantity\": 1,\n  \"unitPrice\": 25\n}" }, "url": { "raw": "{{base_url}}/sales/track" } } },
+        { "name": "Get ROI Analytics", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{base_url}}/sales/roi" } } },
+        { "name": "Close Day", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"items\": [{ \"productId\": \"id\", \"quantityRemaining\": 2 }]\n}" }, "url": { "raw": "{{base_url}}/sales/close-day" } } }
+      ]
+    },
+    {
+      "name": "3. Forecast & Business Intelligence",
+      "item": [
+        { "name": "Get Forecast", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{base_url}}/forecast/{{product_id}}/day/1" } } },
+        { "name": "Break Even Calculation", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"fixedCosts\": 1000,\n  \"unitPrice\": 50,\n  \"unitCost\": 30\n}" }, "url": { "raw": "{{base_url}}/break-even/calculate" } } }
+      ]
+    },
+    {
+      "name": "4. Benchmarking (Admin)",
+      "item": [
+        { "name": "Get BI Metrics", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{base_url}}/benchmarking/metrics" } } },
+        { "name": "Take Daily Snapshot", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "x-google-token", "value": "{{google_token}}" }], "url": { "raw": "{{base_url}}/benchmarking/snapshot" } } }
+      ]
+    },
+    {
+      "name": "5. Marketplace & Orders",
+      "item": [
+        { "name": "Marketplace", "request": { "method": "GET", "url": { "raw": "{{base_url}}/products/marketplace" } } },
+        { "name": "Purchase Request", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\n  \"sellerId\": \"id\",\n  \"items\": [{ \"productId\": \"prod_id\", \"quantity\": 1 }],\n  \"deliveryMessage\": \"En el domo\"\n}" }, "url": { "raw": "{{base_url}}/orders/purchase" } } }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://44.194.142.223:3001/api" },
+    { "key": "token", "value": "" },
+    { "key": "product_id", "value": "" },
+    { "key": "google_token", "value": "" }
+  ]
+}
