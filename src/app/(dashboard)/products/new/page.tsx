@@ -253,13 +253,13 @@ export default function NewProductPage() {
                                 Costo Unitario
                             </h2>
                             <div className="space-y-4">
-                                <div className="text-4xl font-bold flex items-center gap-2">
+                                <div className="text-4xl font-bold flex items-center gap-2 text-black dark:text-white">
                                     $ <input
                                         type="number"
                                         step="0.01"
                                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                         {...form.register('unitCost')}
-                                        className="bg-transparent border-b-4 border-foreground w-full outline-none text-foreground focus:text-green-600 transition-colors placeholder:text-foreground/20"
+                                        className="bg-transparent border-b-4 border-black/40 dark:border-white/40 w-full outline-none text-black dark:text-white focus:text-black dark:focus:text-white transition-colors placeholder:text-black/30 dark:placeholder:text-white/30"
                                     />
                                 </div>
                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">¿Cuánto te cuesta producirlo/comprarlo?</p>
@@ -274,13 +274,13 @@ export default function NewProductPage() {
                                 Precio Venta
                             </h2>
                             <div className="space-y-4">
-                                <div className="text-4xl font-bold flex items-center gap-2">
+                                <div className="text-4xl font-bold flex items-center gap-2 text-black dark:text-white">
                                     $ <input
                                         type="number"
                                         step="0.01"
                                         onWheel={(e) => (e.target as HTMLInputElement).blur()}
                                         {...form.register('salePrice')}
-                                        className="bg-transparent border-b-4 border-foreground/30 w-full outline-none text-white focus:text-neo-red transition-colors placeholder:text-white/20"
+                                        className="bg-transparent border-b-4 border-black/40 dark:border-white/40 w-full outline-none text-black dark:text-white focus:text-black dark:focus:text-white transition-colors placeholder:text-black/30 dark:placeholder:text-white/30"
                                     />
                                 </div>
                                 <p className="text-[10px] font-bold text-black uppercase tracking-wider">¿A cuánto lo vendes al público?</p>
