@@ -200,20 +200,22 @@ export function ProductCard({ product }: { product: Product }) {
                                 {stockAvailable > 0 ? 'Solicitar Compra' : 'Agotado'}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] h-full sm:h-auto max-h-[85vh] p-0 flex flex-col overflow-hidden border-2 shadow-2xl top-[5vh] translate-y-0">
-                            <DialogHeader className="p-4 pb-2 border-b bg-slate-50">
-                                <DialogTitle className="text-lg font-bold text-slate-900 uppercase">Solicitar Compra</DialogTitle>
-                                <DialogDescription className="text-xs text-slate-600 font-medium">
-                                    Vendedor: <strong className="text-slate-900">{sellerName}</strong> | 
-                                    Precio: <strong className="text-[#E31837]">${Number(product.salePrice).toFixed(2)}</strong>
+                        <DialogContent className="sm:max-w-[400px] w-[95vw] max-h-[85vh] p-0 flex flex-col overflow-hidden border-2 shadow-2xl top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]">
+                            <DialogHeader className="p-3 pb-1 border-b bg-slate-50 relative shrink-0">
+                                <DialogTitle className="text-sm font-black text-slate-900 uppercase tracking-tighter">
+                                    Solicitar: {product.name}
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] text-slate-600 font-bold leading-none mt-1">
+                                    Vendedor: {sellerName} • <span className="text-[#E31837]">${Number(product.salePrice).toFixed(2)}</span>
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="quantity" className="text-xs font-bold text-slate-700 uppercase">
-                                        ¿Cuántas piezas?
-                                    </Label>
+                            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-3 min-h-[150px]">
+                                <div className="space-y-1">
+                                    <div className="flex justify-between items-center">
+                                        <Label htmlFor="quantity" className="text-[10px] font-black text-slate-700 uppercase">Cantidad</Label>
+                                        <span className="text-[9px] font-bold text-slate-400">STOCK: {stockAvailable}</span>
+                                    </div>
                                     <Input
                                         id="quantity"
                                         type="number"
@@ -221,48 +223,44 @@ export function ProductCard({ product }: { product: Product }) {
                                         max={stockAvailable}
                                         value={quantity}
                                         onChange={(e: ChangeEvent<HTMLInputElement>) => setQuantity(Number(e.target.value))}
-                                        className="h-10 text-lg font-bold border-2 focus-visible:ring-[#FFC72C]"
+                                        className="h-8 text-sm font-bold border-2 focus-visible:ring-[#FFC72C]"
                                     />
-                                    <p className="text-[10px] font-bold text-slate-500">STOCK: {stockAvailable}</p>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="message" className="text-xs font-bold text-slate-700 uppercase">
-                                        Instrucciones de entrega
-                                    </Label>
+                                <div className="space-y-1">
+                                    <Label htmlFor="message" className="text-[10px] font-black text-slate-700 uppercase">Entrega (Opcional)</Label>
                                     <Textarea
                                         id="message"
-                                        placeholder="Ej. 'Estoy en biblioteca...'"
+                                        placeholder="Ubicación o detalle..."
                                         value={deliveryMessage}
                                         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDeliveryMessage(e.target.value)}
-                                        className="resize-none border-2 focus-visible:ring-[#FFC72C] text-sm"
+                                        className="resize-none border-2 focus-visible:ring-[#FFC72C] text-xs h-16"
                                         rows={2}
                                     />
                                 </div>
 
-                                <div className="flex justify-between items-center bg-[#FFC72C]/10 p-3 rounded-lg border-2 border-[#FFC72C]/20">
-                                    <span className="font-bold text-xs text-slate-700 uppercase">Total:</span>
-                                    <span className="font-black text-xl text-[#E31837]">
+                                <div className="flex justify-between items-center bg-[#FFC72C]/10 px-3 py-2 rounded border border-[#FFC72C]/30">
+                                    <span className="font-bold text-[10px] text-slate-700 uppercase">Total:</span>
+                                    <span className="font-black text-lg text-[#E31837]">
                                         ${(Number(product.salePrice) * quantity).toFixed(2)}
                                     </span>
                                 </div>
                             </div>
 
-                            <DialogFooter className="p-4 pt-2 flex flex-row gap-2 border-t bg-slate-50 mt-auto">
+                            <DialogFooter className="p-3 pt-1 flex flex-row gap-2 border-t bg-slate-50 shrink-0">
                                 <Button 
                                     variant="outline" 
                                     onClick={() => setOpen(false)}
-                                    className="flex-1 font-bold h-10 text-xs"
+                                    className="flex-1 font-bold h-9 text-[10px] uppercase border-2"
                                 >
-                                    CANCELAR
+                                    Cerrar
                                 </Button>
                                 <Button 
                                     onClick={handlePurchase} 
                                     disabled={isPurchasing || quantity < 1 || quantity > stockAvailable}
-                                    className="flex-[1.5] bg-[#E31837] hover:bg-[#c9122e] text-white font-bold h-10 text-xs shadow-md"
+                                    className="flex-[2] bg-[#E31837] hover:bg-[#c9122e] text-white font-bold h-9 text-[10px] uppercase shadow-md active:scale-95"
                                 >
-                                    {isPurchasing && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-                                    CONFIRMAR
+                                    {isPurchasing ? <Loader2 className="h-3 w-3 animate-spin" /> : "Confirmar"}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
