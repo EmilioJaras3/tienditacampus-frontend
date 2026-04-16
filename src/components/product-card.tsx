@@ -200,18 +200,20 @@ export function ProductCard({ product }: { product: Product }) {
                                 {stockAvailable > 0 ? 'Solicitar Compra' : 'Agotado'}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>Solicitar Compra</DialogTitle>
-                                <DialogDescription>
-                                    Vendido por <strong>{sellerName}</strong> {sellerCampus ? `(${sellerCampus})` : ''} <br />
-                                    Precio unidad: <strong className="text-gray-900">${Number(product.salePrice).toFixed(2)}</strong>
+                        <DialogContent className="sm:max-w-[425px] h-full sm:h-auto max-h-[85vh] p-0 flex flex-col overflow-hidden border-2 shadow-2xl top-[5vh] translate-y-0">
+                            <DialogHeader className="p-4 pb-2 border-b bg-slate-50">
+                                <DialogTitle className="text-lg font-bold text-slate-900 uppercase">Solicitar Compra</DialogTitle>
+                                <DialogDescription className="text-xs text-slate-600 font-medium">
+                                    Vendedor: <strong className="text-slate-900">{sellerName}</strong> | 
+                                    Precio: <strong className="text-[#E31837]">${Number(product.salePrice).toFixed(2)}</strong>
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="grid gap-4 py-4">
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="quantity">¿Cuántas piezas deseas apartar?</Label>
+                                    <Label htmlFor="quantity" className="text-xs font-bold text-slate-700 uppercase">
+                                        ¿Cuántas piezas?
+                                    </Label>
                                     <Input
                                         id="quantity"
                                         type="number"
@@ -219,33 +221,48 @@ export function ProductCard({ product }: { product: Product }) {
                                         max={stockAvailable}
                                         value={quantity}
                                         onChange={(e: ChangeEvent<HTMLInputElement>) => setQuantity(Number(e.target.value))}
+                                        className="h-10 text-lg font-bold border-2 focus-visible:ring-[#FFC72C]"
                                     />
-                                    <p className="text-xs text-gray-500">Stock disponible: {stockAvailable}</p>
+                                    <p className="text-[10px] font-bold text-slate-500">STOCK: {stockAvailable}</p>
                                 </div>
+
                                 <div className="space-y-2">
-                                    <Label htmlFor="message">Instrucciones de entrega (Opcional)</Label>
+                                    <Label htmlFor="message" className="text-xs font-bold text-slate-700 uppercase">
+                                        Instrucciones de entrega
+                                    </Label>
                                     <Textarea
                                         id="message"
-                                        placeholder="Ej. 'Llevo sudadera roja, estoy en la biblioteca...'"
+                                        placeholder="Ej. 'Estoy en biblioteca...'"
                                         value={deliveryMessage}
                                         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDeliveryMessage(e.target.value)}
-                                        className="resize-none"
+                                        className="resize-none border-2 focus-visible:ring-[#FFC72C] text-sm"
                                         rows={2}
                                     />
                                 </div>
-                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <span className="font-medium text-gray-700">Total a pagar:</span>
-                                    <span className="font-bold text-xl text-primary">
+
+                                <div className="flex justify-between items-center bg-[#FFC72C]/10 p-3 rounded-lg border-2 border-[#FFC72C]/20">
+                                    <span className="font-bold text-xs text-slate-700 uppercase">Total:</span>
+                                    <span className="font-black text-xl text-[#E31837]">
                                         ${(Number(product.salePrice) * quantity).toFixed(2)}
                                     </span>
                                 </div>
                             </div>
 
-                            <DialogFooter className="flex-row gap-2 sm:justify-between">
-                                <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-                                <Button onClick={handlePurchase} disabled={isPurchasing || quantity < 1 || quantity > stockAvailable}>
-                                    {isPurchasing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Confirmar Compra
+                            <DialogFooter className="p-4 pt-2 flex flex-row gap-2 border-t bg-slate-50 mt-auto">
+                                <Button 
+                                    variant="outline" 
+                                    onClick={() => setOpen(false)}
+                                    className="flex-1 font-bold h-10 text-xs"
+                                >
+                                    CANCELAR
+                                </Button>
+                                <Button 
+                                    onClick={handlePurchase} 
+                                    disabled={isPurchasing || quantity < 1 || quantity > stockAvailable}
+                                    className="flex-[1.5] bg-[#E31837] hover:bg-[#c9122e] text-white font-bold h-10 text-xs shadow-md"
+                                >
+                                    {isPurchasing && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+                                    CONFIRMAR
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
