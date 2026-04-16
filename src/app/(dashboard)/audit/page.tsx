@@ -9,7 +9,6 @@ import {
     User, 
     Activity, 
     FileText,
-    Download,
     RefreshCw,
     AlertCircle,
     CheckCircle2,
@@ -89,9 +88,7 @@ export default function AuditPage() {
                     >
                         <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Actualizar
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground hover:opacity-90 transition-all rounded-xl text-sm font-semibold shadow-md shadow-primary/20">
-                        <Download size={16} /> Exportar Reporte
-                    </button>
+
                 </div>
             </div>
 
@@ -127,16 +124,7 @@ export default function AuditPage() {
                             className="w-full h-11 pl-11 pr-4 bg-background border border-border font-medium text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all rounded-xl"
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                         <span className="text-xs font-bold text-muted-foreground uppercase mr-2 tracking-widest">Ver:</span>
-                         <div className="flex bg-background border border-border p-1 rounded-lg">
-                            {['Todo', 'Error', 'Warn', 'Info'].map((f) => (
-                                <button key={f} className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-tight transition-all ${f === 'Todo' ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted'}`}>
-                                    {f}
-                                </button>
-                            ))}
-                         </div>
-                    </div>
+
                 </div>
 
                 {/* Table */}

@@ -105,9 +105,7 @@ export default function HypothesisPage() {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-8 p-6 bg-primary/5 rounded-2xl border-2 border-primary/10 text-xs font-medium italic">
-                        <strong>Conclusión Preliminar:</strong> Los productos con merma superior al 30% del costo total muestran una erosión crítica en la utilidad neta. Se recomienda ajustar lotes de preparación.
-                    </div>
+
                 </motion.section>
 
                 {/* Hipótesis 2: Correlación Volumen vs Margen */}
@@ -139,9 +137,7 @@ export default function HypothesisPage() {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-8 p-6 bg-secondary/5 rounded-2xl border-2 border-secondary/10 text-xs font-medium italic">
-                        <strong>Insight:</strong> Existe una correlación positiva moderada entre el volumen de compradores registrados (67 alumnos en total) y la estabilidad del margen bruto en categorías de alta rotación.
-                    </div>
+
                 </motion.section>
             </div>
 
@@ -152,18 +148,18 @@ export default function HypothesisPage() {
             >
                 <div className="bg-foreground text-background p-8 rounded-[2rem] flex items-center justify-between">
                     <div>
-                        <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Muestra Poblacional</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">30</h4>
-                        <p className="text-[10px] font-bold uppercase mt-2">Estudiantes Activos</p>
+                        <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Productos Analizados</p>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-secondary">{profitability.length}</h4>
+                        <p className="text-[10px] font-bold uppercase mt-2">Con datos de venta</p>
                     </div>
                     <Target className="w-12 h-12 opacity-20" />
                 </div>
                 
                 <div className="bg-primary p-8 rounded-[2rem] text-primary-foreground flex items-center justify-between">
                     <div>
-                        <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Tasa de Conversión</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-background">92%</h4>
-                        <p className="text-[10px] font-bold uppercase mt-2">Iteración Comprador-Vendedor</p>
+                        <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Margen Promedio</p>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-background">{profitability.length > 0 ? Math.round(profitability.reduce((sum, p) => sum + parseFloat(p.margin_pct), 0) / profitability.length) : 0}%</h4>
+                        <p className="text-[10px] font-bold uppercase mt-2">Rentabilidad General</p>
                     </div>
                     <CheckCircle2 className="w-12 h-12 opacity-20" />
                 </div>
@@ -171,8 +167,8 @@ export default function HypothesisPage() {
                 <div className="bg-secondary p-8 rounded-[2rem] text-secondary-foreground flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 mb-1">Estatus del Modelo</p>
-                        <h4 className="text-5xl font-black italic tracking-tighter text-background">ROBUSTO</h4>
-                        <p className="text-[10px] font-bold uppercase mt-2">Nivel de Confianza 95%</p>
+                        <h4 className="text-5xl font-black italic tracking-tighter text-background">{profitability.length >= 3 ? 'ROBUSTO' : 'PARCIAL'}</h4>
+                        <p className="text-[10px] font-bold uppercase mt-2">{profitability.length} productos evaluados</p>
                     </div>
                     <TrendingUp className="w-12 h-12 opacity-20" />
                 </div>

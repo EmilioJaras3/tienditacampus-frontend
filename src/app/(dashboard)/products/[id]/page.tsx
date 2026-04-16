@@ -123,7 +123,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             await productsService.update(params.id, {
                 ...data,
                 shelfLifeDays: data.shelfLifeDays || undefined,
-                imageUrl: data.imageUrl || undefined,
+                imageUrl: data.imageUrl === '' ? null : data.imageUrl,
             });
             toast.success('Producto actualizado exitosamente');
             router.push('/products');

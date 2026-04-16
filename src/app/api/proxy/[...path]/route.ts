@@ -3,10 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * Proxy Bridge (Server-side)
  * 
- * Frontend -> /api/proxy/auth/login -> http://52.201.136.58/api/auth/login
+ * Frontend -> /api/proxy/auth/login -> BACKEND_PROXY_URL/auth/login
  */
 
-const BACKEND_URL = 'http://52.201.136.58/api';
+function getBackendUrl() {
+    const rawUrl = process.env.BACKEND_PROXY_URL?.trim();
+    if (!rawUrl) {
+        throw new Error('BACKEND_PROXY_URL no está configurada');
+    }
+    return rawUrl.replace(/\/+$/, '');
+}
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -32,6 +38,19 @@ export async function DELETE(request: NextRequest, context: any) {
 }
 
 async function proxyRequest(request: NextRequest, context: any) {
+    let backendUrl: string;
+    try {
+        backendUrl = getBackendUrl();
+    } catch (error: any) {
+        return NextResponse.json(
+            {
+                error: 'Backend proxy no configurado',
+                details: error?.message || 'Falta BACKEND_PROXY_URL',
+            },
+            { status: 500 },
+        );
+    }
+
     const resolvedParams = context.params instanceof Promise 
         ? await context.params 
         : context.params;
@@ -39,7 +58,7 @@ async function proxyRequest(request: NextRequest, context: any) {
     const pathSegments = resolvedParams?.path || [];
     const path = pathSegments.join('/');
     const searchParams = request.nextUrl.search;
-    const targetUrl = `${BACKEND_URL}/${path}${searchParams}`;
+    const targetUrl = `${backendUrl}/${path}${searchParams}`;
 
     console.log(`[Proxy Bridge] ${request.method} -> ${targetUrl}`);
 

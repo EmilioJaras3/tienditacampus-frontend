@@ -44,7 +44,10 @@ ENVEOF
 
 # Frontend .env
 cd ~/tiendita/frontend
-echo 'NEXT_PUBLIC_API_URL=http://98.82.69.208:3001/api' > .env.local
+cat > .env.local << 'ENVEOF'
+NEXT_PUBLIC_API_URL=/api
+BACKEND_PROXY_URL=http://127.0.0.1:3001/api
+ENVEOF
 
 echo "=== 5. Restarting Services ==="
 pm2 delete backend || true

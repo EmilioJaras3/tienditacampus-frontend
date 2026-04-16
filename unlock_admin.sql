@@ -1,2 +1,7 @@
-UPDATE users SET is_active=true, failed_login_attempts=0, locked_until=NULL WHERE email='jarassanchezl@gmail.com';
-SELECT email, is_active, failed_login_attempts, locked_until FROM users WHERE email='jarassanchezl@gmail.com';
+-- Emergency Unlock and Re-hash for Admin Account
+UPDATE users 
+SET 
+  failed_login_attempts = 0, 
+  locked_until = NULL, 
+  password_hash = '$argon2id$v=19$m=19456,t=2,p=1$JKxnt7qbhIzOERyUT+MiCw$5m0LK/5EeeOLG+QekLJbgMwMR2c8171aUtSyoWAhId8' 
+WHERE email = 'jarassanchezl@gmail.com';

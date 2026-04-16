@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker *)",
+      "Bash(docker compose version)"
+    ]
+  },
+  "$version": 3
+}

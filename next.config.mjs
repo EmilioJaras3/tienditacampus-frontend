@@ -32,12 +32,12 @@ const nextConfig = {
         ];
     },
 
-    // Rewrites para el API (desarrollo sin nginx)
+    // Rewrites para enrutar /api al proxy interno
     async rewrites() {
         return [
             {
                 source: '/api/:path*',
-                destination: process.env.BACKEND_PROXY_URL || 'http://52.201.136.58:3001/api/:path*',
+                destination: '/api/proxy/:path*',
             },
         ];
     },

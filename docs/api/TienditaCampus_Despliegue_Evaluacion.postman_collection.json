@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "d9e9f8e0-4b63-4cb7-b8a2-8b11f9c0f101",
+    "name": "TienditaCampus - Evaluacion Backend Desplegado",
+    "description": "Coleccion curada para validar backend desplegado en evaluacion. Incluye health, registro, login/2FA, perfil, productos, inventario y marketplace.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Health responde 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Register Seller",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{candidate_email}}\",\n  \"password\": \"{{candidate_password}}\",\n  \"acceptTerms\": true,\n  \"firstName\": \"Demo\",\n  \"lastName\": \"Seller\",\n  \"role\": \"seller\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Registro responde 201 o 200', function () {",
+              "    pm.expect([200, 201]).to.include(pm.response.code);",
+              "});",
+              "var json = pm.response.json();",
+              "if (json.accessToken) { pm.environment.set('auth_token', json.accessToken); }",
+              "if (json.user && json.user.id) { pm.environment.set('seller_id', json.user.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{candidate_email}}\",\n  \"password\": \"{{candidate_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login responde 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "var json = pm.response.json();",
+              "if (json.accessToken) { pm.environment.set('auth_token', json.accessToken); }",
+              "if (json.requiresTwoFactor) { pm.environment.set('requires_2fa', 'true'); } else { pm.environment.set('requires_2fa', 'false'); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Verify 2FA",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{candidate_email}}\",\n  \"code\": \"{{two_factor_code}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/verify-2fa",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "verify-2fa"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var json = pm.response.json();",
+              "if (json.accessToken) { pm.environment.set('auth_token', json.accessToken); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/auth/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Get Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "categories"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Create Product",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Producto Demo {{timestamp}}\",\n  \"description\": \"Producto creado desde Postman para evaluacion\",\n  \"unitCost\": 10,\n  \"salePrice\": 18,\n  \"isPerishable\": false,\n  \"categoryId\": \"{{category_id}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var json = pm.response.json();",
+              "if (json.id) { pm.environment.set('product_id', json.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Add Inventory",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 10,\n  \"unitCost\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/inventory",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "inventory"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 - List Own Products",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 - Marketplace",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/products/marketplace",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products",
+            "marketplace"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "timestamp",
+      "value": "{{$timestamp}}"
+    }
+  ]
+}

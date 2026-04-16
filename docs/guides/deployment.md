@@ -1,35 +1,27 @@
-# Guía de Despliegue — TienditaCampus
+# Guia de Despliegue - TienditaCampus
 
-## Despliegue Rápido
-
-```bash
-bash devops/scripts/deploy.sh
-```
-
-## Despliegue Manual
+## Despliegue manual
 
 ```bash
-# 1. Configurar .env para producción
 cp .env.example .env
-bash devops/scripts/generate-secrets.sh
-
-# 2. Build y deploy
-docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
-# 3. Verificar
-bash devops/scripts/health-check.sh
+docker compose -f docker-compose.yml build --no-cache
+docker compose -f docker-compose.yml up -d
 ```
 
-## SSL/HTTPS
+## Variables obligatorias
 
-Coloca los certificados en `devops/docker/nginx/ssl/`:
-- `certificate.crt`
-- `private.key`
+- `BACKEND_PROXY_URL` debe apuntar al backend real con prefijo `/api`.
+- `NEXT_PUBLIC_API_URL` debe mantenerse en `/api`.
+- `FRONTEND_URL` debe incluir los origenes autorizados por CORS del backend.
 
-## Backups
+## Notas de despliegue
 
-Los backups se crean automáticamente antes de cada despliegue. Para backup manual:
+- En este checkout el Dockerfile del frontend activo es el `Dockerfile` de la raiz.
+- No uses `context: ./frontend` para construir el frontend actual.
+- Si desplegas el backend por separado, verifica `POSTGRES_*`, `JWT_SECRET` y SMTP antes de levantar.
+
+## Verificacion
+
 ```bash
-bash devops/scripts/backup-db.sh
+bash devops/scripts/health-check.sh
 ```

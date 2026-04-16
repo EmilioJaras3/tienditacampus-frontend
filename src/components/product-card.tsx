@@ -200,7 +200,7 @@ export function ProductCard({ product }: { product: Product }) {
                                 {stockAvailable > 0 ? 'Solicitar Compra' : 'Agotado'}
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>Solicitar Compra</DialogTitle>
                                 <DialogDescription>
@@ -230,10 +230,10 @@ export function ProductCard({ product }: { product: Product }) {
                                         value={deliveryMessage}
                                         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDeliveryMessage(e.target.value)}
                                         className="resize-none"
-                                        rows={3}
+                                        rows={2}
                                     />
                                 </div>
-                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2">
+                                <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100">
                                     <span className="font-medium text-gray-700">Total a pagar:</span>
                                     <span className="font-bold text-xl text-primary">
                                         ${(Number(product.salePrice) * quantity).toFixed(2)}
@@ -241,11 +241,11 @@ export function ProductCard({ product }: { product: Product }) {
                                 </div>
                             </div>
 
-                            <DialogFooter className="sm:justify-between flex-row">
+                            <DialogFooter className="flex-row gap-2 sm:justify-between">
                                 <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
                                 <Button onClick={handlePurchase} disabled={isPurchasing || quantity < 1 || quantity > stockAvailable}>
                                     {isPurchasing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Solicitar (Contraentrega)
+                                    Confirmar Compra
                                 </Button>
                             </DialogFooter>
                         </DialogContent>

@@ -33,14 +33,16 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+        BACKEND_PROXY_URL: ${BACKEND_PROXY_URL:-http://backend:3001/api}
     container_name: tc-frontend
     restart: unless-stopped
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api}
+      - BACKEND_PROXY_URL=${BACKEND_PROXY_URL:-http://backend:3001/api}
     networks:
       - tc-network
     depends_on:
