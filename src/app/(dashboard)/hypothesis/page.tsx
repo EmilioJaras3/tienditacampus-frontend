@@ -5,9 +5,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     LineChart, Line
 } from 'recharts';
-import { useAuthStore } from '@/store/auth.store';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { Loader2, FlaskConical, Target, CheckCircle2, TrendingUp } from 'lucide-react';
 import { financeService, DashboardComparisonResponse } from '@/services/finance.service';
 
@@ -17,8 +15,6 @@ const fadeInUp = {
 };
 
 export default function HypothesisPage() {
-    const { user } = useAuthStore();
-    const router = useRouter();
     const [data, setData] = useState<DashboardComparisonResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
