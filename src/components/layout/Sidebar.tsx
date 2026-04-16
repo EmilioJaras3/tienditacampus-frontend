@@ -85,6 +85,13 @@ const routes = [
         color: 'bg-primary/20 text-primary',
         roles: ['admin'],
     },
+    {
+        label: 'Modelo IQR',
+        icon: Zap,
+        href: '/forecast',
+        color: 'bg-accent text-accent-foreground',
+        roles: ['admin', 'seller'],
+    },
 ];
 
 
