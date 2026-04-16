@@ -84,7 +84,16 @@ export const productsService = {
      * Obtener un producto por ID
      */
     async getById(id: string): Promise<Product> {
-        return api.get<Product>(`/products/marketplace/${id}`);
+        return api.get<Product>(`/products/${id}`);
+    },
+
+    /**
+     * Obtener un producto público del marketplace por ID
+     */
+    async getMarketplaceById(id: string): Promise<Product> {
+        return api.get<Product>(`/products/marketplace/${id}`, {
+            requiresAuth: false,
+        });
     },
 
     /**

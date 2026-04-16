@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, BrainCircuit, CalendarDays, TrendingUp, AlertCircle, ShoppingBag } from 'lucide-react';
-import { forecastService } from '@/services/forecast.service';
+import { forecastService, ForecastResponse } from '@/services/forecast.service';
 import { productsService, Product } from '@/services/products.service';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/store/auth.store';
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -24,22 +25,25 @@ const daysOfWeek = [
 ];
 
 export default function ForecastPage() {
+    const user = useAuthStore((state) => state.user);
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedProductId, setSelectedProductId] = useState<string>('');
     const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay() || 7);
-    
+
     const [loadingProducts, setLoadingProducts] = useState(true);
     const [calculating, setCalculating] = useState(false);
     const [error, setError] = useState('');
-    const [prediction, setPrediction] = useState<number | null>(null);
+    const [prediction, setPrediction] = useState<ForecastResponse | null>(null);
 
     useEffect(() => {
         loadProducts();
-    }, []);
+    }, [user?.role]);
 
     const loadProducts = async () => {
         try {
-            const data = await productsService.getAll();
+            const data = user?.role === 'buyer'
+                ? await productsService.getMarketplace()
+                : await productsService.getAll();
             setProducts(data);
             if (data.length > 0) setSelectedProductId(data[0].id);
         } catch (err) {
@@ -55,9 +59,11 @@ export default function ForecastPage() {
         setCalculating(true);
         setError('');
         setPrediction(null);
-        
+
         try {
-            const result = await forecastService.getForecast(selectedProductId, selectedDay);
+            const result = user?.role === 'buyer'
+                ? await forecastService.getDemoForecast(selectedProductId, selectedDay)
+                : await forecastService.getForecast(selectedProductId, selectedDay);
             setPrediction(result);
         } catch (err: any) {
             console.error('Error calculating forecast:', err);
@@ -91,11 +97,10 @@ export default function ForecastPage() {
                 </p>
             </header>
 
-            <motion.div 
+            <motion.div
                 initial="hidden" animate="visible" variants={fadeInUp}
                 className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             >
-                {/* Configuración del Modelo */}
                 <section className="bg-card border-4 border-foreground/5 p-8 rounded-[2.5rem] shadow-neo-sm space-y-8">
                     <div className="mb-2">
                         <h2 className="text-2xl font-black uppercase italic tracking-tight">Análisis Predictivo</h2>
@@ -114,12 +119,12 @@ export default function ForecastPage() {
                             <Label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
                                 <ShoppingBag className="w-4 h-4" /> Producto a analizar
                             </Label>
-                            <select 
+                            <select
                                 value={selectedProductId}
                                 onChange={(e) => setSelectedProductId(e.target.value)}
                                 className="w-full flex h-14 w-full rounded-2xl border-4 border-foreground/10 bg-background px-4 py-2 text-sm font-bold uppercase ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                             >
-                                {products.length === 0 && <option value="">No tienes productos...</option>}
+                                {products.length === 0 && <option value="">No hay productos disponibles...</option>}
                                 {products.map((p) => (
                                     <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
@@ -136,8 +141,8 @@ export default function ForecastPage() {
                                         key={day.value}
                                         onClick={() => setSelectedDay(day.value)}
                                         className={`py-3 px-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
-                                            selectedDay === day.value 
-                                                ? 'bg-foreground text-background border-foreground shadow-md' 
+                                            selectedDay === day.value
+                                                ? 'bg-foreground text-background border-foreground shadow-md'
                                                 : 'bg-background text-foreground/60 border-foreground/10 hover:border-primary/50 hover:text-foreground'
                                         }`}
                                     >
@@ -147,7 +152,7 @@ export default function ForecastPage() {
                             </div>
                         </div>
 
-                        <Button 
+                        <Button
                             onClick={handleCalculate}
                             disabled={calculating || !selectedProductId}
                             className="w-full h-16 rounded-2xl text-lg uppercase font-black tracking-widest shadow-neo bg-primary text-primary-foreground hover:bg-primary/90 mt-4 active:translate-y-1 active:shadow-none transition-all"
@@ -161,32 +166,39 @@ export default function ForecastPage() {
                     </div>
                 </section>
 
-                {/* Resultado */}
                 <section className={`flex flex-col items-center justify-center p-8 rounded-[2.5rem] border-4 transition-all duration-500 min-h-[400px] shadow-neo-sm relative overflow-hidden ${prediction !== null ? 'bg-secondary text-secondary-foreground border-transparent' : 'bg-transparent border-dashed border-foreground/20 text-foreground/40'}`}>
                     {prediction !== null ? (
                         <div className="text-center z-10 space-y-6">
                             <div className="inline-block bg-background/20 backdrop-blur-md px-6 py-2 rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-sm mb-4">
-                                Proyección Exitosa
+                                {prediction.hasSufficientData ? 'Proyección Exitosa' : 'Historial Insuficiente'}
                             </div>
                             <h3 className="text-sm font-bold uppercase tracking-widest opacity-80">
-                                Producción Sugerida para el día {daysOfWeek.find(d => d.value === selectedDay)?.label}
+                                {prediction.productName || 'Producto'} para el día {daysOfWeek.find(d => d.value === selectedDay)?.label}
                             </h3>
                             <div className="flex items-center justify-center gap-4">
                                 <span className="text-8xl md:text-[8rem] font-black italic tracking-tighter leading-none drop-shadow-md">
-                                    {prediction}
+                                    {prediction.recommendedQuantity}
                                 </span>
                                 <span className="text-2xl font-black uppercase tracking-widest leading-none rotate-90 transform translate-y-4 opacity-50">UNIDADES</span>
                             </div>
-                            <p className="text-xs font-bold w-3/4 mx-auto opacity-75 mt-8 px-4 bg-background/10 py-3 rounded-xl border border-background/20">
-                                Esta recomendación excluye días atípicos aplicando el filtro de Rango Intercuartílico (IQR) sobre el historial reciente.
-                            </p>
+                            <div className="text-xs font-bold w-3/4 mx-auto opacity-75 mt-8 px-4 bg-background/10 py-3 rounded-xl border border-background/20 space-y-2">
+                                <p>{prediction.message}</p>
+                                {prediction.confidenceInterval && (
+                                    <p>
+                                        Rango sugerido: {prediction.confidenceInterval[0]} a {prediction.confidenceInterval[1]} unidades.
+                                    </p>
+                                )}
+                                <p>
+                                    Muestras: {prediction.sampleSize} · Atípicos filtrados: {prediction.outliersRemoved}
+                                </p>
+                            </div>
                         </div>
                     ) : (
                         <div className="text-center z-10 flex flex-col items-center">
                             <TrendingUp className="w-24 h-24 opacity-20 mb-6" />
                             <h3 className="text-2xl font-black uppercase tracking-tighter italic">Esperando Variables</h3>
                             <p className="text-xs font-bold uppercase tracking-widest mt-2 px-8">
-                                Configura el producto y el día para obtener la recomendación con el modelo Predictivo Estadístico.
+                                Configura el producto y el día para obtener la recomendación con el modelo predictivo estadístico.
                             </p>
                         </div>
                     )}

@@ -80,9 +80,12 @@ export function ProductCard({ product }: { product: Product }) {
     // Mejorar validación de URL de imagen
     const isValidImageUrl = (url: string | undefined): boolean => {
         if (!url) return false;
+        if (url.startsWith('data:image/')) return true;
+        if (url.startsWith('/uploads/')) return true;
+
         try {
-            new URL(url);
-            return true;
+            const parsed = new URL(url);
+            return parsed.protocol === 'http:' || parsed.protocol === 'https:';
         } catch {
             return false;
         }

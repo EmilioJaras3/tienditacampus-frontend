@@ -7,12 +7,6 @@ export interface RoiStats {
     roi: number;
 }
 
-// Re-export DailyHistory as DailySale to match component usage or define a separate one if needed.
-// Based on usage in SalesPage: DailySale has details[], totalRevenue, etc.
-// The interface DailyHistory defined here seems to match the "History" list, not the "Today" full details.
-// Let's verify what getToday returns. It returns "any" in the code, but used as DailySale in SalesPage.
-// To fix the build error, we need to export DailySale.
-
 export interface SaleDetail {
     id: string;
     productId: string;
@@ -55,58 +49,57 @@ export interface PrepareSaleItem {
     quantityPrepared: number;
 }
 
+export interface UnifiedPrediction {
+    productId: string;
+    productName: string | null;
+    dayOfWeek: number;
+    recommendedQuantity: number;
+    sampleSize: number;
+    outliersRemoved: number;
+    confidenceInterval: [number, number] | null;
+    hasSufficientData: boolean;
+    message: string;
+    source: 'iqr';
+    scope: 'personal' | 'public-demo';
+}
+
+export interface UserPredictionSummary {
+    dayOfWeek: number;
+    suggestions: UnifiedPrediction[];
+    hasSufficientData: boolean;
+    message: string;
+}
 
 export const salesService = {
-    /**
-     * Obtener ROI y estadisticas financieras acumuladas
-     */
     async getRoiStats(): Promise<RoiStats> {
         return api.get<RoiStats>('/sales/roi');
     },
 
-    /**
-     * Obtener historial de ventas diario para graficas
-     */
     async getHistory(): Promise<DailySale[]> {
         const response = await api.get<{ data: DailySale[]; total: number; page: number; limit: number }>('/sales/history');
         return response.data;
     },
 
-    /**
-     * Obtener venta del día actual (para cierre)
-     */
     async getToday(): Promise<any> {
         return api.get<any>('/sales/today');
     },
 
-    /**
-     * Obtener sugerencia de preparación (Analítica IQR)
-     */
-    async getPrediction(): Promise<{ productName: string; suggested: number; confidence: number } | null> {
-        return api.get<{ productName: string; suggested: number; confidence: number } | null>('/sales/prediction');
+    async getPrediction(): Promise<UserPredictionSummary> {
+        return api.get<UserPredictionSummary>('/sales/prediction');
     },
 
     async getWeekdayAnalytics(): Promise<WeekdayAnalyticsItem[]> {
         return api.get<WeekdayAnalyticsItem[]>('/sales/analytics/by-weekday');
     },
 
-    /**
-     * Iniciar el día (preparación)
-     */
     async prepareDay(items: PrepareSaleItem[]): Promise<DailySale> {
         return api.post<DailySale>('/sales/prepare', { items });
     },
 
-    /**
-     * Registrar venta/merma individual (tracking)
-     */
     async trackProduct(productId: string, sold: number, lost: number): Promise<DailySale> {
         return api.post<DailySale>('/sales/track', { productId, quantitySold: sold, quantityLost: lost });
     },
 
-    /**
-     * Cerrar el día registrando mermas
-     */
     async closeDay(items: { productId: string; waste: number; wasteReason?: 'expired' | 'damaged' | 'other' }[]): Promise<void> {
         return api.post('/sales/close-day', { items });
     },
