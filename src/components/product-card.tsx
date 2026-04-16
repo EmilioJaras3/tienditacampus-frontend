@@ -201,9 +201,10 @@ export function ProductCard({ product }: { product: Product }) {
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[400px] w-[95vw] max-h-[85vh] p-0 flex flex-col overflow-hidden border-2 shadow-2xl top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]">
+                            {/* v2.1: Ultra-compact fix for short viewports */}
                             <DialogHeader className="p-3 pb-1 border-b bg-slate-50 relative shrink-0">
                                 <DialogTitle className="text-sm font-black text-slate-900 uppercase tracking-tighter">
-                                    Solicitar: {product.name}
+                                    COMPRAR: {product.name}
                                 </DialogTitle>
                                 <DialogDescription className="text-[10px] text-slate-600 font-bold leading-none mt-1">
                                     Vendedor: {sellerName} • <span className="text-[#E31837]">${Number(product.salePrice).toFixed(2)}</span>
