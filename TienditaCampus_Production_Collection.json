@@ -1,0 +1,262 @@
+{
+  "info": {
+    "_postman_id": "tienditacampus-prod-2026",
+    "name": "TienditaCampus - Producción",
+    "description": "Colección completa de Endpoints para TienditaCampus.\nServidor Backend: http://44.194.142.223:3001",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@upchiapas.edu.mx\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"Demo\",\n  \"lastName\": \"User\",\n  \"role\": \"seller\",\n  \"campusLocation\": \"UD1\",\n  \"major\": \"ITI\",\n  \"acceptTerms\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Step 1 (Send 2FA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jarassanchezl@gmail.com\",\n  \"password\": \"emico311006L\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Verify 2FA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.accessToken) { pm.environment.set('token', j.accessToken); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jarassanchezl@gmail.com\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-2fa",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-2fa"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Products",
+      "item": [
+        {
+          "name": "Marketplace (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/marketplace?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["products", "marketplace"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producto Nuevo\",\n  \"description\": \"Descripción aquí\",\n  \"category\": \"Comida Preparada\",\n  \"unitCost\": 10,\n  \"sellingPrice\": 20,\n  \"unit\": \"pieza\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Orders",
+      "item": [
+        {
+          "name": "Solicitar Compra",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sellerId\": \"ID_DEL_VENDEDOR\",\n  \"items\": [\n    { \"productId\": \"ID_DEL_PRODUCTO\", \"quantity\": 1 }\n  ],\n  \"deliveryMessage\": \"En el domo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/purchase",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "purchase"]
+            }
+          }
+        },
+        {
+          "name": "Cerrar Caja / Entregar",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/:id/deliver",
+              "host": ["{{base_url}}"],
+              "path": ["orders", ":id", "deliver"],
+              "variable": [
+                { "key": "id", "value": "ID_DE_LA_ORDEN" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Reports & Hypothesis",
+      "item": [
+        {
+          "name": "Dashboard Comparison",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/comparison",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "comparison"]
+            }
+          }
+        },
+        {
+          "name": "Weekly Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/weekly",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "weekly"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Audit (Admin)",
+      "item": [
+        {
+          "name": "Recent activity",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit/recent?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["audit", "recent"],
+              "query": [
+                { "key": "limit", "value": "50" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": { "type": "text/javascript", "exec": [""] }
+    },
+    {
+      "listen": "test",
+      "script": { "type": "text/javascript", "exec": [""] }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://44.194.142.223:3001/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" }
+  ]
+}

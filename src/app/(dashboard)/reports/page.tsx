@@ -1,274 +1,253 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-    BarChart3,
-    TrendingUp,
-    ArrowUpRight,
-    DollarSign,
-    Target,
-    Package,
+import { 
+    Download, 
+    CalendarDays, 
+    ArrowUpRight, 
+    TrendingUp, 
+    Package, 
+    DollarSign, 
+    Zap,
     Loader2,
-    CalendarDays,
     RefreshCw,
-} from 'lucide-react';
+    Trash2
+} from "lucide-react";
 import { salesService, RoiStats } from '@/services/sales.service';
-import { ordersService, Order } from '@/services/orders.service';
-import { financeService, WeeklyReport, DashboardComparisonResponse } from '@/services/finance.service';
+import { financeService } from '@/services/finance.service';
+import { reportsService, WeeklyReport } from '@/services/reports.service';
+import { toast } from 'sonner';
 
 export default function ReportsPage() {
     const [stats, setStats] = useState<RoiStats | null>(null);
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [comparison, setComparison] = useState<DashboardComparisonResponse | null>(null);
-    const [weeklyReports, setWeeklyReports] = useState<WeeklyReport[]>([]);
-    const [weekdayAnalytics, setWeekdayAnalytics] = useState<Awaited<ReturnType<typeof salesService.getWeekdayAnalytics>>>([]);
-    const [isGeneratingWeek, setIsGeneratingWeek] = useState(false);
+    const [reports, setReports] = useState<WeeklyReport[]>([]);
     const [loading, setLoading] = useState(true);
+    const [generating, setGenerating] = useState(false);
 
     useEffect(() => {
-        const loadStats = async () => {
-            try {
-                const [data, ordersData] = await Promise.all([
-                    salesService.getRoiStats('', ''),
-                    ordersService.getIncomingOrders(),
-                ]);
-                const [comparisonData, reportsData, weekdayData] = await Promise.all([
-                    financeService.getDashboardComparison(),
-                    financeService.getWeeklyReports(),
-                    salesService.getWeekdayAnalytics(),
-                ]);
-                setStats(data);
-                setOrders(ordersData);
-                setComparison(comparisonData);
-                setWeeklyReports(reportsData);
-                setWeekdayAnalytics(weekdayData);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadStats();
+        loadData();
     }, []);
 
-    const toMoney = (value?: string | number) => Number(value || 0).toFixed(2);
-
-    const handleGenerateWeekly = async () => {
+    const loadData = async () => {
         try {
-            setIsGeneratingWeek(true);
-            const generated = await financeService.generateWeeklyReport();
-            setWeeklyReports(generated);
+            setLoading(true);
+            const [roiData, weeklyData] = await Promise.all([
+                salesService.getRoiStats('', ''),
+                reportsService.getWeeklyReports()
+            ]);
+            setStats(roiData);
+            setReports(weeklyData || []);
         } catch (error) {
             console.error(error);
+            toast.error('Error al cargar datos de reportes');
         } finally {
-            setIsGeneratingWeek(false);
+            setLoading(false);
         }
     };
 
-    if (loading) {
+    const handleGenerateReport = async () => {
+        try {
+            setGenerating(true);
+            await reportsService.generateWeekly();
+            toast.success('¡Reporte generado correctamente!');
+            await loadData();
+        } catch (error: any) {
+            console.error(error);
+            toast.error(error?.message || 'Error al generar el reporte');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    const handleDeleteReport = async (id: string) => {
+        if (!confirm('¿Estás seguro de eliminar este reporte histórico?')) return;
+        try {
+            await reportsService.deleteReport(id);
+            toast.success('Reporte eliminado');
+            loadData();
+        } catch (error) {
+            toast.error('No se pudo eliminar el reporte');
+        }
+    };
+
+    const toMoney = (val?: string | number) => Number(val || 0).toFixed(2);
+
+    const handleDownloadCSV = (report: WeeklyReport) => {
+        const headers = ['Métrica', 'Valor'];
+        const rows = [
+            ['Semana (Inicio)', new Date(report.weekStart).toLocaleDateString()],
+            ['Fin Semana', report.weekEnd],
+            ['Inversión (Costos)', report.totalInvestment.toString()],
+            ['Ventas Totales', report.totalRevenue?.toString() || report.totalRevenue.toString()],
+            ['Ganancia Neta', report.totalProfit?.toString() || report.totalProfit.toString()],
+            ['Margen Promedio %', report.avgProfitMargin.toString()],
+            ['Costo Merma', report.totalWasteCost?.toString() || report.totalWasteCost.toString()],
+            ['Pérdida (Unidades)', report.lossPercentage?.toString() + '%' || report.lossPercentage.toString() + '%'],
+            ['Producto Estrella', report.bestSellingProduct?.name || 'N/A'],
+            ['Fecha Generación', new Date(report.createdAt).toLocaleDateString()],
+        ];
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `reporte_semana_${report.weekStart}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success(`Reporte Semana de ${new Date(report.weekStart).toLocaleDateString()} descargado`);
+    };
+
+    if (loading && !stats) {
         return (
-            <div className="h-screen flex items-center justify-center bg-neo-white">
-                <Loader2 className="animate-spin text-black" size={64} />
+            <div className="h-screen flex items-center justify-center bg-background">
+                <Loader2 className="animate-spin text-primary" size={64} />
             </div>
         );
     }
 
     return (
-        <div className="p-4 md:p-10 space-y-12 font-display min-h-screen bg-neo-white selection:bg-neo-red selection:text-white pb-24">
+        <div className="p-4 md:p-10 space-y-12 font-display min-h-screen bg-background selection:bg-primary/20 pb-24">
             {/* Header */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b-4 border-black pb-8">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b-4 border-foreground/10 pb-8">
                 <div className="space-y-2">
-                    <div className="inline-block bg-blue-400 text-white border-2 border-black px-3 py-1 font-black uppercase text-xs tracking-widest shadow-neo-sm transform -rotate-1 mb-2">
+                    <div className="inline-block bg-primary text-primary-foreground border border-primary/10 px-3 py-1 font-semibold text-xs tracking-widest shadow-neo-sm transform -rotate-1 mb-2 rounded-sm">
                         BUSINESS INTELLIGENCE
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none text-black">
-                        MÉTRICAS <span className="text-neo-red">PRO</span>
+                    <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-none text-foreground uppercase italic">
+                        REPORTES <span className="text-primary italic">PRO</span>
                     </h1>
-                    <p className="text-lg font-bold text-slate-500 uppercase tracking-tight max-w-md border-l-4 border-black pl-4">
-                        Analiza tu rendimiento y toma decisiones basadas en datos reales.
+                    <p className="text-lg font-bold text-muted-foreground uppercase tracking-tight max-w-md border-l-4 border-primary pl-4">
+                        Analiza tu rendimiento, márgenes y proyecciones de stock.
                     </p>
                 </div>
-                <div className="flex items-center gap-3 bg-white border-4 border-black p-4 shadow-neo-sm">
-                    <CalendarDays className="text-neo-red" />
-                    <div>
-                        <p className="text-[10px] font-black uppercase text-slate-400">Periodo Actual</p>
-                        <p className="font-black uppercase text-sm">Últimos 30 días</p>
-                    </div>
+                <div className="flex gap-4">
+                    <button 
+                        onClick={handleGenerateReport}
+                        disabled={generating}
+                        className="flex items-center gap-3 px-8 h-16 bg-foreground text-background border border-foreground/10 font-bold text-xs tracking-widest uppercase hover:opacity-90 transition-all rounded-xl shadow-neo disabled:opacity-50"
+                    >
+                        {generating ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} />}
+                        GENERAR REPORTE
+                    </button>
+                    <button 
+                        onClick={loadData}
+                        className="flex items-center gap-3 px-6 h-16 bg-card border border-foreground/10 font-bold text-xs tracking-widest uppercase hover:bg-muted transition-all rounded-xl shadow-neo-sm"
+                    >
+                        <RefreshCw size={18} />
+                    </button>
                 </div>
             </div>
 
-            {/* Main Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {/* Ingresos Totales */}
-                <div className="bg-white border-4 border-black p-8 shadow-neo-lg group hover:-translate-y-2 transition-transform">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="bg-card border border-foreground/10 p-10 shadow-neo-sm rounded-[3rem] relative overflow-hidden group">
                     <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-neo-yellow border-2 border-black flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
-                            <DollarSign size={24} className="text-black" />
-                        </div>
-                        <span className="flex items-center text-xs font-black text-neo-green uppercase">
-                            <ArrowUpRight size={14} /> +12%
-                        </span>
+                        <p className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Ventas Brutas</p>
+                        <DollarSign className="text-primary" />
                     </div>
-                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Ingresos Totales</p>
-                    <h3 className="text-4xl font-black tracking-tighter text-black">
-                        ${stats?.revenue?.toFixed(2) || '0.00'}
-                    </h3>
+                    <h3 className="text-5xl font-bold tracking-tighter">${toMoney(stats?.revenue)}</h3>
+                    <p className="text-[10px] font-bold text-primary uppercase mt-2">Ingresos totales acumulados</p>
                 </div>
 
-                {/* Ganancia Neta */}
-                <div className="bg-black text-white border-4 border-black p-8 shadow-neo-lg group hover:-translate-y-2 transition-transform relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-neo-red opacity-20 -mr-12 -mt-12 rounded-full blur-2xl"></div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="w-12 h-12 bg-neo-red border-2 border-white flex items-center justify-center -rotate-6 group-hover:rotate-0 transition-transform">
-                            <TrendingUp size={24} className="text-white" />
-                        </div>
-                        <span className="flex items-center text-xs font-black text-neo-yellow uppercase">
-                            <ArrowUpRight size={14} /> +8.5%
-                        </span>
+                <div className="bg-foreground text-background p-10 shadow-neo rounded-[3rem] relative overflow-hidden group rotate-1">
+                    <div className="flex justify-between items-start mb-6 text-primary">
+                        <p className="text-[10px] font-bold opacity-60 tracking-widest uppercase text-background">Ganancia Neta</p>
+                        <TrendingUp />
                     </div>
-                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1 relative z-10">Ganancia Neta (ROI)</p>
-                    <h3 className="text-4xl font-black tracking-tighter text-white relative z-10">
-                        ${stats?.netProfit?.toFixed(2) || '0.00'}
-                    </h3>
+                    <h3 className="text-5xl font-bold tracking-tighter">${toMoney(stats?.netProfit)}</h3>
+                    <p className="text-[10px] font-bold text-primary uppercase mt-2">Utilidad después de costos</p>
                 </div>
 
-                {/* Margen Promedio */}
-                <div className="bg-neo-green text-black border-4 border-black p-8 shadow-neo-lg group hover:-translate-y-2 transition-transform">
+                <div className="bg-card border border-foreground/10 p-10 shadow-neo-sm rounded-[3rem]">
                     <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-black border-2 border-neo-green flex items-center justify-center rotate-[-3deg] group-hover:rotate-0 transition-transform">
-                            <Target size={24} className="text-neo-green" />
-                        </div>
+                        <p className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Margen ROI</p>
+                        <Zap className="text-primary" />
                     </div>
-                    <p className="text-xs font-black uppercase text-black/40 tracking-widest mb-1">Margen Objetivo</p>
-                    <h3 className="text-4xl font-black tracking-tighter text-black">
-                        {stats?.roi?.toFixed(1) || '0.0'}%
+                    <h3 className="text-5xl font-bold tracking-tighter">
+                        {stats?.revenue ? ((Number(stats.netProfit) / Number(stats.revenue)) * 100).toFixed(1) : '0'}%
                     </h3>
-                </div>
-
-                {/* Pedidos Procesados */}
-                <div className="bg-white border-4 border-black p-8 shadow-neo-lg group hover:-translate-y-2 transition-transform">
-                    <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-blue-400 border-2 border-black flex items-center justify-center rotate-6 group-hover:rotate-0 transition-transform">
-                            <Package size={24} className="text-white" />
-                        </div>
-                    </div>
-                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Ventas Exitosas</p>
-                    <h3 className="text-4xl font-black tracking-tighter text-black">
-                        {orders.filter(o => ['completed', 'delivered'].includes(o.status)).length}
-                    </h3>
-                </div>
-            </div>
-
-            {/* Visual Charts Simulation */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Ventas Semanales */}
-                <div className="lg:col-span-2 bg-white border-4 border-black p-8 shadow-neo relative">
-                    <div className="flex items-center justify-between mb-10">
-                        <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3 text-black">
-                            <BarChart3 className="text-neo-red" /> Rendimiento Semanal
-                        </h3>
-                        <button
-                            onClick={handleGenerateWeekly}
-                            disabled={isGeneratingWeek}
-                            className="flex items-center gap-2 border-2 border-black px-3 py-2 font-black uppercase text-[10px] text-black hover:bg-neo-yellow"
-                        >
-                            <RefreshCw size={14} className={isGeneratingWeek ? 'animate-spin' : ''} />
-                            {isGeneratingWeek ? 'Generando...' : 'Regenerar semana'}
-                        </button>
-                    </div>
-
-                    <div className="space-y-3">
-                        {weeklyReports.slice(0, 4).map((report) => (
-                            <div key={report.id} className="grid grid-cols-2 md:grid-cols-4 gap-3 border-2 border-black p-3 text-xs font-black uppercase text-black">
-                                <div>
-                                    <p className="text-black">Semana</p>
-                                    <p>{report.weekStart} a {report.weekEnd}</p>
-                                </div>
-                                <div>
-                                    <p className="text-black">Utilidad Neta</p>
-                                    <p>${toMoney(report.totalProfit)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-black">Pérdida</p>
-                                    <p>{toMoney(report.lossPercentage)}%</p>
-                                </div>
-                                <div>
-                                    <p className="text-black">Inv vs Ingreso</p>
-                                    <p>${toMoney(report.totalInvestment)} / ${toMoney(report.totalRevenue)}</p>
-                                </div>
-                            </div>
-                        ))}
-                        {weeklyReports.length === 0 && (
-                            <p className="text-xs font-black uppercase text-black">No hay reportes semanales generados.</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Comparativo */}
-                <div className="bg-white border-4 border-black p-8 shadow-neo text-black">
-                    <h3 className="text-2xl font-black uppercase tracking-tighter mb-10 flex items-center gap-3">
-                        <TrendingUp className="text-neo-red" /> Comparativo
-                    </h3>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <p className="text-xs font-black uppercase text-black">Semana (utilidad)</p>
-                            <div className="flex justify-between text-sm font-black uppercase">
-                                <span>Actual</span>
-                                <span>${toMoney(comparison?.weekComparison?.current_profit)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm font-black uppercase">
-                                <span>Anterior</span>
-                                <span>${toMoney(comparison?.weekComparison?.previous_profit)}</span>
-                            </div>
-                        </div>
-                        <div className="space-y-2 border-t-2 border-dashed border-black pt-4">
-                            <p className="text-xs font-black uppercase text-black">Mes (utilidad)</p>
-                            <div className="flex justify-between text-sm font-black uppercase">
-                                <span>Actual</span>
-                                <span>${toMoney(comparison?.monthComparison?.current_profit)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm font-black uppercase">
-                                <span>Anterior</span>
-                                <span>${toMoney(comparison?.monthComparison?.previous_profit)}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-12 p-4 border-4 border-black border-dashed bg-slate-50">
-                        <p className="text-[10px] font-black uppercase text-black mb-2">Top rentabilidad</p>
-                        {comparison?.profitabilityByProduct?.slice(0, 3).map((item) => (
-                            <div key={item.product_id} className="flex justify-between text-xs font-black uppercase py-1 text-black">
-                                <span className="truncate mr-2">{item.product_name}</span>
-                                <span className="text-neo-red">{Number(item.margin_pct || 0).toFixed(2)}%</span>
-                            </div>
-                        ))}
-                        {(!comparison?.profitabilityByProduct || comparison.profitabilityByProduct.length === 0) && (
-                            <p className="text-xs font-bold italic leading-relaxed text-black">Sin productos con rentabilidad registrada.</p>
-                        )}
+                    <div className="w-full h-2 bg-muted rounded-full mt-4 overflow-hidden">
+                        <div 
+                            className="h-full bg-primary" 
+                            style={{ width: `${Math.min(100, (Number(stats?.netProfit) / Number(stats?.revenue)) * 100 || 0)}%` }}
+                        ></div>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white border-4 border-black p-8 shadow-neo text-black">
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-                    <BarChart3 className="text-neo-red" /> Ventas por Día de Semana
-                </h3>
-                <div className="space-y-3">
-                    {weekdayAnalytics.map((item) => (
-                        <div key={item.weekday} className="grid grid-cols-2 md:grid-cols-4 gap-3 border-2 border-black p-3 text-xs font-black uppercase text-black">
-                            <span>{item.weekdayName}</span>
-                            <span>Días: {item.daysCount}</span>
-                            <span>Ingresos: ${toMoney(item.revenueSum)}</span>
-                            <span>Unidades: {item.unitsSoldSum}</span>
-                        </div>
-                    ))}
-                    {weekdayAnalytics.length === 0 && (
-                        <p className="text-xs font-black uppercase text-black">Sin datos de ventas por día de semana.</p>
-                    )}
+            {/* Historical Reports Table */}
+            <div className="bg-card border border-foreground/10 shadow-neo-sm rounded-[3rem] overflow-hidden">
+                <div className="p-8 border-b border-foreground/5 bg-muted/30">
+                    <h3 className="text-3xl font-bold tracking-tighter uppercase italic flex items-center gap-4">
+                        <CalendarDays className="text-primary" /> Reportes Históricos
+                    </h3>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                            <tr>
+                                <th className="px-8 py-5">Periodo</th>
+                                <th className="px-8 py-5">Ventas</th>
+                                <th className="px-8 py-5">Ganancia</th>
+                                <th className="px-8 py-5">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-foreground/5">
+                            {reports.map((report) => (
+                                <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
+                                    <td className="px-8 py-6">
+                                        <div className="font-bold text-lg tracking-tighter uppercase italic text-foreground">
+                                            {report.weekStart} <span className="text-muted-foreground font-normal text-sm">al</span> {report.weekEnd}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Gen: {new Date(report.createdAt).toLocaleDateString()}</span>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className="text-xl font-bold tracking-tighter text-foreground">${toMoney(report.totalRevenue)}</span>
+                                        <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">Margen: {report.avgProfitMargin}%</p>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={`text-xl font-bold tracking-tighter ${Number(report.totalProfit) >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                                            ${toMoney(report.totalProfit)}
+                                        </span>
+                                        <p className="text-[10px] text-destructive uppercase font-bold mt-1">Merma: ${toMoney(report.totalWasteCost)}</p>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => handleDownloadCSV(report)}
+                                                className="p-3 bg-muted border border-foreground/5 hover:text-primary transition-all rounded-xl shadow-neo-sm"
+                                            >
+                                                <Download size={18} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteReport(report.id)}
+                                                className="p-3 bg-muted border border-foreground/5 hover:bg-destructive hover:text-destructive-foreground transition-all rounded-xl shadow-neo-sm"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            {reports.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="px-8 py-20 text-center font-bold text-muted-foreground uppercase italic tracking-widest">
+                                        No hay reportes semanales generados aún.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-
         </div>
     );
 }

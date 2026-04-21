@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
@@ -20,9 +19,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             </Link>
 
             {/* Lado Izquierdo: Visual/Branding (Oculto en móvil) */}
-            <div className="relative hidden w-1/2 flex-col justify-between bg-primary p-12 text-white lg:flex">
+            <div className="relative hidden w-1/2 flex-col justify-between bg-primary p-12 text-primary-foreground lg:flex">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-primary/80 backdrop-blur-sm z-10" />
+                    <div className="absolute inset-0 bg-primary/20 backdrop-blur-sm z-10" />
                     {/* Aquí se usará la imagen generada una vez que tengamos la ruta */}
                     {/* <Image 
             src="/auth-bg.jpg" 
@@ -34,7 +33,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
                 </div>
 
                 <div className="relative z-20 flex items-center text-lg font-medium">
-                    <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-primary font-bold">
+                    <div className="mr-2 flex h-8 w-8 items-center justify-center border border-foreground/10 bg-foreground text-background font-bold">
                         TC
                     </div>
                     TienditaCampus
@@ -55,8 +54,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             {/* Lado Derecho: Contenido (Login/Register) */}
             <div className="flex w-full items-center justify-center p-8 lg:w-1/2 bg-background">
                 <div className="w-full max-w-md animate-slide-up">
-                    <div className="lg:hidden mb-8 flex items-center justify-center text-2xl font-bold text-primary">
-                        <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">
+                    <div className="lg:hidden mb-8 flex items-center justify-center text-2xl font-bold text-foreground">
+                        <div className="mr-2 flex h-8 w-8 items-center justify-center bg-foreground text-background font-bold text-sm">
                             TC
                         </div>
                         TienditaCampus

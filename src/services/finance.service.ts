@@ -28,6 +28,7 @@ export interface WeeklyReport {
     avgProfitMargin: string;
     totalUnitsSold: number;
     totalUnitsLost: number;
+    totalWasteCost: string;
     lossPercentage: string;
     bestSellingProduct?: {
         id: string;
@@ -41,11 +42,13 @@ export interface DashboardPeriodComparison {
     current_revenue: string;
     current_investment: string;
     current_profit: string;
+    current_waste_cost: string;
     previous_start: string;
     previous_end: string;
     previous_revenue: string;
     previous_investment: string;
     previous_profit: string;
+    previous_waste_cost: string;
 }
 
 export interface ProductProfitability {
@@ -54,6 +57,7 @@ export interface ProductProfitability {
     revenue: string;
     investment: string;
     profit: string;
+    total_waste_cost: string;
     margin_pct: string;
 }
 

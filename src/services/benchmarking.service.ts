@@ -23,8 +23,9 @@ export const benchmarkingService = {
     async sendSnapshot(googleToken: string) {
         return api.post('/benchmarking/snapshot', {}, {
             headers: {
-                Authorization: `Bearer ${googleToken}`
-            }
+                'x-google-token': googleToken
+            },
+            requiresAuth: true
         });
     },
 
@@ -55,7 +56,7 @@ export const benchmarkingService = {
     async verifyStatus(googleToken: string) {
         return api.post('/benchmarking/verify-status', {}, {
             headers: {
-                Authorization: `Bearer ${googleToken}`
+                'x-google-token': googleToken
             }
         });
     }

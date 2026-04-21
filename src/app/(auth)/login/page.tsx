@@ -26,6 +26,11 @@ export default function LoginPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [isResendingCode, setIsResendingCode] = useState(false);
+
+    const [emailCache, setEmailCache] = useState('');
+    const [showTwoFactor, setShowTwoFactor] = useState(false);
+    const [twoFactorCode, setTwoFactorCode] = useState('');
 
     const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
@@ -34,7 +39,7 @@ export default function LoginPage() {
                 const response = await authService.loginWithGoogle(tokenResponse.access_token);
                 toast.success('¡Bienvenido con Google!');
                 if (response.user.role === 'buyer') {
-                    router.push('/buyer/dashboard');
+                    router.push('/mis-compras');
                 } else {
                     router.push('/dashboard');
                 }
@@ -62,11 +67,17 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             const response = await authService.login(data);
-            toast.success('¡Bienvenido de nuevo!');
-            if (response.user.role === 'buyer') {
-                router.push('/buyer/dashboard');
-            } else {
-                router.push('/dashboard');
+            if (response.requiresTwoFactor) {
+                setEmailCache(data.email);
+                setShowTwoFactor(true);
+                toast.success('Petición exitosa, ingresa el código OTP enviado a tu correo');
+            } else if (response.user) {
+                toast.success('¡Bienvenido de nuevo!');
+                if (response.user.role === 'buyer') {
+                    router.push('/mis-compras');
+                } else {
+                    router.push('/dashboard');
+                }
             }
         } catch (error: any) {
             toast.error(error.message || 'Error al iniciar sesión');
@@ -75,58 +86,148 @@ export default function LoginPage() {
         }
     };
 
+    const handleVerify2FA = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!twoFactorCode) {
+            toast.error('Ingresa el código OTP');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const response = await authService.verify2FA({ email: emailCache, code: twoFactorCode });
+            toast.success('¡Bienvenido de nuevo!');
+            if (response.user?.role === 'buyer') {
+                router.push('/mis-compras');
+            } else {
+                router.push('/dashboard');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Código OTP inválido o expirado');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResend2FA = async () => {
+        if (!emailCache) {
+            toast.error('Primero intenta iniciar sesión con tu correo y contraseña');
+            return;
+        }
+
+        setIsResendingCode(true);
+        try {
+            const response = await authService.resend2FA(emailCache);
+            toast.success(response.message || 'Se envió un nuevo código OTP');
+        } catch (error: any) {
+            toast.error(error.message || 'No se pudo reenviar el código OTP');
+        } finally {
+            setIsResendingCode(false);
+        }
+    };
+
     return (
         <div className="w-full max-w-md mx-auto">
             {/* Header Neo-Brutalista */}
-            <div className="mb-8 text-center lg:text-left relative">
-                <div className="inline-flex h-16 w-16 items-center justify-center border-4 border-black bg-neo-yellow shadow-[4px_4px_0_0_#000] mb-6 -rotate-3">
-                    <ShieldCheck size={32} className="text-black" />
+            <div className="mb-10 text-center lg:text-left relative">
+                <div className="inline-flex h-20 w-20 items-center justify-center border-4 border-foreground bg-primary text-primary-foreground shadow-neo mb-8 rotate-3 rounded-2xl">
+                    <ShieldCheck size={40} />
                 </div>
-                <h1 className="text-5xl font-black uppercase tracking-tighter text-black leading-none mb-2">
-                    ¡HOLA DE <br /> <span className="text-neo-red">NUEVO!</span>
+                <h1 className="text-6xl font-bold tracking-tighter text-foreground leading-none mb-4 uppercase">
+                    ¡HOLA DE <br /> <span className="text-primary italic">NUEVO!</span>
                 </h1>
-                <p className="text-lg font-bold text-slate-600 border-l-4 border-neo-yellow pl-4 mt-4">
+                <p className="text-xl font-bold text-muted-foreground border-l-8 border-secondary pl-6 mt-6 uppercase italic">
                     Entra para seguir dominando el campus.
                 </p>
             </div>
 
             {/* Card Contenedor Neo-Brutalista */}
-            <div className="border-4 border-black bg-white p-8 shadow-[10px_10px_0_0_#000] relative overflow-hidden">
+            <div className="border-4 border-foreground bg-card p-10 shadow-neo-lg relative overflow-hidden rounded-3xl">
                 {/* Elemento decorativo */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-neo-red/10 -mr-8 -mt-8 rotate-45 border-b-2 border-black"></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary text-primary-foreground/10 -mr-12 -mt-12 rotate-45 border-b-4 border-foreground"></div>
 
+                {showTwoFactor ? (
+                    <form onSubmit={handleVerify2FA} className="space-y-6 relative z-10">
+                        <div className="space-y-5">
+                            <div className="space-y-2">
+                                <Label htmlFor="twoFactorCode" className="text-sm font-semibold tracking-widest text-foreground flex items-center gap-2">
+                                    <ShieldCheck size={16} /> Código 2FA
+                                </Label>
+                                <div className="relative group">
+                                    <Input
+                                        id="twoFactorCode"
+                                        type="text"
+                                        placeholder="123456"
+                                        maxLength={6}
+                                        inputMode="numeric"
+                                        autoComplete="one-time-code"
+                                        value={twoFactorCode}
+                                        onChange={(e) => setTwoFactorCode(e.target.value)}
+                                        className="h-14 border-2 border-foreground bg-background text-center text-foreground font-bold text-2xl tracking-[0.5em] rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                                <p className="text-xs font-semibold text-muted-foreground mt-2">
+                                    Enviado a <span className="text-foreground">{emailCache}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="group w-full h-20 bg-foreground text-background text-2xl font-bold tracking-widest border-2 border-foreground shadow-neo-sm hover:shadow-neo hover:-translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-4 disabled:opacity-70 rounded-2xl"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <Loader2 className="h-8 w-8 animate-spin" />
+                            ) : (
+                                <>
+                                    VERIFICAR
+                                    <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" />
+                                </>
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleResend2FA}
+                            disabled={isLoading || isResendingCode}
+                            className="w-full h-12 border-2 border-foreground bg-background text-foreground text-sm font-bold tracking-widest hover:bg-foreground hover:text-background transition-all disabled:opacity-70 rounded-xl"
+                        >
+                            {isResendingCode ? 'REENVIANDO...' : 'REENVIAR CÓDIGO'}
+                        </button>
+                    </form>
+                ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-10">
                     <div className="space-y-5">
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-sm font-black uppercase tracking-widest text-black flex items-center gap-2">
-                                <Mail size={16} /> Email Institucional
+                            <Label htmlFor="email" className="text-sm font-semibold tracking-widest text-foreground flex items-center gap-2">
+                                <Mail size={16} /> Correo
                             </Label>
                             <div className="relative group">
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="tu@correo.edu"
-                                    className="neo-input"
+                                    placeholder="tu@correo.com"
+                                    autoComplete="email"
+                                    className="h-14 border-2 border-foreground bg-background text-foreground font-bold text-lg rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
                                     {...register('email')}
                                     disabled={isLoading}
-                                    autoComplete="email"
-                                    spellCheck={false}
                                 />
-                                <div className="absolute inset-0 border-4 border-black translate-x-1 translate-y-1 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
+                                <div className="absolute inset-0 border-2 border-primary/20 translate-x-1.5 translate-y-1.5 -z-10 group-focus-within:translate-x-0 group-focus-within:translate-y-0 transition-transform bg-primary/5 rounded-xl"></div>
                             </div>
                             {errors.email && (
-                                <p className="text-xs font-black text-neo-red uppercase mt-1 italic">{errors.email.message}</p>
+                                <p className="text-xs font-bold text-primary uppercase mt-1 italic">{errors.email.message}</p>
                             )}
                         </div>
 
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="password" className="text-sm font-black uppercase tracking-widest text-black flex items-center gap-2">
+                                <Label htmlFor="password" className="text-sm font-semibold tracking-widest text-foreground flex items-center gap-2">
                                     <Lock size={16} /> Contraseña
                                 </Label>
                                 <Link
                                     href="/forgot-password"
-                                    className="text-xs font-black uppercase text-neo-red hover:text-black transition-colors underline decoration-2 underline-offset-4"
+                                    className="text-xs font-semibold text-primary/70 hover:text-primary transition-colors underline decoration-2 underline-offset-4"
                                 >
                                     ¿Olvidaste?
                                 </Link>
@@ -136,75 +237,76 @@ export default function LoginPage() {
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
-                                    className="neo-input"
+                                    autoComplete="current-password"
+                                    className="h-14 border-2 border-foreground bg-background text-foreground font-bold text-lg rounded-xl focus:ring-0 focus:border-primary transition-all shadow-sm"
                                     {...register('password')}
                                     disabled={isLoading}
-                                    autoComplete="current-password"
                                 />
-                                <div className="absolute inset-0 border-4 border-black translate-x-1 translate-y-1 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
+                                <div className="absolute inset-0 border-2 border-primary/20 translate-x-1.5 translate-y-1.5 -z-10 group-focus-within:translate-x-0 group-focus-within:translate-y-0 transition-transform bg-primary/5 rounded-xl"></div>
                             </div>
                             {errors.password && (
-                                <p className="text-xs font-black text-neo-red uppercase mt-1 italic">{errors.password.message}</p>
+                                <p className="text-xs font-bold text-primary uppercase mt-1 italic">{errors.password.message}</p>
                             )}
                         </div>
                     </div>
 
                     <button
                         type="submit"
-                        className="group w-full h-16 bg-black text-white text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#FFC72C] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-[transform,shadow,background-color] flex items-center justify-center gap-3 disabled:opacity-70"
+                        className="group w-full h-20 bg-foreground text-background text-2xl font-bold tracking-widest border-2 border-foreground shadow-neo-sm hover:shadow-neo hover:-translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-4 disabled:opacity-70 rounded-2xl"
                         disabled={isLoading}
                     >
                         {isLoading ? (
-                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <Loader2 className="h-8 w-8 animate-spin" />
                         ) : (
                             <>
                                 ENTRAR AHORA
-                                <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                                <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" />
                             </>
                         )}
                     </button>
 
-                    <div className="relative flex items-center py-2">
-                        <div className="flex-grow border-t-2 border-slate-200"></div>
-                        <span className="flex-shrink-0 mx-4 text-xs font-black text-slate-400 uppercase tracking-widest">O</span>
-                        <div className="flex-grow border-t-2 border-slate-200"></div>
+                    <div className="relative flex items-center py-4">
+                        <div className="flex-grow border-t-4 border-muted"></div>
+                        <span className="flex-shrink-0 mx-6 text-sm font-bold text-muted-foreground uppercase tracking-widest italic">O TAMBIÉN</span>
+                        <div className="flex-grow border-t-4 border-muted"></div>
                     </div>
 
                     <button
                         type="button"
                         onClick={() => googleLogin()}
                         disabled={isLoading || isGoogleLoading}
-                        className="group w-full h-16 bg-white text-black text-lg font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_#94A3B8] hover:bg-slate-50 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-[transform,shadow,background-color] flex items-center justify-center gap-3 disabled:opacity-70"
+                        className="group w-full h-20 bg-card text-foreground text-xl font-bold tracking-widest border-2 border-foreground shadow-neo-sm hover:shadow-neo hover:-translate-y-1 hover:bg-background transition-all flex items-center justify-center gap-4 disabled:opacity-70 rounded-2xl"
                     >
                         {isGoogleLoading ? (
-                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <Loader2 className="h-8 w-8 animate-spin" />
                         ) : (
                             <>
-                                <Globe size={24} className="text-black group-hover:-rotate-12 transition-transform" />
-                                INICIAR CON GOOGLE
+                                <Globe size={28} className="text-primary group-hover:rotate-12 transition-transform" />
+                                CONTINUAR CON GOOGLE
                             </>
                         )}
                     </button>
                 </form>
+                )}
 
-                <div className="mt-10 pt-6 border-t-4 border-black flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-sm font-bold text-slate-600 uppercase tracking-tight">
-                        ¿Sin cuenta aún?
+                <div className="mt-12 pt-8 border-t-4 border-foreground/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-tight italic">
+                        ¿AÚN NO TIENES CUENTA?
                     </p>
                     <Link
                         href="/register"
-                        className="px-6 py-2 border-2 border-black bg-neo-yellow text-black font-black uppercase text-xs hover:bg-black hover:text-white transition-[background-color,color,transform,shadow] shadow-[3px_3px_0_0_#000] hover:shadow-none translate-y-[-2px] active:translate-y-0"
+                        className="px-8 py-4 border-2 border-primary bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-background hover:text-primary transition-all shadow-neo-sm hover:shadow-neo active:translate-y-0 rounded-xl"
                     >
-                        REGISTRARSE
+                        CREAR CUENTA
                     </Link>
                 </div>
             </div>
 
             {/* Footer decorativo */}
-            <div className="mt-8 flex justify-center gap-4 grayscale opacity-40">
-                <div className="w-12 h-2 bg-black"></div>
-                <div className="w-12 h-2 bg-neo-red"></div>
-                <div className="w-12 h-2 bg-neo-yellow"></div>
+            <div className="mt-8 flex justify-center gap-4 opacity-10">
+                <div className="w-12 h-2 bg-foreground"></div>
+                <div className="w-12 h-2 bg-primary"></div>
+                <div className="w-12 h-2 bg-secondary"></div>
             </div>
         </div>
     );

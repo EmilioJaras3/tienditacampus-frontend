@@ -1,205 +1,358 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-    Activity,
-    Send,
-    Database,
-    Play,
-    AlertCircle,
+import { 
+    TrendingUp, 
+    Zap, 
+    BarChart3, 
+    Target, 
+    Users, 
+    ArrowUpRight, 
+    ArrowDownRight,
+    RefreshCw,
+    Download,
+    Star,
+    Trophy,
     Loader2,
-    Globe,
-    Zap,
-    History as HistoryIcon
+    Database,
+    Send,
+    Globe
 } from 'lucide-react';
-import { benchmarkingService } from '@/services/benchmarking.service';
+import { benchmarkingService, QueryMetric } from '@/services/benchmarking.service';
+import { useAuthStore } from '@/store/auth.store';
 import { toast } from 'sonner';
 import { useGoogleLogin } from '@react-oauth/google';
 
-interface GoogleLoginButtonProps {
-    isLoading: boolean;
-    setIsLoading: (loading: boolean) => void;
-    setLastStatus: (status: string) => void;
-}
+export default function BenchmarkingPage() {
+    const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const [metrics, setMetrics] = useState<QueryMetric[]>([]);
+    const { token, googleToken, setGoogleToken, user } = useAuthStore();
 
-function GoogleLoginButton({ isLoading, setIsLoading, setLastStatus }: GoogleLoginButtonProps) {
-    const login = useGoogleLogin({
+    const isAdmin = user?.role === 'admin';
+
+    const googleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-            setIsLoading(true);
-            try {
-                const response = await benchmarkingService.sendSnapshot(tokenResponse.access_token) as any;
-                toast.success('¡SNAPSHOT ENVIADO!', {
-                    description: `Se enviaron ${response.count} métricas al almacén de BigQuery.`
-                });
-                setLastStatus(`Exitoso: ${new Date().toLocaleTimeString()}`);
-            } catch (error: any) {
-                toast.error('Error al enviar snapshot', {
-                    description: error.response?.data?.message || error.message
-                });
-            } finally {
-                setIsLoading(false);
-            }
+            setGoogleToken(tokenResponse.access_token);
+            toast.success('Cuenta de Google vinculada correctamente para BigQuery');
         },
         onError: () => {
-            toast.error('Fallo en la autenticación con Google');
+            toast.error('Error al autenticar con Google');
         },
         scope: 'https://www.googleapis.com/auth/bigquery'
     });
 
-    return (
-        <button
-            onClick={() => login()}
-            disabled={isLoading}
-            className="w-full py-4 bg-black text-white font-black uppercase border-4 border-black shadow-[6px_6px_0_0_#FFC72C] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-        >
-            {isLoading ? <Loader2 className="animate-spin" /> : <Globe size={20} className="text-neo-yellow" />}
-            ENVIAR A BIGQUERY
-        </button>
-    );
-}
-
-export default function BenchmarkingPage() {
-    const [isMounted, setIsMounted] = useState(false);
-    const [projectId, setProjectId] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isRunningQueries, setIsRunningQueries] = useState(false);
-    const [lastStatus, setLastStatus] = useState<string | null>(null);
-
-    const loadProject = async () => {
-        try {
-            const data = await benchmarkingService.getProject();
-            setProjectId(data.project_id);
-        } catch (error) {
-            console.error('Error al cargar proyecto', error);
-        }
-    };
-
     useEffect(() => {
-        setIsMounted(true);
-        loadProject();
+        loadData();
     }, []);
 
-    if (!isMounted) return null;
-
-    const handleRunQueries = async () => {
-        setIsRunningQueries(true);
+    const loadData = async () => {
         try {
-            await benchmarkingService.runQueries();
-            toast.success('¡TRÁFICO GENERADO!', {
-                description: 'Las consultas de benchmarking se ejecutaron con éxito.'
-            });
-            setLastStatus('Consultas ejecutadas - Métricas listas');
+            setLoading(true);
+            const data = await benchmarkingService.getMetrics(10);
+            setMetrics(data || []);
         } catch (error) {
-            toast.error('Error al ejecutar consultas');
+            console.error(error);
+            toast.error('Error al cargar métricas reales de la base de datos');
         } finally {
-            setIsRunningQueries(false);
+            setLoading(false);
         }
     };
 
-    // OAuth Login & BigQuery Upload logic moved to GoogleLoginButton component
+    const handleSendSnapshot = async () => {
+        if (!googleToken) {
+            toast.info('Debes vincular tu cuenta de Google para enviar datos a BigQuery');
+            googleLogin();
+            return;
+        }
+
+        try {
+            setSending(true);
+            await benchmarkingService.sendSnapshot(googleToken);
+            toast.success('Snapshot enviado correctamente a BigQuery');
+        } catch (error: any) {
+            console.error(error);
+            // Si el error es de autenticación, limpiamos el token viejo
+            if (error?.message?.includes('authentication') || error?.message?.includes('token')) {
+                setGoogleToken(null);
+                toast.error('Token de Google expirado. Por favor, vincula de nuevo.');
+            } else {
+                toast.error(error?.message || 'Error al enviar snapshot');
+            }
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const handleDownloadCSV = () => {
+        if (metrics.length === 0) {
+            toast.error('No hay datos para descargar');
+            return;
+        }
+
+        const headers = ['Query', 'Llamadas', 'Tiempo Total (ms)', 'Tiempo Promedio (ms)'];
+        const csvContent = [
+            headers.join(','),
+            ...metrics.map(m => [
+                `"${m.query.replace(/"/g, '""')}"`,
+                m.calls,
+                m.total_time_ms,
+                m.avg_time_ms
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `benchmarking_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success('Métricas descargadas en CSV');
+    };
+
+    if (loading) return (
+        <div className="h-screen flex items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-4">
+                <Loader2 className="animate-spin text-primary" size={64} />
+                <p className="font-bold text-[10px] tracking-widest uppercase animate-pulse">Consultando métricas reales...</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="p-4 md:p-10 space-y-10 font-display min-h-screen bg-neo-white pb-24">
-            {/* Header Neo-Brutalista */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b-4 border-black pb-8">
-                <div className="space-y-4">
-                    <div className="inline-block bg-neo-yellow text-black border-2 border-black px-3 py-1 font-black uppercase text-xs tracking-widest shadow-neo-sm transform -rotate-1 mb-2">
-                        EVALUACIÓN UNIDAD 2 / BENCHMARKING
+        <div className="p-4 md:p-10 space-y-12 font-display min-h-screen bg-background selection:bg-primary/20 pb-24">
+            {/* Admin Instructions Section */}
+            {isAdmin && (
+                <div className="bg-card border-4 border-primary/20 p-8 rounded-[2rem] shadow-neo-sm space-y-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 font-bold text-[10px] tracking-widest uppercase rounded-bl-xl shadow-sm">
+                        ADMIN ACCESS ONLY
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none text-black">
-                        METRICS <span className="text-neo-red">LAB</span>
-                    </h1>
-                    <p className="text-lg font-bold text-slate-500 uppercase tracking-tight max-w-md border-l-4 border-black pl-4">
-                        Centro de control de métricas según las instrucciones de la Evaluación - Unidad 2.
-                    </p>
-                </div>
-                <div className="bg-black text-white border-4 border-black p-4 rotate-2 shadow-neo-red">
-                    <p className="font-black uppercase text-xs">Project ID: {projectId || '...'}</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* CARD 1: Generar Tráfico */}
-                <div className="bg-white border-4 border-black p-8 shadow-neo-lg space-y-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform">
-                        <Zap size={120} />
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-neo-yellow border-2 border-black flex items-center justify-center -rotate-3">
-                            <Play className="text-black" size={24} />
+                    
+                    <div className="flex items-start gap-6">
+                        <div className="w-16 h-16 bg-primary/10 text-primary flex items-center justify-center rounded-2xl shrink-0">
+                            <Trophy size={32} />
                         </div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter">Estresar Sistema</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <h2 className="text-3xl font-bold tracking-tighter uppercase italic text-foreground">
+                                    EVALUACIÓN - UNIDAD 2 - <span className="text-primary">BENCHMARKING</span>
+                                </h2>
+                                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                                    Docente: Dr. Horacio Irán Solís Cisneros • 100 Puntos
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-[11px] font-medium leading-relaxed uppercase tracking-tight text-foreground/80">
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-primary flex items-center gap-2">
+                                            <Target size={14} /> OBJETIVO PRINCIPAL
+                                        </h4>
+                                        <p>Implementar la estructura de BD descrita, ejecutar pruebas controladas y enviar periódicamente métricas a BigQuery vía OAuth.</p>
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-primary flex items-center gap-2">
+                                            <Database size={14} /> ESTRUCTURA OBLIGATORIA
+                                        </h4>
+                                        <p>Tablas: <span className="text-foreground font-bold">PROJECTS, QUERIES, EXECUTIONS</span>. Respetar tipos, CHECKs y llaves. No modificar nombres de columnas.</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-primary flex items-center gap-2">
+                                            <Zap size={14} /> CONFIGURACIÓN POSTGRES
+                                        </h4>
+                                        <p>Habilitar <code className="bg-muted px-1 rounded text-[10px]">pg_stat_statements</code>. El reset solo se ejecuta si el envío a BigQuery es exitoso.</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-primary flex items-center gap-2">
+                                            <Send size={14} /> SNAPSHOT DIARIO
+                                        </h4>
+                                        <p>Consultar vista <span className="text-foreground font-bold">V_DAILY_EXPORT</span>, serializar en JSON y enviar a BigQuery antes de finalizar la sesión.</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h4 className="font-bold text-primary flex items-center gap-2">
+                                            <Users size={14} /> AUTENTICACIÓN OAUTH
+                                        </h4>
+                                        <p>Uso obligatorio de <span className="text-foreground font-bold">ACCESS_TOKEN</span> obtenido vía Google Login. No se permiten envíos manuales o cuentas no registradas.</p>
+                                    </div>
+
+                                    <div className="p-4 bg-muted/50 border border-foreground/5 rounded-xl">
+                                        <h4 className="font-bold text-foreground text-[10px] mb-2 border-b border-foreground/10 pb-1">FACTORES DE EVALUACIÓN</h4>
+                                        <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                            <li className="flex items-center gap-1">✓ Modelo Relacional</li>
+                                            <li className="flex items-center gap-1">✓ Configuración PG</li>
+                                            <li className="flex items-center gap-1">✓ Consistencia de Datos</li>
+                                            <li className="flex items-center gap-1">✓ Flujo OAuth</li>
+                                            <li className="flex items-center gap-1">✓ Automatización</li>
+                                            <li className="flex items-center gap-1">✓ Integridad Exp.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p className="font-bold text-slate-500 uppercase text-xs leading-relaxed">
-                        Ejecuta las consultas registradas en la tabla 'queries' para PostgreSQL acumule datos en pg_stat_statements.
+                </div>
+            )}
+
+            {/* Header */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b-4 border-foreground/10 pb-8">
+                <div className="space-y-2">
+                    <div className="inline-block bg-primary text-primary-foreground border border-primary/10 px-3 py-1 font-semibold text-xs tracking-widest shadow-neo-sm transform -rotate-1 mb-2 rounded-sm">
+                        BIGQUERY INTEGRATION
+                    </div>
+                    <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-none text-foreground uppercase italic">
+                        BENCHMARKING <span className="text-primary italic">DATA</span>
+                    </h1>
+                    <p className="text-lg font-bold text-muted-foreground uppercase tracking-tight max-w-md border-l-4 border-foreground pl-4">
+                        Analiza el rendimiento de tus consultas y envía snapshots.
                     </p>
-                    <button
-                        onClick={handleRunQueries}
-                        disabled={isRunningQueries}
-                        className="w-full py-4 bg-neo-red text-white font-black uppercase border-4 border-black shadow-[6px_6px_0_0_#000] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                </div>
+                <div className="flex gap-4">
+                    <button 
+                        onClick={loadData}
+                        className="flex items-center gap-3 px-6 h-14 bg-card border border-foreground/10 font-bold text-xs tracking-widest uppercase hover:bg-muted transition-all rounded-xl shadow-neo-sm"
                     >
-                        {isRunningQueries ? <Loader2 className="animate-spin" /> : <Play size={20} />}
-                        EJECUTAR QUERIES
+                        <RefreshCw size={18} /> ACTUALIZAR
+                    </button>
+                    <button 
+                        onClick={handleDownloadCSV}
+                        className="flex items-center gap-3 px-6 h-14 bg-card border border-foreground/10 font-bold text-xs tracking-widest uppercase hover:bg-muted transition-all rounded-xl shadow-neo-sm"
+                    >
+                        <Download size={18} /> EXPORTAR
+                    </button>
+                    <button 
+                        onClick={handleSendSnapshot}
+                        disabled={sending}
+                        className="flex items-center gap-3 px-8 h-14 bg-primary text-primary-foreground border border-primary/20 font-bold text-xs tracking-widest uppercase hover:opacity-90 transition-all rounded-xl shadow-neo disabled:opacity-50"
+                    >
+                        {sending ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
+                        ENVIAR A BIGQUERY
                     </button>
                 </div>
-
-                {/* CARD 2: Snapshot y BigQuery */}
-                <div className="bg-neo-green/10 border-4 border-black p-8 shadow-neo-lg space-y-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:-rotate-12 transition-transform">
-                        <Globe size={120} />
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-neo-green border-2 border-black flex items-center justify-center rotate-6">
-                            <Send className="text-black" size={24} />
-                        </div>
-                        <h2 className="text-3xl font-black uppercase tracking-tighter">Corte del Día</h2>
-                    </div>
-                    <p className="font-bold text-slate-500 uppercase text-xs leading-relaxed">
-                        Sube las métricas consolidadas al almacén central BigQuery y reinicia las estadísticas tras éxito.
-                    </p>
-                    <GoogleLoginButton
-                        isLoading={isLoading}
-                        setIsLoading={setIsLoading}
-                        setLastStatus={setLastStatus}
-                    />
-                </div>
             </div>
 
-            {/* Status Panel */}
-            <div className="bg-white border-4 border-black p-8 shadow-neo-lg space-y-6">
-                <div className="flex items-center justify-between border-b-2 border-black border-dashed pb-4">
-                    <h3 className="text-xl font-black uppercase tracking-widest flex items-center gap-3">
-                        <Activity className="text-neo-red" size={20} />
-                        Estatus Experimental
-                    </h3>
-                    <div className={`px-4 py-1 border-2 border-black font-black text-[10px] uppercase tracking-widest ${lastStatus ? 'bg-neo-green text-black' : 'bg-neo-red text-white'}`}>
-                        {lastStatus ? 'METRICS READY' : 'WAITING FOR DATA'}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                {/* Real Metrics Table */}
+                <div className="lg:col-span-2 bg-card border border-foreground/10 shadow-neo-sm rounded-[3rem] overflow-hidden">
+                    <div className="p-8 border-b border-foreground/5 flex items-center justify-between">
+                        <h3 className="text-2xl font-bold tracking-tighter uppercase italic flex items-center gap-4">
+                            <Database className="text-primary" /> Métricas de DB (pg_stat)
+                        </h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                                <tr>
+                                    <th className="px-6 py-4">Query (Fragmento)</th>
+                                    <th className="px-6 py-4">Llamadas</th>
+                                    <th className="px-6 py-4">Tiempo Total</th>
+                                    <th className="px-6 py-4">Promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-foreground/5">
+                                {metrics.map((m, i) => (
+                                    <tr key={i} className="hover:bg-muted/30 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <code className="text-[10px] font-mono text-foreground break-all bg-muted/50 px-2 py-1 rounded block max-w-xs truncate">
+                                                {m.query}
+                                            </code>
+                                        </td>
+                                        <td className="px-6 py-4 font-bold text-sm tracking-tighter italic">
+                                            {m.calls}
+                                        </td>
+                                        <td className="px-6 py-4 text-xs font-bold text-muted-foreground italic">
+                                            {Number(m.total_time_ms || 0).toFixed(2)}ms
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`font-bold text-xs italic ${Number(m.avg_time_ms || 0) > 100 ? 'text-destructive' : 'text-primary'}`}>
+                                                {Number(m.avg_time_ms || 0).toFixed(2)}ms
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {metrics.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-20 text-center font-bold text-muted-foreground uppercase italic tracking-widest">
+                                            No hay métricas disponibles en pg_stat_statements.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <Database size={12} /> Persistencia Local
-                        </p>
-                        <p className="text-sm font-bold text-black border-l-4 border-black pl-4">
-                            Conectado a PostgreSQL 16 <br />
-                            Esquema: Benchmarking v1.0
-                        </p>
+
+                {/* BigQuery Status Card */}
+                <div className="space-y-8">
+                    <div className="bg-foreground text-background p-10 shadow-neo rounded-[3rem] space-y-8 rotate-1">
+                        <h3 className="text-3xl font-bold tracking-tighter uppercase italic border-b-2 border-background/10 pb-6">
+                            BigQuery Status
+                        </h3>
+                        
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 flex items-center justify-center rounded-xl ${googleToken ? 'bg-primary/20 text-primary' : 'bg-destructive/20 text-destructive'}`}>
+                                    <Globe size={24} />
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-bold text-lg uppercase tracking-tighter leading-none">Cuenta Google</h4>
+                                        {!googleToken && (
+                                            <button 
+                                                onClick={() => googleLogin()}
+                                                className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded font-bold hover:scale-110 transition-transform"
+                                            >
+                                                VINCULAR
+                                            </button>
+                                        )}
+                                    </div>
+                                    <p className={`text-[10px] font-bold uppercase tracking-widest italic ${googleToken ? 'text-primary' : 'text-destructive'}`}>
+                                        {googleToken ? 'VINCULADA' : 'NO VINCULADA'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs font-bold opacity-60 leading-relaxed uppercase italic">
+                                Envía un snapshot para registrar el desempeño de tu base de datos en la nube y comparar métricas históricas.
+                            </p>
+
+                            <button 
+                                onClick={async () => {
+                                    try {
+                                        await benchmarkingService.runQueries();
+                                        toast.success('Test de estrés ejecutado. ¡Datos generados!');
+                                        loadData();
+                                    } catch (e) {
+                                        toast.error('Error al ejecutar test de estrés');
+                                    }
+                                }}
+                                className="w-full h-16 bg-background text-foreground font-bold text-xs tracking-widest uppercase shadow-md hover:-translate-y-1 transition-all rounded-2xl border border-background/10 flex items-center justify-center gap-3"
+                            >
+                                <Zap className="text-primary" size={18} /> EJECUTAR TEST STRESS
+                            </button>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                            <HistoryIcon size={12} /> Última Actividad
-                        </p>
-                        <p className="text-sm font-bold text-black border-l-4 border-black pl-4 uppercase">
-                            {lastStatus || 'No hay actividad registrada'}
-                        </p>
+
+                    <div className="bg-card border border-foreground/10 p-8 shadow-neo-sm rounded-[2.5rem] flex items-center gap-6 group">
+                        <div className="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center font-bold text-2xl rotate-[-4deg] shadow-neo-sm rounded-2xl transition-transform group-hover:rotate-0">
+                            ?
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="font-bold text-sm uppercase tracking-widest italic">¿Qué se envía?</h4>
+                            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider leading-relaxed">
+                                Se envía el ID del proyecto, timestamp y las métricas de rendimiento agregadas del vendedor.
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className="mt-6 p-4 bg-slate-50 border-2 border-black flex items-start gap-4 italic text-xs font-bold text-slate-500">
-                    <AlertCircle className="shrink-0 text-neo-red" size={16} />
-                    <p>
-                        Nota: El envío es obligatorio antes de terminar cada sesión de pruebas. Solo se permite una exportación consolidada por día.
-                    </p>
                 </div>
             </div>
         </div>

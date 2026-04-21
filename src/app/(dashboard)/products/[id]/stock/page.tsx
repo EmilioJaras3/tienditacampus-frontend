@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2, Save, History } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, History, TrendingUp, Target, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +40,12 @@ export default function StockManagementPage({ params }: { params: { id: string }
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isCalculatingBreakEven, setIsCalculatingBreakEven] = useState(false);
-    const [fixedCosts, setFixedCosts] = useState<number>(0);
+    const [foodFixedCost, setFoodFixedCost] = useState<number>(0);
+    const [foodPeriod, setFoodPeriod] = useState<string>('mensual');
+    const [rentCost, setRentCost] = useState<number>(0);
+    const [rentPeriod, setRentPeriod] = useState<string>('mensual');
+    const [otherCost, setOtherCost] = useState<number>(0);
+    const [otherPeriod, setOtherPeriod] = useState<string>('mensual');
 
     const form = useForm<StockFormValues>({
         resolver: zodResolver(stockSchema) as any,
@@ -102,11 +107,16 @@ export default function StockManagementPage({ params }: { params: { id: string }
 
         try {
             setIsCalculatingBreakEven(true);
+            const totalFixedCosts = Math.max(0,
+                (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) +
+                (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) +
+                (otherPeriod === 'semanal' ? otherCost * 4 : otherCost)
+            );
             const result = await financeService.calculateBreakEven({
                 productId: product.id,
-                fixedCosts,
-                unitCost: Number(product.unitCost),
-                unitPrice: Number(product.salePrice),
+                fixedCosts: totalFixedCosts,
+                unitCost: Math.max(0, Number(product.unitCost)),
+                unitPrice: Math.max(0, Number(product.salePrice)),
             });
             setBreakEvenResult(result);
         } catch (error) {
@@ -226,37 +236,138 @@ export default function StockManagementPage({ params }: { params: { id: string }
                 </Card>
             </div>
 
-            <Card>
+            <Card className="rounded-[2.5rem] border border-foreground/5 shadow-neo-sm">
                 <CardHeader>
-                    <CardTitle>Punto de Equilibrio</CardTitle>
+                    <CardTitle className="text-3xl font-bold tracking-tighter uppercase italic">Análisis de Recuperación</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-medium leading-none">Costos Fijos ($)</label>
-                            <Input
-                                type="number"
-                                step="0.01"
-                                value={fixedCosts}
-                                onChange={(event) => setFixedCosts(Number(event.target.value))}
-                            />
+                <CardContent className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest pl-2">Variabl. Comida / Unidad</label>
+                            <div className="relative">
+                                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 w-4 h-4" />
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    className="pl-12 h-14 bg-background border-foreground/5 rounded-xl font-bold text-lg"
+                                    value={product.unitCost}
+                                    readOnly
+                                />
+                            </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                            <p>Costo unitario: ${Number(product.unitCost).toFixed(2)}</p>
-                            <p>Precio venta: ${Number(product.salePrice).toFixed(2)}</p>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest pl-2 flex justify-between">
+                                <span>Fijos Comida</span>
+                                <select value={foodPeriod} onChange={e => setFoodPeriod(e.target.value)} className="bg-transparent border-none outline-none cursor-pointer">
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                            </label>
+                            <div className="relative">
+                                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 w-4 h-4" />
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={foodFixedCost || ''}
+                                    onChange={e => setFoodFixedCost(Math.max(0, Number(e.target.value)))}
+                                    className="pl-12 h-14 bg-background border-foreground/5 rounded-xl font-bold text-lg"
+                                />
+                            </div>
                         </div>
-                        <Button onClick={handleCalculateBreakEven} disabled={isCalculatingBreakEven}>
-                            {isCalculatingBreakEven ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Calcular
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest pl-2 flex justify-between">
+                                <span>Renta / Espacio</span>
+                                <select value={rentPeriod} onChange={e => setRentPeriod(e.target.value)} className="bg-transparent border-none outline-none cursor-pointer">
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                            </label>
+                            <div className="relative">
+                                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 w-4 h-4" />
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={rentCost || ''}
+                                    onChange={e => setRentCost(Math.max(0, Number(e.target.value)))}
+                                    className="pl-12 h-14 bg-background border-foreground/5 rounded-xl font-bold text-lg"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest pl-2 flex justify-between">
+                                <span>Otros Gastos</span>
+                                <select value={otherPeriod} onChange={e => setOtherPeriod(e.target.value)} className="bg-transparent border-none outline-none cursor-pointer">
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                </select>
+                            </label>
+                            <div className="relative">
+                                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 w-4 h-4" />
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={otherCost || ''}
+                                    onChange={e => setOtherCost(Math.max(0, Number(e.target.value)))}
+                                    className="pl-12 h-14 bg-background border-foreground/5 rounded-xl font-bold text-lg"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-center gap-6 p-1 bg-background rounded-2xl border border-foreground/5 overflow-hidden">
+                        <div className="p-8 text-center md:text-left flex-1 space-y-2 opacity-60">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.2em]">Referencia de Venta</p>
+                            <p className="text-2xl font-bold tracking-tighter">Precio: ${Number(product.salePrice).toFixed(2)}</p>
+                        </div>
+                        <Button
+                            onClick={handleCalculateBreakEven}
+                            disabled={isCalculatingBreakEven}
+                            className="h-20 px-12 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all"
+                        >
+                            {isCalculatingBreakEven ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Target className="mr-3 w-6 h-6" />}
+                            Calcular Meta de Venta
                         </Button>
                     </div>
 
                     {breakEvenResult && (
-                        <div className="border rounded-md p-4 bg-muted/20 text-sm space-y-1">
-                            <p><strong>Producto:</strong> {breakEvenResult.productName}</p>
-                            <p><strong>Margen unitario:</strong> ${breakEvenResult.unitMargin}</p>
-                            <p><strong>Unidades para equilibrio:</strong> {breakEvenResult.breakEvenUnits}</p>
-                            <p className="text-muted-foreground">{breakEvenResult.formula}</p>
+                        <div className="bg-foreground text-background p-10 rounded-[2.5rem] shadow-neo space-y-6 transform animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-4 border-b border-background/10 pb-6">
+                                <div className="w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center rounded-xl rotate-3">
+                                    <TrendingUp size={24} />
+                                </div>
+                                <h4 className="text-2xl font-bold tracking-tighter uppercase italic">Resultado del Análisis</h4>
+                            </div>
+
+                            <div className="space-y-8">
+                                <p className="text-3xl font-bold leading-tight tracking-[0.02em]">
+                                    Mensaje sencillo:<br />
+                                    <span className="text-primary italic border-b-4 border-primary/30 pb-2">
+                                        Necesitas vender {Math.max(0, Math.ceil(breakEvenResult.breakEvenUnits))} {product.name.toLowerCase()}s (al mes) para recuperar tus gastos fijos.
+                                    </span>
+                                </p>
+
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-6 border-t border-background/10">
+                                    <div>
+                                        <p className="text-[9px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">Margen Neto Unitario</p>
+                                        <p className="text-xl font-bold">${Math.max(0, Number(breakEvenResult.unitMargin)).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">Costo Fijo Mensual Proyectado</p>
+                                        <p className="text-xl font-bold">${Math.max(0,
+                                            (foodPeriod === 'semanal' ? foodFixedCost * 4 : foodFixedCost) +
+                                            (rentPeriod === 'semanal' ? rentCost * 4 : rentCost) +
+                                            (otherPeriod === 'semanal' ? otherCost * 4 : otherCost)
+                                        ).toFixed(2)}</p>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <p className="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Estado</p>
+                                        <span className="bg-primary/20 text-primary border border-primary/30 px-3 py-1 text-[8px] font-bold uppercase rounded-full tracking-widest">OK</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </CardContent>

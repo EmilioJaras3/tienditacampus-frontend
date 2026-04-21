@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { Store, Calendar, MapPin, Loader2, MessageCircle } from 'lucide-react';
 import { usersService, PublicUser } from '@/services/users.service';
 import { Product } from '@/services/products.service';
-import { ProductCard } from '@/features/products/product-card';
+import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 export default function SellerProfilePage({ params }: { params: { id: string } }) {
     const [seller, setSeller] = useState<PublicUser | null>(null);
@@ -62,96 +63,98 @@ export default function SellerProfilePage({ params }: { params: { id: string } }
     });
 
     return (
-        <div className="min-h-screen bg-[#f7f7f7] pb-20">
+        <div className="min-h-screen bg-background font-display selection:bg-primary/20 pb-20">
             {/* Navbar Simple */}
-            <nav className="bg-white sticky top-0 z-30 border-b-2 border-slate-900 dark:border-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <nav className="bg-card sticky top-0 z-30 border-b border-foreground/5 backdrop-blur-md bg-card/80">
+                <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
                     <Link
                         href="/marketplace"
-                        className="px-3 py-1.5 text-sm font-black uppercase tracking-wide text-slate-900 border-2 border-slate-900 dark:border-white hover:bg-[#FFC72C] transition-colors"
+                        className="h-10 px-6 flex items-center text-xs font-bold tracking-[0.2em] uppercase border border-foreground/10 hover:bg-foreground hover:text-background transition-all rounded-xl"
                     >
                         Volver
                     </Link>
-                    <Link href="/" className="font-black text-lg sm:text-xl uppercase tracking-tight text-slate-900">
-                        Tiendita<span className="text-[#E31837]">Campus</span>
+                    <Link href="/" className="font-bold text-xl uppercase tracking-tighter text-foreground decoration-primary decoration-4 underline-offset-4">
+                        Tiendita<span className="text-primary italic">Campus</span>
                     </Link>
                 </div>
             </nav>
 
             {/* Header Profile */}
-            <div className="bg-white border-b-2 border-slate-900 dark:border-white">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div className="border-2 border-slate-900 dark:border-white shadow-[6px_6px_0px_0px_#E31837] bg-white p-6">
-                        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
-                            <Avatar className="w-24 h-24 border-2 border-slate-900 dark:border-white shadow-[4px_4px_0px_0px_#FFC72C] rounded-none">
-                                <AvatarImage src={seller.avatarUrl || ''} alt={seller.firstName} />
-                                <AvatarFallback className="text-2xl font-black bg-[#FFC72C] text-slate-900 rounded-none">
-                                    {seller.firstName.charAt(0)}{seller.lastName.charAt(0)}
-                                </AvatarFallback>
-                            </Avatar>
-
-                        <div className="flex-1 space-y-2">
-                            <div className="flex flex-col md:flex-row items-center gap-3">
-                                <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900">
-                                    {seller.firstName} {seller.lastName}
-                                </h1>
-                                {hasActiveStock ? (
-                                    <Badge className="bg-[#FFC72C] text-slate-900 hover:bg-[#FFC72C] border-2 border-slate-900 dark:border-white px-3 py-1 rounded-none font-black uppercase tracking-wide">
-                                        <span className="w-2 h-2 bg-green-500 mr-2" />
-                                        Vendiendo Ahora
-                                    </Badge>
+            <div className="bg-card border-b border-foreground/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[100px] -mr-32 -mt-32"></div>
+                <div className="max-w-5xl mx-auto px-6 lg:px-10 py-16 relative z-10">
+                    <div className="bg-background/50 border border-foreground/5 p-10 rounded-[3rem] shadow-neo-sm">
+                        <div className="flex flex-col md:flex-row items-center md:items-center gap-10 text-center md:text-left">
+                            <div className="w-32 h-32 border border-foreground/5 shadow-neo bg-primary text-primary-foreground flex items-center justify-center text-5xl font-bold rotate-[-3deg] hover:rotate-0 transition-transform rounded-[2.5rem] relative group overflow-hidden">
+                                {seller.avatarUrl ? (
+                                    <img src={seller.avatarUrl} alt={seller.firstName} className="w-full h-full object-cover" />
                                 ) : (
-                                    <Badge variant="secondary" className="px-3 py-1 rounded-none border-2 border-slate-900 dark:border-white font-black uppercase tracking-wide">
-                                        Sin venta activa
-                                    </Badge>
+                                    <span>{seller.firstName.charAt(0)}</span>
                                 )}
                             </div>
 
-                            <p className="text-slate-700 flex items-center justify-center md:justify-start gap-4 text-sm font-medium">
-                                <span className="flex items-center gap-1">
-                                    <Store size={16} className="text-slate-900" /> Vendedor Verificado
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    <Calendar size={16} className="text-slate-900" /> Miembro desde {joinedDate}
-                                </span>
-                            </p>
-                        </div>
+                            <div className="flex-1 space-y-4">
+                                <div className="flex flex-col md:flex-row items-center gap-4">
+                                    <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground uppercase italic underline decoration-primary/20 decoration-8 underline-offset-8">
+                                        {seller.firstName} {seller.lastName}
+                                    </h1>
+                                    {hasActiveStock ? (
+                                        <div className="bg-primary text-primary-foreground border border-foreground/5 px-4 py-1.5 font-bold text-[10px] tracking-[0.3em] shadow-neo-sm transform -rotate-1 uppercase rounded-full flex items-center gap-2">
+                                            <span className="w-2 h-2 bg-background rounded-full animate-pulse" />
+                                            En Venta
+                                        </div>
+                                    ) : (
+                                        <Badge variant="secondary" className="bg-foreground/5 text-foreground/30 border-none px-4 py-1.5 font-bold text-[10px] tracking-[0.3em] uppercase rounded-full">
+                                            Catálogo Inactivo
+                                        </Badge>
+                                    )}
+                                </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-3">
-                            <Button className="gap-2 bg-[#E31837] hover:bg-[#c9122e] border-2 border-slate-900 dark:border-white font-black uppercase shadow-[4px_4px_0px_0px_#FFC72C]">
-                                <MessageCircle size={18} />
-                                Contactar
-                            </Button>
-                        </div>
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 pt-2">
+                                    <span className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest italic">
+                                        <Store size={16} className="text-primary" /> Vendedor Campus
+                                    </span>
+                                    <span className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest italic">
+                                        <Calendar size={16} className="text-foreground/20" /> Miembro desde {joinedDate}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => toast.info('Función de mensajería próximamente disponible')}
+                                    className="h-14 px-8 bg-primary text-primary-foreground border border-foreground/5 shadow-neo-sm hover:shadow-neo hover:-translate-y-1 transition-all rounded-2xl font-bold text-xs tracking-[0.2em] uppercase flex items-center gap-3">
+                                    <MessageCircle size={20} />
+                                    Contactar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Content */}
-            <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="inline-flex items-center gap-2 border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
-                        Menú de hoy: {products.length}
+            <main className="max-w-5xl mx-auto px-6 lg:px-10 py-16">
+                <div className="flex items-center gap-4 border-b-2 border-foreground/5 pb-4 mb-12">
+                    <TrendingUp className="text-primary w-8 h-8" />
+                    <h2 className="text-3xl font-bold tracking-tighter uppercase italic">Productos Disponibles</h2>
+                    <div className="ml-auto bg-foreground text-background px-4 py-1.5 font-bold text-[10px] uppercase tracking-[0.3em] rounded-full shadow-sm">
+                        {products.length} Items
                     </div>
                 </div>
 
                 {products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {products.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 ) : (
-                    <div className="border-2 border-slate-900 dark:border-white bg-white shadow-[6px_6px_0px_0px_#E31837] p-10 text-center">
-                        <div className="mx-auto mb-4 w-fit border-2 border-slate-900 dark:border-white bg-[#FFC72C] px-3 py-1 text-xs font-black uppercase tracking-widest">
-                            Sin productos
-                        </div>
-                        <Store size={44} className="mx-auto text-slate-900 mb-4" />
-                        <h3 className="text-xl font-black uppercase tracking-tight text-slate-900">No hay productos disponibles</h3>
-                        <p className="mt-2 text-slate-700 font-medium">
-                            {seller.firstName} no ha publicado nada para vender en este momento.
+                    <div className="border border-foreground/5 bg-card shadow-neo-sm p-20 text-center rounded-[3rem]">
+                        <Store size={48} className="mx-auto text-foreground/5 mb-6" />
+                        <h3 className="text-2xl font-bold tracking-tighter text-foreground/30 uppercase italic">Catálogo vacío</h3>
+                        <p className="mt-4 text-xs font-bold text-foreground/20 uppercase tracking-widest max-w-xs mx-auto">
+                            {seller.firstName} no tiene productos publicados en este momento. Vuelve pronto para ver novedades.
                         </p>
                     </div>
                 )}

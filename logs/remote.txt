@@ -1,0 +1,4 @@
+origin	https://github.com/EmilioJaras3/tienditacampus-frontend (fetch)
+origin	https://github.com/EmilioJaras3/tienditacampus-frontend (push)
+vercel	https://github.com/Jesel8D/tienditacampus-frontend.git (fetch)
+vercel	https://github.com/Jesel8D/tienditacampus-frontend.git (push)

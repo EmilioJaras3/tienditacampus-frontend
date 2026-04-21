@@ -21,16 +21,25 @@ const productSchema = z.object({
     salePrice: z.coerce.number().min(0, 'El precio no puede ser negativo'),
     isPerishable: z.boolean().default(false),
     shelfLifeDays: z.coerce.number().optional(),
-    imageUrl: z.string().optional().or(z.literal('')),
+    imageUrl: z.string().optional().default(''),
+    categoryId: z.string().min(1, 'Debes seleccionar una categoría'),
+    subcategory: z.string().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
+
+const SUBCATEGORIES: Record<string, string[]> = {
+    'Snacks y Comidas': ['Papas fritas', 'Dulces', 'Galletas', 'Comida rápida', 'Sandwiches', 'Otros'],
+    'Bebidas': ['Refrescos', 'Jugos', 'Agua', 'Café', 'Té', 'Otros'],
+    'Postres': ['Pasteles', 'Helados', 'Fruta preparada', 'Otros']
+};
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [categories, setCategories] = useState<any[]>([]);
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema) as any,
@@ -42,13 +51,21 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             isPerishable: false,
             shelfLifeDays: undefined,
             imageUrl: undefined,
+            categoryId: '',
+            subcategory: '',
         },
     });
 
     const loadProduct = useCallback(async () => {
         try {
             setIsLoading(true);
-            const product = await productsService.getById(params.id);
+            const [product, fetchedCategories] = await Promise.all([
+                productsService.getById(params.id),
+                productsService.getCategories()
+            ]);
+            
+            setCategories(fetchedCategories);
+
             form.reset({
                 name: product.name,
                 description: product.description || undefined,
@@ -57,6 +74,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 isPerishable: product.isPerishable,
                 shelfLifeDays: product.shelfLifeDays ? Number(product.shelfLifeDays) : undefined,
                 imageUrl: product.imageUrl || undefined,
+                categoryId: product.categoryId || '',
+                subcategory: (product as any).subcategory || '',
             });
             if (product.imageUrl) {
                 setImagePreview(product.imageUrl);
@@ -104,13 +123,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             await productsService.update(params.id, {
                 ...data,
                 shelfLifeDays: data.shelfLifeDays || undefined,
-                imageUrl: data.imageUrl || undefined,
+                imageUrl: data.imageUrl === '' ? null : data.imageUrl,
             });
             toast.success('Producto actualizado exitosamente');
             router.push('/products');
-        } catch (error) {
-            toast.error('Error al actualizar el producto');
-            console.error(error);
+        } catch (error: any) {
+            toast.error('Error al actualizar el producto', {
+                description: error.message || 'Se produjo un error crítico al guardar'
+            });
+            console.error('Submit Error:', error);
         } finally {
             setIsSubmitting(false);
         }
@@ -150,6 +171,43 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             />
                             {form.formState.errors.name && (
                                 <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium leading-none">Categoría</label>
+                                <select
+                                    {...form.register('categoryId')}
+                                    className={`neo-input w-full ${form.formState.errors.categoryId ? "border-destructive" : ""}`}
+                                >
+                                    <option value="">Selecciona una categoría</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {form.formState.errors.categoryId && (
+                                    <p className="text-sm text-destructive">{form.formState.errors.categoryId.message}</p>
+                                )}
+                            </div>
+
+                            {form.watch('categoryId') && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none">Subcategoría (Opcional)</label>
+                                    <select
+                                        {...form.register('subcategory')}
+                                        className="neo-input w-full"
+                                    >
+                                        <option value="">Selecciona una subcategoría</option>
+                                        {(SUBCATEGORIES[categories.find(c => c.id === form.watch('categoryId'))?.name] || []).map((sub: string) => (
+                                            <option key={sub} value={sub}>
+                                                {sub}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             )}
                         </div>
 
